@@ -8,9 +8,11 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~
 cat ~/.zshrc | sed -e "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" > temp_file_for_zsh_rc
 cat temp_file_for_zsh_rc > ~/.zshrc
 rm temp_file_for_zsh_rc
-cat ~/.zshrc | sed -e "s/robbyrussel/powerlevel10k/powerlevel10k/" > temp_file_for_zsh_rc
+cat ~/.zshrc | sed -e "s/robbyrussel/powerlevel10k\/powerlevel10k/" > temp_file_for_zsh_rc
 cat temp_file_for_zsh_rc > ~/.zshrc
 rm temp_file_for_zsh_rc
+sed -i "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" ~/.zshrc
+sed -i "s/robbyrussel/agnoster/" ~/.zshrc
 
 echo "alias c=clear" >> .zshrc
 echo "alias l='ls -l'" >> .zshrc
