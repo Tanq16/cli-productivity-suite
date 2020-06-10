@@ -4,12 +4,8 @@ sudo apt install zsh curl git
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
-cat ~/.zshrc | sed -e "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" > temp_file_for_zsh_rc
-cat temp_file_for_zsh_rc > ~/.zshrc
-rm temp_file_for_zsh_rc
-cat ~/.zshrc | sed -e "s/robbyrussel/agnoster/" > temp_file_for_zsh_rc
-cat temp_file_for_zsh_rc > ~/.zshrc
-rm temp_file_for_zsh_rc
+sed -i "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" ~/.zshrc
+sed -i "s/robbyrussel/agnoster/" ~/.zshrc
 
 echo "alias c=clear" >> .zshrc
 echo "alias l='ls -l'" >> .zshrc
