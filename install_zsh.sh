@@ -5,9 +5,9 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/mas
 git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 
-echo ('Choose an installation: 
+echo """Choose an installation: 
 1. OhMyZsh (Recommended, good for all) 
-2. Powerlevel10k (Fast alternative, with more features that need installation. Good for heavy customization) ')
+2. Powerlevel10k (Fast alternative, with more features that need installation. Good for heavy customization) """
 
 read choice
 if [ $choice -eq 2 ]
