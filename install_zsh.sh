@@ -1,21 +1,24 @@
 #!/bin/sh
 
 sudo apt install -y zsh curl git
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh > install_hahanet.sh
+sh install_hahanet.sh --unattended
 
-echo """Choose an installation: 
-1. OhMyZsh (Recommended, good for all) 
-2. Powerlevel10k (Fast alternative, with more features that need installation. Good for heavy customization) """
+echo """______________________________________________________________________________
+
+Choose an installation:
+1. OhMyZsh (Recommended, good for all)
+2. Powerlevel10k (Fast alternative, with more features that need installation. Good for heavy customization)
+______________________________________________________________________________
+"""
 
 read choice
 if [ $choice -eq 2 ]
 then
-	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k
-	sed -i "s/robbyrussel/powerlevel10k\/powerlevel10k/" ~/.zshrc
+        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k
+        sed -i "s/robbyrussel/powerlevel10k\/powerlevel10k/" ~/.zshrc
 else
-	sed -i "s/robbyrussel/agnoster/" ~/.zshrc
+        sed -i "s/robbyrussel/agnoster/" ~/.zshrc
 fi
 
 sed -i "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" ~/.zshrc
@@ -30,4 +33,3 @@ rm -rf dirco_for_script_color_option/
 echo "eval \`dircolors ~/.oh-my-zsh/dircolors.256dark\`" >> .zshrc
 
 source ~/.zshrc
-
