@@ -13,11 +13,14 @@ sudo apt install curl
 ```bash
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/oh-my-zsh-speed-installation/master/install_zsh.sh)"
 ```
+The script also asks if you want to install [powerlevel10k](https://github.com/romkatv/powerlevel10k).
+Select option `1` to install OhMyZsh (Recommended and usually great for an everyday user).
+Select `2` if you need more customization along with additional features (which you need to install on your own in addition to autocomplete and suggestions that this script installs).
 
 ## Features
 This script installs the following -
 1. Zsh
-2. OH-MY-ZSH custom shell
+2. OH-MY-ZSH custom shell (also gives an option to install Powerlevel10k)
 3. Syntax highlighting for command line
 4. Auto-completion on command lilne
 
