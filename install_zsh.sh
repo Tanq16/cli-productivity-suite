@@ -29,5 +29,9 @@ cp dirco_for_script_color_option/dircolors.256dark ~/.oh-my-zsh/dircolors.256dar
 rm -rf dirco_for_script_color_option/
 echo "eval \`dircolors ~/.oh-my-zsh/dircolors.256dark\`" >> ~/.zshrc
 
-echo "If you chose Powerlevel10k installation, the installation options"
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "If you don't see shapes properly, install powerline fonts. The recommended font is given in the README of the repo for this script."
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 exec zsh -l
