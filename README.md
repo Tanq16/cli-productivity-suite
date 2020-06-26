@@ -26,4 +26,4 @@ To install from repositories, use
 ```bash
 sudo apt install fonts-powerline
 ```
-If you are installing on windows, Install the Ubuntu Mono Derivative as the recommended font from [here](https://github.com/powerline/fonts/blob/master/UbuntuMono/). Download the folder and install Ubuntu Mono Derivative for powerline and set it as your font in whatever terminal you use. Then restart the terminal app.
+If you are installing on windows, Install the **Ubuntu Mono Derivative** as the recommended font from [here](https://github.com/powerline/fonts/blob/master/UbuntuMono/). Download the folder and install Ubuntu Mono Derivative for powerline and set it as your font in whatever terminal you use. Then restart the terminal app. For windows, right click the font ttf and install. The settings json file must be edited for setting this as the default font in windows terminal.
