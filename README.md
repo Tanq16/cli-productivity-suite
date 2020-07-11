@@ -31,4 +31,11 @@ To install from repositories on debian systems, use
 sudo apt install fonts-powerline
 ```
 
-If you are installing on windows, you could just install the **Ubuntu Mono Derivative** (recommended) font from [here](https://github.com/powerline/fonts/blob/master/UbuntuMono/) or use the the repository to install all fonts as per the instructions there. Download the folder and install Ubuntu Mono Derivative for powerline and set it as your font in whatever terminal you use. Then restart the terminal app. For windows, right click the font ttf and install. The settings json file must be edited for setting this as the default font in windows terminal.
+If you are installing on windows, you could just install the **FuraCode Nerd Font Mono** (recommended) font from [here](https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip) or use the the repository to install all fonts as per the instructions there. Download the folder and install Ubuntu Mono Derivative for powerline and set it as your font in whatever terminal you use. Then restart the terminal app. For windows, right click the font ttf and install. The settings json file must be edited for setting this as the default font in windows terminal.
+
+## Bonus: Basic Vim quick changes
+To use the basic modern editor features in vim, use the given script to install the features as follows -
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/oh-my-zsh-speed-installation/master/vim_improve.sh)"
+```
+This installs the supertab (tab => autocomplete), auto-pair brackets, lightline plugin and sets numbering, expandtab, tab=4 spaces and autoindent.
