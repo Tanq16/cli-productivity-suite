@@ -15,3 +15,5 @@ echo "set autoindent" >> ~/.vimrc
 echo "set expandtab" >> ~/.vimrc
 echo "set laststatus=2" >> ~/.vimrc
 echo "syntax on" >> ~/.vimrc
+echo "set hlsearch" >> ~/.vimrc
+echo "nnoremap \\ :noh<return>" >> ~/.vimrc
