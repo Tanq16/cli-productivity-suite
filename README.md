@@ -39,3 +39,13 @@ To use the basic modern editor features in vim, use the given script to install 
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/oh-my-zsh-speed-installation/master/vim_improve.sh)"
 ```
 This installs the supertab (tab => autocomplete), auto-pair brackets, lightline plugin and sets numbering, expandtab, tab=4 spaces and autoindent.
+
+## Bonus: Installation of Bat
+Bat is an alternative of the `cat` command. It uses syntax highlighting and works similar to cat. This is installed by default. Bat also enables pager by default i.e., the command is automatically piped to `less` when the output is larger than a threshold. This is disabled in the installion by using -
+```bash
+export BAT_PAGER=''
+```
+during the installation. You could re-enable the same by deleting the line in your `.zshrc`. Or you could also just paste the following -
+```bash
+sed -i "s/export BAT_PAGER=''//" ~/.zshrc
+```
