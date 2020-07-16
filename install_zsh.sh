@@ -22,12 +22,17 @@ sed -i "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/"
 echo "alias c=clear" >> ~/.zshrc
 echo "alias l='ls -l'" >> ~/.zshrc
 echo "alias la='ls -la'" >> ~/.zshrc
+echo "export BAT_PAGER=''" >> ~/.zshrc
 
 echo "Installing Awesome color scheme"
 git clone https://github.com/seebi/dircolors-solarized.git dirco_for_script_color_option 2>/dev/null
 cp dirco_for_script_color_option/dircolors.256dark ~/.oh-my-zsh/dircolors.256dark
 rm -rf dirco_for_script_color_option/
 echo "eval \`dircolors ~/.oh-my-zsh/dircolors.256dark\`" >> ~/.zshrc
+
+wget https://github.com/sharkdp/bat/releases/download/v0.11.0/bat_0.11.0_amd64.deb 2>/dev/null
+sudo dpkg -i bat_0.11.0_amd64.deb 2>/dev/null
+rm bat_0.11.0_amd64.deb
 
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
