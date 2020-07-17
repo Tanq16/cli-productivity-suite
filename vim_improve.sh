@@ -1,4 +1,7 @@
 #!/usr/bin/zsh
+echo "Installing vim"
+sudo apt install vim
+
 git clone https://github.com/itchyny/lightline.vim ~/.vim/pack/plugins/start/lightline
 git clone https://github.com/jiangmiao/auto-pairs.git ~/auto_pairs_vim
 mkdir ~/.vim/plugin
