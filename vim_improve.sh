@@ -28,7 +28,7 @@ echo "set expandtab" >> ~/.vimrc
 echo "set laststatus=2" >> ~/.vimrc
 echo "syntax on" >> ~/.vimrc
 echo "set hlsearch" >> ~/.vimrc
-echo "colorscheme novum"
+echo "colorscheme novum" >> ~/.vimrc
 echo "nnoremap \\ :noh<return>" >> ~/.vimrc
 
 sleep 2
