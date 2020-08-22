@@ -14,9 +14,9 @@ sed -i "s/robbyrussell/powerlevel10k\/powerlevel10k/" ~/.zshrc
 
 echo "Custom shell installed."
 echo "Installing Auto-suggestions"
-sudo apt install -y zsh-autosuggestions 1>/dev/null 2>/dev/null
+git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions 2>/dev/null
 echo "Installing Syntax highlighting"
-sudo apt install -y zsh-syntax-highlighting 1>/dev/null 2>/dev/null
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting 2>/dev/null
 
 sed -i "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" ~/.zshrc
 echo "alias c=clear" >> ~/.zshrc
