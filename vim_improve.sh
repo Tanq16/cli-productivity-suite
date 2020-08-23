@@ -6,7 +6,7 @@ echo "Installing Lightline"
 git clone https://github.com/itchyny/lightline.vim ~/.vim/pack/plugins/start/lightline 2>/dev/null
 echo "Installing Bracket Auto-Pair"
 git clone https://github.com/jiangmiao/auto-pairs.git ~/auto_pairs_vim 2>/dev/null
-mkdir ~/.vim/plugin
+mkdir -p ~/.vim/plugin
 cp ~/auto_pairs_vim/plugin/auto-pairs.vim ~/.vim/plugin/
 rm -rf ~/auto_pairs_vim
 
