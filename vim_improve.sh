@@ -21,6 +21,7 @@ mkdir -p ~/.vim/colors
 mv novum.vim ~/.vim/colors/novum.vim
 
 echo "Setting .vimrc"
+echo "set mouse=a" >> ~/.vimrc
 echo "set number" >> ~/.vimrc
 echo "set tabstop=4" >> ~/.vimrc
 echo "set autoindent" >> ~/.vimrc
