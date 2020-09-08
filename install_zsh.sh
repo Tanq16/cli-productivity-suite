@@ -30,15 +30,41 @@ cp dirco_for_script_color_option/dircolors.256dark ~/.oh-my-zsh/dircolors.256dar
 rm -rf dirco_for_script_color_option/
 echo "eval \`dircolors ~/.oh-my-zsh/dircolors.256dark\`" >> ~/.zshrc
 
+echo "Installing Bat and fast-update command"
+mkdir -p ~/.custom_commands
+touch ~/.custom_commands/update
+echo "#!/usr/bin/zsh" >> ~/.custom_commands/update
+echo "echo 'Fetching repositories .....'" >> ~/.custom_commands/update
+echo "a=$(sudo apt update 2>/dev/null)" >> ~/.custom_commands/update
+echo "if [[ $a == *--upgradeable* ]]" >> ~/.custom_commands/update
+echo "then" >> ~/.custom_commands/update
+echo "    echo 'Upgrading packages'" >> ~/.custom_commands/update
+echo "    sudo apt upgrade -y 1>/dev/null 2>/dev/null" >> ~/.custom_commands/update
+echo "    sudo apt dist-upgrade -y 1>/dev/null 2>/dev/null" >> ~/.custom_commands/update
+echo "    echo 'Removing unused packages'" >> ~/.custom_commands/update
+echo "    sudo apt autoremove -y 1>/dev/null 2>/dev/null" >> ~/.custom_commands/update
+echo "    echo 'Clearing local repository'" >> ~/.custom_commands/update
+echo "    sudo apt autoclean -y 1>/dev/null 2>/dev/null" >> ~/.custom_commands/update
+echo "    echo 'System Updated !!'" >> ~/.custom_commands/update
+echo "else" >> ~/.custom_commands/update
+echo "    echo 'System upto date !!'" >> ~/.custom_commands/update
+echo "fi" >> ~/.custom_commands/update
+chmod +x ~/.custom_commands/update
+echo "export PATH=$PATH:~/custom_commands/"
+
 wget https://github.com/sharkdp/bat/releases/download/v0.11.0/bat_0.11.0_amd64.deb 2>/dev/null
 sudo dpkg -i bat_0.11.0_amd64.deb 2>/dev/null
 rm bat_0.11.0_amd64.deb
+
+echo "Downloading fuzzy finder"
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
+~/.fzf/install --all 1>/dev/null 2>/dev/null
 
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "If you don't see shapes properly, install powerline fonts. The recommended font is given in the README of the repo for this script."
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-echo "Starting powerlevel config in 10 seconds ..."
+echo "Starting powerlevel config in 10 seconds. Ater the configuration, please close all shell instances and restart the shell for fuzzy search and zsh plugins to take effect......."
 sleep 10
 exec zsh -l
