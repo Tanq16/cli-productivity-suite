@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Installing ZSH, wget and git. This may take 3-4 minutes depending on network/processor/storage."
-sudo apt install -y zsh wget git 1>/dev/null 2>/dev/null
+sudo apt install -y zsh wget git tree 1>/dev/null 2>/dev/null
 wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null
 sh install.sh --unattended
 rm install.sh
@@ -60,6 +60,15 @@ rm bat_0.11.0_amd64.deb
 echo "Downloading fuzzy finder"
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
 ~/.fzf/install --all 1>/dev/null 2>/dev/null
+
+echo 'export FZF_DEFAULT_OPTS="' >> ~/.zshrc
+echo "--layout=reverse" >> ~/.zshrc
+echo "--info=inline" >> ~/.zshrc
+echo "--height=95%" >> ~/.zshrc
+echo "--multi" >> ~/.zshrc
+echo "--preview '([[ -f {}  ]] && (bat --style=numbers --color=always {} || cat {})) || ([[ -d {}  ]] && (tree -C {} | less)) || echo {} 2> /dev/null | head -200'" >> ~/.zshrc
+echo '"' >> ~/.zshrc
+echo 'alias f=fzf' >> ~/.zshrc
 
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
