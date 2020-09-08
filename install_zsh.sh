@@ -34,9 +34,10 @@ echo "Installing Bat and fast-update command"
 mkdir -p ~/.custom_commands
 touch ~/.custom_commands/update
 echo "#!/usr/bin/zsh" >> ~/.custom_commands/update
+echo "echo 'The install process requires 2-30 mins depending on size of updates and speed of drives and network.'" >> ~/.custom_commands/update
 echo "echo 'Fetching repositories .....'" >> ~/.custom_commands/update
 echo "a=$(sudo apt update 2>/dev/null)" >> ~/.custom_commands/update
-echo "if [[ $a == *--upgradeable* ]]" >> ~/.custom_commands/update
+echo "if [[ $a == *--upgradable* ]]" >> ~/.custom_commands/update
 echo "then" >> ~/.custom_commands/update
 echo "    echo 'Upgrading packages'" >> ~/.custom_commands/update
 echo "    sudo apt upgrade -y 1>/dev/null 2>/dev/null" >> ~/.custom_commands/update
