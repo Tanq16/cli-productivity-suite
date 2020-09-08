@@ -19,12 +19,13 @@ Or you could clone the repo and run the `install_zsh.sh` script.
 This script installs the following -
 1. Zsh.
 2. OH-MY-ZSH custom shell with Powerlevel10k theme.
+3. Fuzzy finder for awesome productivity.
 3. Syntax highlighting for command line.
 4. Auto-completion on command line.
 5. Color scheme that looks good on dark terminals.
 
 ## Post Installation
-If the prompt looks funny or as unintended or options for lock, debian logo, etc. were not visible, please change font of the terminal you use to a powerline-font. Best recommendation from me - Ubuntu Mono Powerline Derivative.
+If the prompt looks funny or as unintended or options for lock, debian logo, etc. were not visible, please change font of the terminal you use to a powerline-font. Best recommendation from me - FiraCode Nerd Font, Ubuntu Mono Powerline Derivative.
 
 To install from repositories on debian systems, use
 ```bash
@@ -36,7 +37,9 @@ After this reconfigure the powerlevel10k using -
 p10k configure
 ```
 
-If you are installing on windows, you could just install the **FuraCode Nerd Font Mono** (recommended) font from [here](https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip) or use the the repository to install all fonts as per the instructions there. Download the folder and install Ubuntu Mono Derivative for powerline and set it as your font in whatever terminal you use. Then restart the terminal app. For windows, right click the font ttf and install. The settings json file must be edited for setting this as the default font in windows terminal.
+If you are installing on windows, you could just install the **FiraCode Nerd Font Mono** (recommended) font from [here](https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip) or use the the repository to install all fonts as per the instructions there. Download the folder and install Ubuntu Mono Derivative for powerline and set it as your font in whatever terminal you use. Then restart the terminal app. For windows, right click the font ttf and install. The settings json file must be edited for setting this as the default font in windows terminal.
+
+The fuzzy search is another awesome feature to have. Read the specifics at the github page [here](https://github.com/junegunn/fzf) and learn about the features a bit more [here](https://medium.com/better-programming/boost-your-command-line-productivity-with-fuzzy-finder-985aa162ba5d).
 
 ## Bonus: Basic Vim quick changes
 To use the basic modern editor features in vim, use the given script to install the features as follows -
