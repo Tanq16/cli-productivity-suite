@@ -31,6 +31,7 @@ echo "syntax on" >> ~/.vimrc
 echo "set hlsearch" >> ~/.vimrc
 echo "colorscheme novum" >> ~/.vimrc
 echo "nnoremap \\ :noh<return>" >> ~/.vimrc
+echo "set rtp+=~/.fzf" >> ~/.vimrc
 echo "set cursorline" >> ~/.vimrc
 
 sleep 2
