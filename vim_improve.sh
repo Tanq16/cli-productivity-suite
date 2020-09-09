@@ -33,6 +33,9 @@ echo "colorscheme novum" >> ~/.vimrc
 echo "nnoremap \\ :noh<return>" >> ~/.vimrc
 echo "set rtp+=~/.fzf" >> ~/.vimrc
 echo "set cursorline" >> ~/.vimrc
+nnoremap <C-m> :tabnext<return>
+nnoremap <C-n> :tabprev<return>
+nnoremap ff :FZF ~<return>
 
 sleep 2
 echo "Done!"
