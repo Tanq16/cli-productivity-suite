@@ -71,7 +71,7 @@ echo "--bind=ctrl-k:preview-down" >> ~/.zshrc
 echo "--bind=ctrl-j:preview-up" >> ~/.zshrc
 echo '"' >> ~/.zshrc
 echo 'alias f=fzf' >> ~/.zshrc
-echo "export FZF_DEFAULT_COMMAND='fd --follow --hidden'" >> ~/.zshrc
+echo "export FZF_DEFAULT_COMMAND='fdfind --follow --hidden'" >> ~/.zshrc
 echo 'export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"' >> ~/.zshrc
 
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
