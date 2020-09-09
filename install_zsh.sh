@@ -55,6 +55,7 @@ chmod +x ~/.custom_commands/update
 echo "export PATH=$PATH:~/custom_commands/"
 
 sudo apt install bat -y 1>/dev/null 2>/dev/null
+sudo apt install fd-find -y 1>/dev/null 2>/dev/null
 
 echo "Downloading fuzzy finder"
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
@@ -70,6 +71,8 @@ echo "--bind=ctrl-k:preview-down" >> ~/.zshrc
 echo "--bind=ctrl-j:preview-up" >> ~/.zshrc
 echo '"' >> ~/.zshrc
 echo 'alias f=fzf' >> ~/.zshrc
+echo "export FZF_DEFAULT_COMMAND='fd --follow --hidden'" >> ~/.zshrc
+echo 'export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"' >> ~/.zshrc
 
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
