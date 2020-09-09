@@ -36,6 +36,7 @@ echo "set cursorline" >> ~/.vimrc
 nnoremap <C-m> :tabnext<return>
 nnoremap <C-n> :tabprev<return>
 nnoremap ff :FZF ~<return>
+nnoremap tt :tabnew<return>
 
 sleep 2
 echo "Done!"
