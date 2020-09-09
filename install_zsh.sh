@@ -67,6 +67,8 @@ echo "--info=inline" >> ~/.zshrc
 echo "--height=95%" >> ~/.zshrc
 echo "--multi" >> ~/.zshrc
 echo "--preview '([[ -f {}  ]] && (bat --style=numbers --color=always {} || cat {})) || ([[ -d {}  ]] && (tree -C {} | less)) || echo {} 2> /dev/null | head -200'" >> ~/.zshrc
+echo "--bind=ctrl-k:preview-down" >> ~/.zshrc
+echo "--bind=ctrl-j:preview-up" >> ~/.zshrc
 echo '"' >> ~/.zshrc
 echo 'alias f=fzf' >> ~/.zshrc
 
