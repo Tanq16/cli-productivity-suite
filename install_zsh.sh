@@ -23,6 +23,7 @@ echo "alias c=clear" >> ~/.zshrc
 echo "alias l='ls -l'" >> ~/.zshrc
 echo "alias la='ls -la'" >> ~/.zshrc
 echo "export BAT_PAGER=''" >> ~/.zshrc
+echo "alias bat=batcat" >> ~/.zshrc
 
 echo "Installing Awesome color scheme"
 git clone https://github.com/seebi/dircolors-solarized.git dirco_for_script_color_option 2>/dev/null
@@ -53,9 +54,7 @@ echo "fi" >> ~/.custom_commands/update
 chmod +x ~/.custom_commands/update
 echo "export PATH=$PATH:~/custom_commands/"
 
-wget https://github.com/sharkdp/bat/releases/download/v0.11.0/bat_0.11.0_amd64.deb 2>/dev/null
-sudo dpkg -i bat_0.11.0_amd64.deb 2>/dev/null
-rm bat_0.11.0_amd64.deb
+sudo apt install bat -y 1>/dev/null 2>/dev/null
 
 echo "Downloading fuzzy finder"
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
@@ -66,7 +65,7 @@ echo "--layout=reverse" >> ~/.zshrc
 echo "--info=inline" >> ~/.zshrc
 echo "--height=95%" >> ~/.zshrc
 echo "--multi" >> ~/.zshrc
-echo "--preview '([[ -f {}  ]] && (bat --style=numbers --color=always {} || cat {})) || ([[ -d {}  ]] && (tree -C {} | less)) || echo {} 2> /dev/null | head -200'" >> ~/.zshrc
+echo "--preview '([[ -f {}  ]] && (batcat --style=numbers --color=always {} || cat {})) || ([[ -d {}  ]] && (tree -C {} | less)) || echo {} 2> /dev/null | head -200'" >> ~/.zshrc
 echo "--bind=ctrl-k:preview-down" >> ~/.zshrc
 echo "--bind=ctrl-j:preview-up" >> ~/.zshrc
 echo '"' >> ~/.zshrc
