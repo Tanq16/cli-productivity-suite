@@ -52,7 +52,7 @@ echo "else" >> ~/.custom_commands/update
 echo "    echo 'System upto date !!'" >> ~/.custom_commands/update
 echo "fi" >> ~/.custom_commands/update
 chmod +x ~/.custom_commands/update
-echo "export PATH=$PATH:~/custom_commands/"
+echo "export PATH=$PATH:~/custom_commands/" >> ~/.zshrc
 
 sudo apt install bat -y 1>/dev/null 2>/dev/null
 sudo apt install fd-find -y 1>/dev/null 2>/dev/null
