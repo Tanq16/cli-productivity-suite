@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Installing ZSH, wget and git. This may take 3-4 minutes depending on network/processor/storage."
-sudo apt install -y zsh wget git tree 1>/dev/null 2>/dev/null
+sudo apt install -y zsh wget git tree sshpass 1>/dev/null 2>/dev/null
 wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null
 sh install.sh --unattended
 rm install.sh
