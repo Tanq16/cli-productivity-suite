@@ -37,6 +37,7 @@ echo "nnoremap <C-m> :tabnext<return>" >> ~/.vimrc
 echo "nnoremap <C-n> :tabprev<return>" >> ~/.vimrc
 echo "nnoremap ff :FZF ~<return>" >> ~/.vimrc
 echo "nnoremap tt :tabnew<return>" >> ~/.vimrc
+echo "nnoremap nm :set invnumber<return>" >> ~/.vimrc
 
 sleep 2
 echo "Done!"
