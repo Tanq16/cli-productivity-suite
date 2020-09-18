@@ -30,6 +30,11 @@ echo "set laststatus=2" >> ~/.vimrc
 echo "syntax on" >> ~/.vimrc
 echo "set hlsearch" >> ~/.vimrc
 echo "colorscheme novum" >> ~/.vimrc
+
+echo "let g:lightline = {" >> ~/.vimrc
+echo "      \ 'colorscheme': 'wombat'," >> ~/.vimrc
+echo "      \}" >> ~/.vimrc
+echo "set noshowmode" >> ~/.vimrc
 echo "nnoremap \\ :noh<return>" >> ~/.vimrc
 echo "set rtp+=~/.fzf" >> ~/.vimrc
 echo "set cursorline" >> ~/.vimrc
