@@ -32,8 +32,8 @@ echo "set hlsearch" >> ~/.vimrc
 echo "colorscheme novum" >> ~/.vimrc
 
 echo "let g:lightline = {" >> ~/.vimrc
-echo "      \ 'colorscheme': 'wombat'," >> ~/.vimrc
-echo "      \}" >> ~/.vimrc
+echo "      \\ 'colorscheme': 'wombat'," >> ~/.vimrc
+echo "      \\}" >> ~/.vimrc
 echo "set noshowmode" >> ~/.vimrc
 echo "nnoremap \\ :noh<return>" >> ~/.vimrc
 echo "set rtp+=~/.fzf" >> ~/.vimrc
@@ -45,7 +45,7 @@ echo "nnoremap tt :tabnew<return>" >> ~/.vimrc
 echo "nnoremap nm :set invnumber<return>" >> ~/.vimrc
 
 echo "if has("autocmd")" >> ~/.vimrc
-echo "  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif" >> ~/.vimrc
+echo "  au BufReadPost * if line(\"'\\\"\") > 0 && line(\"'\\\"\") <= line(\"$\") | exe \"normal! g\`\\\"\" | endif" >> ~/.vimrc
 echo "endif" >> ~/.vimrc
 
 sleep 2
