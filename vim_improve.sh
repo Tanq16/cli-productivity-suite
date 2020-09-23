@@ -20,6 +20,10 @@ wget https://raw.githubusercontent.com/dylnmc/novum.vim/master/colors/novum.vim 
 mkdir -p ~/.vim/colors
 mv novum.vim ~/.vim/colors/novum.vim
 
+echo "Installing nerd commenter"
+curl -fLo ~/.vim/plugin/NERD_Commenter.vim --create-dirs https://raw.githubusercontent.com/preservim/nerdcommenter/master/plugin/NERD_commenter.vim 2>/dev/null
+curl -fLo ~/.vim/doc/NERD_Commenter.txt --create-dirs https://raw.githubusercontent.com/preservim/nerdcommenter/master/doc/NERD_commenter.txt 2>/dev/null
+
 echo "Setting .vimrc"
 echo "set mouse=a" >> ~/.vimrc
 echo "set number" >> ~/.vimrc
@@ -35,7 +39,7 @@ echo "let g:lightline = {" >> ~/.vimrc
 echo "      \\ 'colorscheme': 'wombat'," >> ~/.vimrc
 echo "      \\}" >> ~/.vimrc
 echo "set noshowmode" >> ~/.vimrc
-echo "nnoremap \\ :noh<return>" >> ~/.vimrc
+echo "nnoremap \\\\ :noh<return>" >> ~/.vimrc
 echo "set rtp+=~/.fzf" >> ~/.vimrc
 echo "set cursorline" >> ~/.vimrc
 echo "nnoremap <C-m> :tabnext<return>" >> ~/.vimrc
@@ -47,6 +51,8 @@ echo "nnoremap nm :set invnumber<return>" >> ~/.vimrc
 echo "if has("autocmd")" >> ~/.vimrc
 echo "  au BufReadPost * if line(\"'\\\"\") > 0 && line(\"'\\\"\") <= line(\"$\") | exe \"normal! g\`\\\"\" | endif" >> ~/.vimrc
 echo "endif" >> ~/.vimrc
+
+echo "filetype plugin on" >> ~/.vimrc
 
 sleep 2
 echo "Done!"
