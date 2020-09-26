@@ -48,9 +48,7 @@ echo "nnoremap ff :FZF ~<return>" >> ~/.vimrc
 echo "nnoremap tt :tabnew<return>" >> ~/.vimrc
 echo "nnoremap nm :set invnumber<return>" >> ~/.vimrc
 
-echo "if has("autocmd")" >> ~/.vimrc
-echo "  au BufReadPost * if line(\"'\\\"\") > 0 && line(\"'\\\"\") <= line(\"$\") | exe \"normal! g\`\\\"\" | endif" >> ~/.vimrc
-echo "endif" >> ~/.vimrc
+echo "au BufReadPost * if line(\"'\\\"\") > 0 && line(\"'\\\"\") <= line(\"$\") | exe \"normal! g\`\\\"\" | endif" >> ~/.vimrc
 
 echo "filetype plugin on" >> ~/.vimrc
 
