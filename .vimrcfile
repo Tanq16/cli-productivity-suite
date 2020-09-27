@@ -23,7 +23,7 @@ set noshowmode
 " Search highlight to ensure match while typing
 set hlsearch is
 " remove highlight by pressing \\
-nnoremap \ :noh<return>
+nnoremap \\ :noh<return>
 
 " Shift selected lines around
 xnoremap J :move '<-2<CR>gv-gv
