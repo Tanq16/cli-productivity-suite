@@ -26,8 +26,8 @@ set hlsearch is
 nnoremap \\ :noh<return>
 
 " Shift selected lines around
-xnoremap J :move '<-2<CR>gv-gv
-xnoremap K :move '<+1<CR>gv-gv
+xnoremap K :move '<-2<CR>gv-gv
+xnoremap J :move '<+1<CR>gv-gv
 
 " Others
 set mouse=a
