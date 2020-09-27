@@ -28,7 +28,7 @@ echo "alias bat=batcat" >> ~/.zshrc
 
 echo "Installing Awesome color scheme"
 git clone https://github.com/seebi/dircolors-solarized.git dirco_for_script_color_option 2>/dev/null
-https://github.com/arcticicestudio/nord-dircolors.git 2>/dev/null
+git clone https://github.com/arcticicestudio/nord-dircolors.git 2>/dev/null
 cp nord-dircolors/src/dir_colors ~/.oh-my-zsh/nord.dircolors
 rm -rf nord-dircolors/
 cp dirco_for_script_color_option/dircolors.256dark ~/.oh-my-zsh/dircolors.256dark
