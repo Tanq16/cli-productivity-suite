@@ -40,7 +40,7 @@ nnoremap <C-m> :tabnext<return>
 nnoremap <C-n> :tabprev<return>
 nnoremap ff :FZF ~<return>
 nnoremap tt :tabnew<return>
-nnoremap nm :set nonumber! norelativenumber!<return>
+nnoremap mn :set nonumber! norelativenumber!<return>
 
 " Remember last edit
 au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
