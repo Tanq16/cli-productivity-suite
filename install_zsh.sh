@@ -20,6 +20,7 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/
 
 sed -i "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" ~/.zshrc
 echo "alias c=clear" >> ~/.zshrc
+echo "alias v='vim -p'" >> ~/.zshrc
 echo "alias l='ls -l'" >> ~/.zshrc
 echo "alias la='ls -la'" >> ~/.zshrc
 echo "export BAT_PAGER=''" >> ~/.zshrc
