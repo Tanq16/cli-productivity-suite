@@ -36,6 +36,7 @@ set rtp+=~/.fzf
 filetype plugin on
 
 " Buttons
+nnoremap <C-x> <CR>
 nnoremap <C-m> :tabnext<return>
 nnoremap <C-n> :tabprev<return>
 nnoremap ff :FZF ~<return>
