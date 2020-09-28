@@ -44,3 +44,10 @@ nnoremap mn :set nonumber! norelativenumber!<return>
 
 " Remember last edit
 au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+
+" Fast escape to remove lag after hitting escape from Insert mode
+augroup FastEscape
+    autocmd!
+    au InsertEnter * set timeoutlen=0
+    au InsertLeave * set timeoutlen=1000
+augroup END
