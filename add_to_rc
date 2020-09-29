@@ -1,0 +1,28 @@
+export FZF_DEFAULT_OPTS="
+--layout=reverse
+--info=inline
+--height=95%
+--multi
+--preview '([[ -f {}  ]] && (batcat --style=numbers --color=always {} || cat {})) || ([[ -d {}  ]] && (tree -C {} | less)) || echo {} 2> /dev/null | head -200'
+--bind=ctrl-k:preview-down
+--bind=ctrl-j:preview-up
+"
+export FZF_DEFAULT_COMMAND='fdfind --follow --hidden'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export BAT_PAGER=''
+
+eval `dircolors ~/.oh-my-zsh/nord.dircolors`
+alias f='fzf'
+alias gitn='git --no-pager'
+alias vim='vim -p'
+alias ascii='ascii -adx'
+alias tt='tmux new -s default'
+alias t='tmux a -t default'
+alias ts='tmux new -s'
+alias ta='tmux a -t'
+alias tls='tmux list-sessions'
+alias v='vim -p'
+alias c=clear
+alias l='ls -l'
+alias la='ls -la'
+alias bat=batcat
