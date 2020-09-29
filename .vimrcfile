@@ -1,5 +1,6 @@
 " General
 set tabstop=4
+set wildmode=longest,list,full
 set wildmenu
 set expandtab
 set laststatus=2
@@ -42,6 +43,7 @@ nnoremap <C-n> :tabprev<return>
 nnoremap ff :FZF ~<return>
 nnoremap tt :tabnew<return>
 nnoremap mn :set nonumber! norelativenumber!<return>
+nnoremap S :%s///g<Left><Left><Left>
 
 " Remember last edit
 au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
