@@ -32,6 +32,11 @@ echo "Installing Bat and fd-Find"
 sudo apt install bat -y 1>/dev/null 2>/dev/null
 sudo apt install fd-find -y 1>/dev/null 2>/dev/null
 
+echo "Installing Tmux - Upon first start, press `Prefix` then type `:source-file ~/.tmux.conf`, then press `Prefix->I` to install plugins properly."
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm 2>/dev/null
+wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/tmuxconf 2>/dev/null
+mv tmuxconf ~/.tmux.conf
+
 echo "Installing fuzzy finder"
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
 ~/.fzf/install --all 1>/dev/null 2>/dev/null
