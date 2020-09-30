@@ -2,7 +2,7 @@
 # Then do => tmux source ~/.tmux.conf
 # from tmux session
 # Use <prefix>+I to install plugins
-set -g default-terminal "xterm-256color" # TERM env var should be "xterS-256color" for Ctrl+arrow keys to work.
+set -g default-terminal "xterm-256color" # TERM env var should be "xterm-256color" for Ctrl+arrow keys to work.
 set -g mouse on
 # Start numbering at 1
 set -g base-index 1
@@ -11,6 +11,7 @@ set -g renumber-windows on
 # Auto set window title
 set-window-option -g automatic-rename on
 set-option -g set-titles on
+set-option -g status-position top
 # No delay for escape key press
 set -sg escape-time 0
 
