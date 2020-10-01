@@ -7,13 +7,13 @@ set laststatus=2
 set autoindent
 set smartindent
 set number relativenumber
-colorscheme nord
+colorscheme novum
 set ignorecase
 set smartcase
 
 " Lightline
 let g:lightline = {
-      \ 'colorscheme': 'nord',
+      \ 'colorscheme': 'novum',
       \}
 let g:lightline.separator = { 'left': "\ue0b8", 'right': "\ue0be"  }
 let g:lightline.subseparator = { 'left': "\ue0b9", 'right': "\ue0b9"  }
