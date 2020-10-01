@@ -21,7 +21,7 @@ git clone https://github.com/arcticicestudio/nord-vim.git 2>/dev/null
 mkdir -p ~/.vim/colors
 mv nord-vim/colors/nord.vim ~/.vim/colors/nord.vim
 mv novum.vim ~/.vim/colors/novum.vim
-mv nord-vim/autoload/lightline/colorscheme/nord.vim ~/.vim/pack/plugins/start/lightline/autoload/lightline/colorscheme/
+# mv nord-vim/autoload/lightline/colorscheme/nord.vim ~/.vim/pack/plugins/start/lightline/autoload/lightline/colorscheme/
 rm -rf nord-vim/
 
 echo "Installing nerd commenter"
