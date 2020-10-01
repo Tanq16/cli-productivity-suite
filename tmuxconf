@@ -1,4 +1,4 @@
-# Install using => git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+# sed -i "s/user@#h/user/" ~/.tmux/plugins/tmux-power/tmux-power.tmux  --> Do this to remove machine name
 # Then do => tmux source ~/.tmux.conf
 # from tmux session
 # Use <prefix>+I to install plugins
@@ -27,11 +27,10 @@ bind -n S-Up select-pane -U
 bind -n m-\\ split-window -h
 bind -n m-| split-window -v
 # set -g @plugin "arcticicestudio/nord-tmux"
-set -g @plugin 'jimeh/tmux-themepack'
+set -g @plugin 'wfxr/tmux-power'
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'nhdaly/tmux-better-mouse-mode'
-set -g @themepack 'powerline/block/gray'
+set -g @tmux_power_theme '#b0b0b0'
 
-source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme"
 run '~/.tmux/plugins/tpm/tpm'
