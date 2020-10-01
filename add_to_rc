@@ -11,7 +11,7 @@ export FZF_DEFAULT_COMMAND='fdfind --follow --hidden'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export BAT_PAGER=''
 
-eval `dircolors ~/.oh-my-zsh/nord.dircolors`
+eval `dircolors ~/.oh-my-zsh/dircolors.256dark`
 alias f='fzf'
 alias gitn='git --no-pager'
 alias vim='vim -p'
