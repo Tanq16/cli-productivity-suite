@@ -1,4 +1,5 @@
 # sed -i "s/user@#h/user/" ~/.tmux/plugins/tmux-power/tmux-power.tmux  --> Do this to remove machine name
+# sed -i "s/%T/%H:%M/" .tmux/plugins/tmux-power/tmux-power.tmux  --> Do this to remove seconds from status
 # Then do => tmux source ~/.tmux.conf
 # from tmux session
 # Use <prefix>+I to install plugins
