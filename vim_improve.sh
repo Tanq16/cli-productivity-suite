@@ -15,7 +15,7 @@ wget https://www.vim.org/scripts/download_script.php\?src_id\=21752 2>/dev/null
 mv 'download_script.php?src_id=21752' ~/.vim/supertab.vmb
 vim -c 'so %' -c 'q' ~/.vim/supertab.vmb
 
-echo "Installing nord colorscheme"
+echo "Installing colorscheme"
 wget https://raw.githubusercontent.com/dylnmc/novum.vim/master/colors/novum.vim 2>/dev/null
 # git clone https://github.com/arcticicestudio/nord-vim.git 2>/dev/null
 mkdir -p ~/.vim/colors
