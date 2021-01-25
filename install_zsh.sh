@@ -1,13 +1,10 @@
 #!/bin/sh
 
-echo "Installing ZSH, wget and git. This may take 3-4 minutes depending on network/processor/storage."
-sudo apt install -y zsh wget git tree sshpass tmux 1>/dev/null 2>/dev/null
-wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null
-sh install.sh --unattended
-rm install.sh
+echo "Insitializing..... may take a few seeconds."
+sudo apt install -y tree sshpass tmux 1>/dev/null 2>/dev/null
 
-echo "Setting ZSH to default shell :: Please enter your password."
-chsh -s /usr/bin/zsh $USER
+# echo "Setting ZSH to default shell :: Please enter your password."
+# chsh -s /usr/bin/zsh $USER
 
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k 2>/dev/null
 sed -i "s/robbyrussell/powerlevel10k\/powerlevel10k/" ~/.zshrc
