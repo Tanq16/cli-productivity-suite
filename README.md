@@ -10,10 +10,21 @@ sudo apt install curl vim
 ```
 
 ## Installation
+The first step is to install zsh. You will be asked to set up how the prompt looks. Just ignore that and set it up later or select random options. This will be changed later on. Execute the following on your terminal -
+```bash
+sudo apt install -y zsh wget git
+wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null
+sh install.sh
+rm install.sh
+```
+
+Once done, execute the following to install all other magic and enter your password whenever prompted.
 ```bash
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh.sh)"
 ```
 Or you could clone the repo and run the `install_zsh.sh` script.
+
+Restart your shell (log out and back in on a linux machine or simply close the shell and start again on something like WSL). Execute `p10k configure`. This time, set the options according to the way you want your prompt to look. For any wierd looking prompts, see Post Installation steps below.
 
 ## Features
 This script installs the following -
