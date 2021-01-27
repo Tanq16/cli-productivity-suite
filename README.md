@@ -10,7 +10,7 @@ sudo apt install curl vim
 ```
 
 ## Installation
-The first step is to install zsh. You will be asked to set up how the prompt looks. Just ignore that and set it up later or select random options. This will be changed later on. Execute the following on your terminal -
+The first step is to install zsh. Enter your password when prompted to make zsh default (or do it on your own as per your wish). Execute the following on your terminal -
 ```bash
 sudo apt install -y zsh wget git
 wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null
