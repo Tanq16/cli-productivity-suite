@@ -26,6 +26,7 @@ alias c=clear
 alias l='ls -l'
 alias la='ls -la'
 alias bat=batcat
+alias ip4="ip a | grep inet | cut -d ' ' -f6 | grep -vE ':'"
 
 # Colored man pages
 export LESS_TERMCAP_mb=$'\e[1;32m'
