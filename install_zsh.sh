@@ -7,7 +7,6 @@ sudo apt install -y tree sshpass tmux 1>/dev/null 2>/dev/null
 # chsh -s /usr/bin/zsh $USER
 
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k 2>/dev/null
-cat .zshrc | grep -vE "^#" | grep -vE "^$" > .zshrc
 sed -i "s/robbyrussell/powerlevel10k\/powerlevel10k/" ~/.zshrc
 
 echo "Custom shell installed."
@@ -43,6 +42,7 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/add_to_rc 2>/dev/null
 cat add_to_rc >> ~/.zshrc
 rm add_to_rc
+cat .zshrc | grep -vE "^#" | grep -vE "^$" > .zshrc
 
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
