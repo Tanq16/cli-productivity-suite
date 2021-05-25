@@ -42,7 +42,8 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/add_to_rc 2>/dev/null
 cat add_to_rc >> ~/.zshrc
 rm add_to_rc
-cat .zshrc | grep -vE "^#" | grep -vE "^$" > .zshrc
+cp .zshrc temptemp
+cat temptemp | grep -vE "^#" | grep -vE "^$" > .zshrc
 
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
