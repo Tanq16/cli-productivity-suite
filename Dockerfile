@@ -9,44 +9,18 @@ ENV TERM xterm
 RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
 
 # Update and Upgrade
-RUN add-apt-repository ppa:longsleep/golang-backports; \
-	apt update && apt upgrade -y
+RUN apt update && apt upgrade -y
 
 # Install other packages
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
-    build-essential \
-    zlib1g-dev \
-    libncurses5-dev \
-    libgdbm-dev \
-    libnss3-dev \
-    libssl-dev \
-    libreadline-dev \
-    libffi-dev \
-    apt-transport-https \
-    software-properties-common \
-    vim \
-    curl \
-    strace \
-    ltrace \
-    bat \
-    fd-find \
-    wget \
-    gdb \
-    git \
+    build-essential libssl-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libreadline-dev libffi-dev nasm unzip \
+    apt-transport-https software-properties-common openssl\
+    vim curl strace ltrace bat fd-find wget gdb git tmux tree fzf php \
     default-jre default-jdk \
     python3-pkg-resources python3-setuptools python3-pip python3 python3-dev \
-    php \
-    nasm \
-    ncat \
-    nmap \
-    openssl \
-    tmux \
-    tree \
-    unzip \
-    fzf \
-    iproute2 \
-    openssh-server
+    ncat nmap \
+    iproute2 openssh-server
 
 # Install zsh and tmux
 RUN apt install -y --no-install-recommends zsh
