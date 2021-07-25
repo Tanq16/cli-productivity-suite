@@ -68,3 +68,25 @@ during the installation. You could re-enable the same by deleting the line in yo
 ```bash
 sed -i "s/export BAT_PAGER=''//" ~/.zshrc
 ```
+
+# AIO Container
+The given `Dockerfile` is for an ubuntu that has essentially all tools above installed and ssh enabled for anyone to reach it via ssh and work on it. The `p10k.zsh` file has to be inside the same directory as the `Dockerfile` as it copies it and prevents the configuration wizard of zsh from running when you run the docker. If the wizard is still needed for customization, then run `p10k configure` and replcae the contents of the `p10k.zsh` file in the host with those of the `~/.p10k.zsh` file inside the docker.
+
+After this, it is possible to ssh into the docker with the root user and password `docker`. To build the docker use this command in the folder that contains the files -
+```bash
+docker build -t aio_docker .
+```
+Thereafter, run the following command to run the docker -
+```bash
+docker run --name="aio_docker_instance" --rm -p 50232:22 -it aio_docker zsh -c "service ssh start; zsh"
+```
+To ssh into the docker without adding it to the hosts file, use the following command -
+```bash
+ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" root@localhost -p 50232
+```
+More parameters for specifying shared volumes or other ports can be added to the run command.
+It is also useful to have buildkit enabled. This can be done by using the follwing command or adding it to the shell rc file -
+```bash
+export DOCKER_BUILDKIT=1
+```
+Disabling can be done by making the above 0.
