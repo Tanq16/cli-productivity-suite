@@ -15,7 +15,7 @@ RUN apt update && apt upgrade -y
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
     build-essential libssl-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libreadline-dev libffi-dev \
-    apt-transport-https software-properties-common openssl \
+    apt-transport-https software-properties-common openssl gpg-agent \
     nmap ncat ltrace strace openvpn openssh-server gobuster nikto dirb netdiscover hydra \
     vim curl strace ltrace bat fd-find wget gdb git tmux tree fzf php \
     default-jre default-jdk john wireshark gcc-multilib nasm unzip fcrackzip \
