@@ -66,18 +66,13 @@ RUN sleep 2
 
 # More tool installations
 RUN mkdir /root/installations
-RUN cd installations
-RUN git clone https://github.com/pwndbg/pwndbg
-RUN cd pwndbg
-RUN ./setup.sh
-RUN cd ..
+RUN git clone https://github.com/pwndbg/pwndbg /root/installations/pwndbg
+RUN cd /root/installations/pwndbg && ./setup.sh
 RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall && ./msfinstall
-RUN git clone https://github.com/offensive-security/exploitdb.git /home/installations/exploit-database
-RUN ln -sf /home/tanq/installations/exploit-database/searchsploit /usr/local/bin/searchsploit
-RUN git clone https://github.com/danielmiessler/SecLists.git
-RUN cd SecLists
-RUN wget https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
-RUN cd
+RUN git clone https://github.com/offensive-security/exploitdb.git /root/installations/exploit-database
+RUN ln -sf /root/installations/exploit-database/searchsploit /usr/local/bin/searchsploit
+RUN git clone https://github.com/danielmiessler/SecLists.git /root/installations/SecLists
+RUN wget https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt -o /root/installations/SecLists/rockyou.txt
 
 # Write stuff to do into a file
 RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
