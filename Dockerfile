@@ -14,12 +14,12 @@ RUN apt update && apt upgrade -y
 # Install other packages
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
-    build-essential libssl-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libreadline-dev libffi-dev nasm unzip \
-    apt-transport-https software-properties-common openssl\
+    build-essential libssl-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libreadline-dev libffi-dev \
+    apt-transport-https software-properties-common openssl \
+    nmap ncat ltrace strace openvpn openssh-server gobuster nikto dirb netdiscover hydra \
     vim curl strace ltrace bat fd-find wget gdb git tmux tree fzf php \
-    default-jre default-jdk \
-    python3-pkg-resources python3-setuptools python3-pip python3 python3-dev \
-    ncat nmap \
+    default-jre default-jdk john wireshark gcc-multilib nasm unzip fcrackzip \
+    python3-pkg-resources python3-setuptools python3-pip python3 python3-dev ipython3 \
     iproute2 openssh-server
 
 # Install zsh and tmux
@@ -63,6 +63,21 @@ RUN curl -fLo ~/.vim/doc/NERD_Commenter.txt --create-dirs https://raw.githubuser
 RUN wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/.vimrcfile 2>/dev/null
 RUN mv .vimrcfile ~/.vimrc
 RUN sleep 2
+
+# More tool installations
+RUN mkdir /root/installations
+RUN cd installations
+RUN git clone https://github.com/pwndbg/pwndbg
+RUN cd pwndbg
+RUN ./setup.sh
+RUN cd ..
+RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall && ./msfinstall
+RUN git clone https://github.com/offensive-security/exploitdb.git /home/installations/exploit-database
+RUN ln -sf /home/tanq/installations/exploit-database/searchsploit /usr/local/bin/searchsploit
+RUN git clone https://github.com/danielmiessler/SecLists.git
+RUN cd SecLists
+RUN wget https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
+RUN cd
 
 # Write stuff to do into a file
 RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
