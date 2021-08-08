@@ -25,8 +25,8 @@ mv novum.vim ~/.vim/colors/novum.vim
 # rm -rf nord-vim/
 
 echo "Installing nerd commenter"
-curl -fLo ~/.vim/plugin/NERD_Commenter.vim --create-dirs https://raw.githubusercontent.com/preservim/nerdcommenter/master/plugin/NERD_commenter.vim 2>/dev/null
-curl -fLo ~/.vim/doc/NERD_Commenter.txt --create-dirs https://raw.githubusercontent.com/preservim/nerdcommenter/master/doc/NERD_commenter.txt 2>/dev/null
+curl -fLo ~/.vim/plugin/nerdcommenter.vim --create-dirs https://raw.githubusercontent.com/preservim/nerdcommenter/master/plugin/nerdcommenter.vim 2>/dev/null
+curl -fLo ~/.vim/doc/nerdcommenter.txt --create-dirs https://raw.githubusercontent.com/preservim/nerdcommenter/master/doc/nerdcommenter.txt 2>/dev/null
 
 mv ~/.vimrc ~/.vimrc.old
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/.vimrcfile 2>/dev/null
