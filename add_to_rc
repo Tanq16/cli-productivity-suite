@@ -27,6 +27,7 @@ alias l='ls -l'
 alias la='ls -la'
 alias bat=batcat
 alias ip4="ip a | grep inet | cut -d ' ' -f6 | grep -vE ':'"
+alias sshide='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null"'
 
 # Colored man pages
 export LESS_TERMCAP_mb=$'\e[1;32m'
