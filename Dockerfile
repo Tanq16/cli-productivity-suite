@@ -72,24 +72,20 @@ RUN rm add_to_rc
 RUN cp ~/.zshrc temptemp
 RUN cat temptemp | grep -vE "^#" | grep -vE "^$" > ~/.zshrc
 RUN chsh -s /usr/bin/zsh
-RUN echo "cd tanishq" >> ~/.zshrc
 RUN echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> ~/.zshrc
 
 # Install vim extensions
-RUN git clone https://github.com/itchyny/lightline.vim ~/.vim/pack/plugins/start/lightline 2>/dev/null
-RUN git clone https://github.com/jiangmiao/auto-pairs.git ~/auto_pairs_vim 2>/dev/null
+RUN git clone https://github.com/itchyny/lightline.vim ~/.vim/pack/plugins/start/lightline
+RUN git clone https://github.com/jiangmiao/auto-pairs.git ~/auto_pairs_vim
 RUN mkdir -p ~/.vim/plugin
 RUN cp ~/auto_pairs_vim/plugin/auto-pairs.vim ~/.vim/plugin/
 RUN rm -rf ~/auto_pairs_vim
-RUN wget https://www.vim.org/scripts/download_script.php\?src_id\=21752 2>/dev/null
-RUN mv 'download_script.php?src_id=21752' ~/.vim/supertab.vmb
-RUN vim -c 'so %' -c 'q' ~/.vim/supertab.vmb
-RUN wget https://raw.githubusercontent.com/dylnmc/novum.vim/master/colors/novum.vim 2>/dev/null
+RUN mkdir -p ~/.vim/pack/plugins/start
+RUN git clone --depth=1 https://github.com/ervandew/supertab.git ~/.vim/pack/plugins/start/supertab
+RUN wget https://raw.githubusercontent.com/dylnmc/novum.vim/master/colors/novum.vim
 RUN mkdir -p ~/.vim/colors
 RUN mv novum.vim ~/.vim/colors/novum.vim
-RUN curl -fLo ~/.vim/plugin/nerdcommenter.vim --create-dirs https://raw.githubusercontent.com/preservim/nerdcommenter/master/plugin/nerdcommenter.vim 2>/dev/null
-RUN curl -fLo ~/.vim/doc/nerdcommenter.txt --create-dirs https://raw.githubusercontent.com/preservim/nerdcommenter/master/doc/nerdcommenter.txt 2>/dev/null
-RUN wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/.vimrcfile 2>/dev/null
+RUN wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/.vimrcfile
 RUN mv .vimrcfile ~/.vimrc
 RUN sleep 2
 
@@ -125,7 +121,6 @@ RUN mv rockyou.txt /opt/SecLists/rockyou.txt
 
 
 # Final steps for perfect run
-RUN "mkdir tanishq"
 RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 RUN echo 'root:docker' | chpasswd 
 COPY ./p10k.zsh .
