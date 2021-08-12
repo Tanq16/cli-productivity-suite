@@ -44,6 +44,7 @@ cat add_to_rc >> ~/.zshrc
 rm add_to_rc
 cp .zshrc temptemp
 cat temptemp | grep -vE "^#" | grep -vE "^$" > .zshrc
+rm temptemp
 
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"

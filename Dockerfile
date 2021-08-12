@@ -72,6 +72,7 @@ RUN rm add_to_rc
 RUN cp ~/.zshrc temptemp
 RUN cat temptemp | grep -vE "^#" | grep -vE "^$" > ~/.zshrc
 RUN chsh -s /usr/bin/zsh
+RUN echo "cd tanishq" >> ~/.zshrc
 RUN echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> ~/.zshrc
 
 # Install vim extensions
@@ -123,7 +124,8 @@ RUN mv rockyou.txt /opt/SecLists/rockyou.txt
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-# Write stuff to do into a file
+# Final steps for perfect run
+RUN "mkdir tanishq"
 RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 RUN echo 'root:docker' | chpasswd 
 COPY ./p10k.zsh .
