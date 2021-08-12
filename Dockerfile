@@ -1,26 +1,54 @@
 FROM ubuntu:20.04
 
+# ======================================================================================================================================
+# ================================================================================================== Environment and Installations =====
+# ======================================================================================================================================
+
 # Set environment variables
 ENV RUNNING_IN_DOCKER true
 ENV SHELL /bin/zsh
 ENV TERM xterm
 
-# Enable multiverse repository
-RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
-
 # Update and Upgrade
 RUN apt update && apt upgrade -y
 
-# Install other packages
+# Install packages
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
-    build-essential libssl-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libreadline-dev libffi-dev \
-    apt-transport-https software-properties-common openssl gpg-agent \
-    nmap ncat ltrace strace openvpn openssh-server gobuster nikto dirb netdiscover hydra \
-    vim curl strace ltrace bat fd-find wget gdb git tmux tree fzf php \
-    default-jre default-jdk john wireshark gcc-multilib nasm unzip fcrackzip \
+    build-essential libssl-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libreadline-dev libffi-dev
+
+RUN DEBIAN_FRONTEND="noninteractive" \
+    apt install -y --no-install-recommends \
+    apt-transport-https software-properties-common openssl gpg-agent
+
+RUN DEBIAN_FRONTEND="noninteractive" \
+    apt install -y --no-install-recommends \
+    nmap ncat ltrace strace openvpn openssh-server gobuster nikto dirb netdiscover hydra
+
+RUN DEBIAN_FRONTEND="noninteractive" \
+    apt install -y --no-install-recommends \
+    vim curl strace ltrace bat fd-find wget gdb git tmux tree fzf php
+
+RUN DEBIAN_FRONTEND="noninteractive" \
+    apt install -y --no-install-recommends \
+    default-jre default-jdk john wireshark gcc-multilib nasm unzip fcrackzip
+
+RUN DEBIAN_FRONTEND="noninteractive" \
+    apt install -y --no-install-recommends \
     python3-pkg-resources python3-setuptools python3-pip python3 python3-dev ipython3 \
-    iproute2 openssh-server
+    iproute2 openssh-server ncrack
+
+# ======================================================================================================================================
+# ======================================================================================================================================
+# ======================================================================================================================================
+
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+# ======================================================================================================================================
+# ====================================================================================================== Shell Customization Stuff =====
+# ======================================================================================================================================
 
 # Install zsh and tmux
 RUN apt install -y --no-install-recommends zsh
@@ -64,15 +92,36 @@ RUN wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/
 RUN mv .vimrcfile ~/.vimrc
 RUN sleep 2
 
+# ======================================================================================================================================
+# ======================================================================================================================================
+# ======================================================================================================================================
+
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+# ======================================================================================================================================
+# ==================================================================================================== External Tools Installation =====
+# ======================================================================================================================================
+
 # More tool installations
-RUN mkdir /root/installations
-RUN git clone https://github.com/pwndbg/pwndbg /root/installations/pwndbg
-RUN cd /root/installations/pwndbg && ./setup.sh
+RUN git clone https://github.com/pwndbg/pwndbg /opt/pwndbg
+RUN cd /opt/pwndbg && ./setup.sh
 RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall && ./msfinstall
-RUN git clone https://github.com/offensive-security/exploitdb.git /root/installations/exploit-database
-RUN ln -sf /root/installations/exploit-database/searchsploit /usr/local/bin/searchsploit
-RUN git clone https://github.com/danielmiessler/SecLists.git /root/installations/SecLists
-RUN wget https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt -o /root/installations/SecLists/rockyou.txt
+RUN rm msfinstall
+RUN git clone https://github.com/offensive-security/exploitdb.git /opt/exploit-database
+RUN ln -sf /opt/exploit-database/searchsploit /usr/local/bin/searchsploit
+RUN git clone https://github.com/danielmiessler/SecLists.git /opt/SecLists
+RUN wget https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
+RUN mv rockyou.txt /opt/SecLists/rockyou.txt
+
+# ======================================================================================================================================
+# ======================================================================================================================================
+# ======================================================================================================================================
+
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 # Write stuff to do into a file
 RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
