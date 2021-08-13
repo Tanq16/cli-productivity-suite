@@ -9,34 +9,27 @@ ENV RUNNING_IN_DOCKER true
 ENV SHELL /bin/zsh
 ENV TERM xterm
 
-# Update and Upgrade
 RUN apt update && apt upgrade -y
 
 # Install packages using APT
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
     build-essential libssl-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libreadline-dev libffi-dev
-
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
-    apt-transport-https software-properties-common openssl gpg-agent
-
+    apt-transport-https software-properties-common openssl gpg-agent openssh-server
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
-    nmap ncat ltrace strace openvpn openssh-server gobuster nikto dirb netdiscover hydra
-
+    nmap ncat ncrack ltrace strace openvpn openssh-server gobuster nikto dirb netdiscover hydra less
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
-    vim curl strace ltrace bat fd-find wget gdb git tmux tree fzf php
-
+    vim curl strace ltrace bat fd-find wget gdb git tmux tree fzf php p7zip-full
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
     default-jre default-jdk john wireshark gcc-multilib nasm unzip fcrackzip
-
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
-    python3-pkg-resources python3-setuptools python3-pip python3 python3-dev ipython3 \
-    iproute2 openssh-server ncrack
+    python3-pkg-resources python3-setuptools python3-pip python3 python3-dev ipython3 iproute2
 
 # ======================================================================================================================================
 # ======================================================================================================================================
@@ -71,6 +64,8 @@ RUN cat add_to_rc >> ~/.zshrc
 RUN rm add_to_rc
 RUN cp ~/.zshrc temptemp
 RUN cat temptemp | grep -vE "^#" | grep -vE "^$" > ~/.zshrc
+RUN rm temptemp
+RUN echo "export PATH=$PATH:/usr/local/go/bin/" >> ~/.zshrc
 RUN chsh -s /usr/bin/zsh
 RUN echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> ~/.zshrc
 
@@ -104,16 +99,39 @@ RUN sleep 2
 # More tool installations
 RUN git clone https://github.com/pwndbg/pwndbg /opt/pwndbg
 RUN cd /opt/pwndbg && ./setup.sh
+
 RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall && ./msfinstall
 RUN rm msfinstall
+
 RUN git clone https://github.com/rbsec/sslscan.git /opt/sslscan
 RUN cd /opt/sslscan && make static
+
 RUN git clone https://github.com/offensive-security/exploitdb.git /opt/exploit-database
 RUN ln -sf /opt/exploit-database/searchsploit /usr/local/bin/searchsploit
+
 RUN git clone https://github.com/danielmiessler/SecLists.git /opt/SecLists
+
 RUN wget https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
 RUN mv rockyou.txt /opt/SecLists/rockyou.txt
+
 RUN python3 -m pip install jupyterlab
+
+RUN wget https://golang.org/dl/go1.16.7.linux-amd64.tar.gz
+RUN tar -C /usr/local -xzf go1.16.7.linux-amd64.tar.gz && rm go1.16.7.linux-amd64.tar.gz
+
+# ======================================================================================================================================
+# ======================================================================================================================================
+# ======================================================================================================================================
+
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+# ======================================================================================================================================
+# ================================================================================================ Miscellaneous apt Installations =====
+# ======================================================================================================================================
+
+# All other apt installations go here to benefit from layer caching of other installs
 
 # ======================================================================================================================================
 # ======================================================================================================================================
