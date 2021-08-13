@@ -6,8 +6,8 @@ FROM ubuntu:20.04
 
 # Set environment variables
 ENV RUNNING_IN_DOCKER true
-ENV SHELL /bin/zsh
 ENV TERM xterm
+ENV SHELL /bin/zsh
 
 RUN apt update && apt upgrade -y
 
@@ -17,10 +17,10 @@ RUN DEBIAN_FRONTEND="noninteractive" \
     build-essential libssl-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libreadline-dev libffi-dev
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
-    apt-transport-https software-properties-common openssl gpg-agent openssh-server
+    apt-transport-https software-properties-common openssl gpg-agent openssh-server openvpn
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
-    nmap ncat ncrack openvpn openssh-server gobuster nikto dirb netdiscover hydra less
+    nmap ncat gobuster nikto dirb netdiscover hydra less
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
     vim curl strace ltrace bat fd-find wget gdb git tmux tree fzf php p7zip-full
