@@ -12,7 +12,7 @@ ENV TERM xterm
 # Update and Upgrade
 RUN apt update && apt upgrade -y
 
-# Install packages
+# Install packages using APT
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y --no-install-recommends \
     build-essential libssl-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libreadline-dev libffi-dev
@@ -106,11 +106,14 @@ RUN git clone https://github.com/pwndbg/pwndbg /opt/pwndbg
 RUN cd /opt/pwndbg && ./setup.sh
 RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall && ./msfinstall
 RUN rm msfinstall
+RUN git clone https://github.com/rbsec/sslscan.git /opt/sslscan
+RUN cd /opt/sslscan && make static
 RUN git clone https://github.com/offensive-security/exploitdb.git /opt/exploit-database
 RUN ln -sf /opt/exploit-database/searchsploit /usr/local/bin/searchsploit
 RUN git clone https://github.com/danielmiessler/SecLists.git /opt/SecLists
 RUN wget https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
 RUN mv rockyou.txt /opt/SecLists/rockyou.txt
+RUN python3 -m pip install jupyterlab
 
 # ======================================================================================================================================
 # ======================================================================================================================================
