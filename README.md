@@ -92,7 +92,7 @@ docker run --name="sec_docker" -v ~/go_programs/:/root/go/src -v ~/python_progra
 docker run --name="sec_docker" --rm -p 58080:8080 -p 50022:22 -it tanq16/sec_docker:main zsh -c "service ssh start; zsh"
 ```
 
-The security image also has the development instructions in its `Dockerfile`, so the volumes can be mounted there as well. On connecting the VS code via the remote ssh extension to the docker image, the python package and the go package
+The security image also has the development instructions in its `Dockerfile`, so the volumes can be mounted there as well. On connecting the VS code via the remote ssh extension to the docker image, the python package and the go package should be installed everytime the docker is run. This is not a cumbersome process for doing manually but is cumbersome doing it in an automated fashion. The advantage of using the development image over the security image, despite the security image containing both the development environments, is that the development image is only 1.45 GB in size compared to 6.5 GB for the security image.
 
 The `service ssh start` section of the command to be executed is needed to enable ssh access. Direct loading of the shell interferes with the oh-my-zsh themes and not all things are loaded. Therefore, the docker image should be run either in background or as stated above to signify a control shell and then use ssh and tmux to simulate work environment. After this, it is possible to ssh into the docker with the `root` user and password `docker`.
 
