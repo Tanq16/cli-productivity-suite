@@ -74,46 +74,53 @@ during the installation. You could re-enable the same by deleting the line in yo
 sed -i "s/export BAT_PAGER=''//" ~/.zshrc
 ```
 
-# Security focussed docker image
+# Docker Images
 
-This docker image is intended to be used for cybersecurity related operations. It's effectively a combination of all the good tools required for basic pentesting. This includes the command line enhancements listed above. The intended way to use it is to run the docker and then ssh into the instance via VS code and a terminal application, use tmux and work.
+The two docker images in this repository are intended to be used for cybersecurity related operations and for python/go development. The security docker is effectively a combination of all the good tools required for basic pentesting. Both the images include the command line enhancements listed above. The intended way to use it is to run the docker and then ssh into the instance via VS code and a terminal application, use tmux and work.
 
 This is specific to x86 machines and the best way to get access is to pull the image by using -
 ```bash
-docker pull tanq16/sec_docker:main
+docker pull tanq16/sec_docker:main # For the security docker image/
+docker pull tanq16/sec_docker:dev # For the development docker image
 ```
 Then, it can be run by using -
 ```bash
-docker run --name="sec_docker" -v ~/go/:/root/go/ --rm -p 50022:22 -it tanq16/sec_docker:main zsh -c "service ssh start; zsh"
+# The dev docker image - mount the programming folders from host and map the ssh port
+docker run --name="sec_docker" -v ~/go_programs/:/root/go/src -v ~/python_programs/:/root/python/ --rm -p 50022:22 -it tanq16/sec_docker:dev zsh -c "service ssh start; zsh"
+
+# The security docker image - map the ssh port and the jupyterlab port
+docker run --name="sec_docker" --rm -p 58080:8080 -p 50022:22 -it tanq16/sec_docker:main zsh -c "service ssh start; zsh"
 ```
 
-After this, it is possible to ssh into the docker with the `root` user and password `docker`.
+The security image also has the development instructions in its `Dockerfile`, so the volumes can be mounted there as well. On connecting the VS code via the remote ssh extension to the docker image, the python package and the go package
 
-The above command mounts the local volume for go code. Similarly, the only port mapped to localhost is 50022, for ssh. Jupyter-Lab is also installed on the docker and the port 8888 can be mapped to that of localhost:58888. The general norm for mapping ports for this docker should be 50000+port for consistency and interoperability.
+The `service ssh start` section of the command to be executed is needed to enable ssh access. Direct loading of the shell interferes with the oh-my-zsh themes and not all things are loaded. Therefore, the docker image should be run either in background or as stated above to signify a control shell and then use ssh and tmux to simulate work environment. After this, it is possible to ssh into the docker with the `root` user and password `docker`.
 
-## Notable installations in the docker
+The general norm for mapping ports for these images is 50000+port for consistency and interoperability.
 
-nmap, ncat & ncrack
-ltrace & strace
-gobuster, nikto & dirb
-netdiscover & wireshark (tshark mainly, because its cli)
-hydra, fcrackzip & john the ripper
-pwndbg
-metasploit-framework & searchsploit (with exploit-database)
-jupyter-lab & golang
-seclists & rockyou.txt
+## Notable installations in the security docker
+
+* nmap, ncat & ncrack
+* ltrace & strace
+* gobuster, nikto & dirb
+* netdiscover & wireshark (tshark mainly, because its cli)
+* hydra, fcrackzip & john the ripper
+* pwndbg
+* metasploit-framework & searchsploit (with exploit-database)
+* jupyter-lab & golang
+* seclists & rockyou.txt
 
 ## Build on your own
 
-The repository includes the required files to build the image. If the exact tools are not required and extra tools must be installed or replaced, the given `Dockerfile` should be edited. 
+The repository includes the required files to build both the images. If the existing tools are not required or extra tools must be installed or replaced, the given `Dockerfile`s in the respective directories should be edited. 
 
-The `p10k.zsh` file has to be inside the same directory as the `Dockerfile` as it copies it and prevents the configuration wizard of zsh from running when you run the docker. If the wizard is still needed for customization, then run `p10k configure` inside the docker and replace the contents of the `p10k.zsh` file in the host with those of the `~/.p10k.zsh` file inside the docker.
+The `p10k.zsh` file for each directory must be inside the same directory as the `Dockerfile` of the respective docker image, as the vuild process copies it and prevents the configuration wizard of oh-my-zsh from running when accessing the shell of the docker image. If the wizard is still needed for customization, then run `p10k configure` inside the docker and replace the contents of the `p10k.zsh` file in the host with those of the `~/.p10k.zsh` file inside the directory for the required docker image.
 
-To build the docker use this command in the folder that contains the files -
+To build the docker use this command in the required folder that contains the files -
 ```bash
-docker build -t aio_docker .
+docker build -t dev_docker .
 ```
-Thereafter, run the following command to run the docker -
+Thereafter, run the following command to execute the shell within the image -
 ```bash
 docker run --name="aio_docker_instance" --rm -p 50022:22 -it aio_docker zsh -c "service ssh start; zsh"
 ```
