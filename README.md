@@ -61,7 +61,7 @@ To use the basic modern editor features in vim, use the given script to install 
 ```bash
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/vim_improve.sh)"
 ```
-This installs the supertab (tab => autocomplete), auto-pair brackets, lightline plugin and sets numbering, expandtab, tab=4 spaces and autoindent.
+This installs the supertab (tab => autocomplete), auto-pair brackets, lightline plugin and sets numbering, expandtab, tab=4 spaces, autoindent and some shortcuts.
 
 ## Bonus: Installation of Bat
 
@@ -80,7 +80,7 @@ The two docker images in this repository are intended to be used for cybersecuri
 
 This is specific to x86 machines and the best way to get access is to pull the image by using -
 ```bash
-docker pull tanq16/sec_docker:main # For the security docker image/
+docker pull tanq16/sec_docker:main # For the security docker image
 docker pull tanq16/sec_docker:dev # For the development docker image
 ```
 Then, it can be run by using -
@@ -92,11 +92,15 @@ docker run --name="sec_docker" -v ~/go_programs/:/root/go/src -v ~/python_progra
 docker run --name="sec_docker" --rm -p 58080:8080 -p 50022:22 -it tanq16/sec_docker:main zsh -c "service ssh start; zsh"
 ```
 
-The security image also has the development instructions in its `Dockerfile`, so the volumes can be mounted there as well. On connecting the VS code via the remote ssh extension to the docker image, the python package and the go package should be installed everytime the docker is run. This is not a cumbersome process for doing manually but is cumbersome doing it in an automated fashion. The advantage of using the development image over the security image, despite the security image containing both the development environments, is that the development image is only 1.45 GB in size compared to 6.5 GB for the security image.
+The security image also has the development instructions in its `Dockerfile`, so the volumes can be mounted there as well. On connecting the VS code via the remote ssh extension to the docker image, the python package and the go package should be installed everytime the docker is run. This is not a cumbersome process for doing manually but is cumbersome doing it in an automated fashion. The advantage of using the development image over the security image, despite the security image containing both the development environments, is that the development image is only ``1.45 GB`` in size compared to ``6.5 GB`` for the security image.
 
 The `service ssh start` section of the command to be executed is needed to enable ssh access. Direct loading of the shell interferes with the oh-my-zsh themes and not all things are loaded. Therefore, the docker image should be run either in background or as stated above to signify a control shell and then use ssh and tmux to simulate work environment. After this, it is possible to ssh into the docker with the `root` user and password `docker`.
 
 The general norm for mapping ports for these images is 50000+port for consistency and interoperability.
+
+## Golang environment for development docker
+
+Given the unique file structure for the go root directory, it is best to map the ``src/`` directory or a code store directory of the host to that of the `src` directory in the actual go structure inside the image. This avoids writing the built binaries and added packages into the code saved on the host, thereby allowing a clean sync of the code directory on the host to a version control system.
 
 ## Notable installations in the security docker
 
@@ -105,7 +109,7 @@ The general norm for mapping ports for these images is 50000+port for consistenc
 * gobuster, nikto & dirb
 * netdiscover & wireshark (tshark mainly, because its cli)
 * hydra, fcrackzip & john the ripper
-* pwndbg
+* gdb with pwndbg
 * metasploit-framework & searchsploit (with exploit-database)
 * jupyter-lab & golang
 * seclists & rockyou.txt
