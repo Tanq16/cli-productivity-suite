@@ -147,7 +147,10 @@ RUN mv /tmp/dlv /root/go/bin/dlv-dap
 # ====================================================================== Miscellaneous apt Installations =====
 # ============================================================================================================
 
-# All other apt installations go here to benefit from layer caching of other installs
+# All other installations go here to benefit from layer caching of other installs
+RUN apt install ruby-full -y
+RUN git clone https://github.com/wpscanteam/wpscan.git /opt/wp-scan
+RUN cd /opt/wp-scan && gem install wpscan
 
 # ============================================================================================================
 # ============================================================================================================
