@@ -6,29 +6,29 @@ FROM ubuntu:20.04
 
 # Set environment variables
 ENV RUNNING_IN_DOCKER true
-ENV TERM xterm
 ENV SHELL /bin/zsh
+ENV TERM xterm
 
 RUN apt update && apt upgrade -y
 
 # Install packages using APT
 RUN DEBIAN_FRONTEND="noninteractive" \
-    apt install -y --no-install-recommends \
+    apt install -y \
     build-essential libssl-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libreadline-dev libffi-dev
 RUN DEBIAN_FRONTEND="noninteractive" \
-    apt install -y --no-install-recommends \
+    apt install -y \
     apt-transport-https software-properties-common openssl gpg-agent openssh-server openvpn
 RUN DEBIAN_FRONTEND="noninteractive" \
-    apt install -y --no-install-recommends \
-    nmap ncat gobuster nikto dirb netdiscover hydra less
+    apt install -y \
+    nmap ncat gobuster nikto dirb netdiscover hydra less file binwalk
 RUN DEBIAN_FRONTEND="noninteractive" \
-    apt install -y --no-install-recommends \
+    apt install -y \
     vim curl strace ltrace bat fd-find wget gdb git tmux tree fzf php p7zip-full
 RUN DEBIAN_FRONTEND="noninteractive" \
-    apt install -y --no-install-recommends \
+    apt install -y \
     default-jre default-jdk john wireshark gcc-multilib nasm unzip fcrackzip
 RUN DEBIAN_FRONTEND="noninteractive" \
-    apt install -y --no-install-recommends \
+    apt install -y \
     python3-pkg-resources python3-setuptools python3-pip python3 python3-dev ipython3 iproute2
 
 # ============================================================================================================
@@ -44,7 +44,7 @@ RUN DEBIAN_FRONTEND="noninteractive" \
 # ============================================================================================================
 
 # Install zsh and tmux
-RUN apt install -y --no-install-recommends zsh
+RUN apt install -y zsh
 RUN curl -L http://install.ohmyz.sh | sh
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k 2>/dev/null
 RUN sed -i "s/robbyrussell/powerlevel10k\/powerlevel10k/" ~/.zshrc
@@ -148,7 +148,7 @@ RUN mv /tmp/dlv /root/go/bin/dlv-dap
 # ============================================================================================================
 
 # All other installations go here to benefit from layer caching of other installs
-RUN apt install ruby-full -y
+RUN DEBIAN_FRONTEND="noninteractive" apt install ruby-full -y
 RUN git clone https://github.com/wpscanteam/wpscan.git /opt/wp-scan
 RUN cd /opt/wp-scan && gem install wpscan
 
