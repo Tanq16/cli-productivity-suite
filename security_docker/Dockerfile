@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu
 
 # ============================================================================================================
 # ======================================================================== Environment and Installations =====
@@ -6,8 +6,8 @@ FROM ubuntu:20.04
 
 # Set environment variables
 ENV RUNNING_IN_DOCKER true
-ENV SHELL /bin/zsh
 ENV TERM xterm
+ENV SHELL /bin/zsh
 
 RUN apt update && apt upgrade -y
 
@@ -20,16 +20,22 @@ RUN DEBIAN_FRONTEND="noninteractive" \
     apt-transport-https software-properties-common openssl gpg-agent openssh-server openvpn
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y \
-    nmap ncat gobuster nikto dirb netdiscover hydra less file binwalk
+    nmap ncat gobuster nikto dirb netdiscover hydra less file binwalk p7zip-full
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y \
-    vim curl strace ltrace bat fd-find wget gdb git tmux tree fzf php p7zip-full
+    vim curl strace ltrace bat fd-find wget gdb git tmux tree fzf php ntp
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y \
     default-jre default-jdk john wireshark gcc-multilib nasm unzip fcrackzip
 RUN DEBIAN_FRONTEND="noninteractive" \
     apt install -y \
     python3-pkg-resources python3-setuptools python3-pip python3 python3-dev ipython3 iproute2
+RUN DEBIAN_FRONTEND="noninteractive" \
+    apt install -y \
+    inetutils-ping inetutils-telnet inetutils-inetd inetutils-ftpd inetutils-telnetd inetutils-talkd
+RUN DEBIAN_FRONTEND="noninteractive" \
+    apt install -y \
+    inetutils-tools inetutils-syslogd inetutils-talk inetutils-traceroute inetutils-ftp
 
 # ============================================================================================================
 # ============================================================================================================
@@ -58,7 +64,6 @@ RUN git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm 2>/dev/nul
 RUN git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
 RUN wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/tmuxconf 2>/dev/null
 RUN mv tmuxconf ~/.tmux.conf
-RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
 RUN wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/add_to_rc 2>/dev/null
 RUN cat add_to_rc >> ~/.zshrc
 RUN rm add_to_rc
@@ -119,6 +124,7 @@ RUN tar -C /usr/local -xzf go1.16.7.linux-amd64.tar.gz && rm go1.16.7.linux-amd6
 
 RUN python3 -m pip install jupyterlab cryptography requests
 
+# For VS Code to run smoothly for golang
 RUN /usr/local/go/bin/go get github.com/uudashr/gopkgs/v2/cmd/gopkgs
 RUN /usr/local/go/bin/go get github.com/ramya-rao-a/go-outline
 RUN /usr/local/go/bin/go get github.com/cweill/gotests/gotests

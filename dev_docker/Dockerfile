@@ -77,6 +77,7 @@ RUN tar -C /usr/local -xzf go1.16.7.linux-amd64.tar.gz && rm go1.16.7.linux-amd6
 
 RUN python3 -m pip install cryptography requests 
 
+# For VS code to run smoothly for golang
 RUN /usr/local/go/bin/go get github.com/uudashr/gopkgs/v2/cmd/gopkgs
 RUN /usr/local/go/bin/go get github.com/ramya-rao-a/go-outline
 RUN /usr/local/go/bin/go get github.com/cweill/gotests/gotests
