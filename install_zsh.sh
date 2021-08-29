@@ -36,8 +36,12 @@ wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/tmux
 mv tmuxconf ~/.tmux.conf
 
 echo "Installing fuzzy finder"
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
-~/.fzf/install --all 1>/dev/null 2>/dev/null
+sudo apt install fzf
+echo "if [[ ! "$PATH" == */home/tanq/.fzf/bin* ]]; then" > ~/.fzf.zsh
+echo '  export PATH="${PATH:+${PATH}:}/home/tanq/.fzf/bin"' >> ~/.fzf.zsh
+echo 'fi' >> ~/.fzf.zsh
+echo '[[ $- == *i* ]] && source "/home/tanq/.fzf/shell/completion.zsh" 2> /dev/null' >> ~/.fzf.zsh
+echo 'source "/home/tanq/.fzf/shell/key-bindings.zsh"' >> ~/.fzf.zsh
 
 echo "Installing colored ls"
 wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd64.deb 2>/dev/null
