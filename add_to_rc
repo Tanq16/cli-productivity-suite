@@ -23,8 +23,8 @@ alias ta='tmux a -t'
 alias tls='tmux list-sessions'
 alias v='vim -p'
 alias c=clear
-alias l='ls -l'
-alias la='ls -la'
+alias l='lsd -l'
+alias la='lsd -la'
 alias bat=batcat
 alias ip4="ip a | grep inet | cut -d ' ' -f6 | grep -vE ':'"
 alias sshide='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null"'
