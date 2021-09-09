@@ -34,6 +34,7 @@ set -g @plugin 'wfxr/tmux-power'
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'nhdaly/tmux-better-mouse-mode'
-set -g @tmux_power_theme '#b0b0b0'
+set -g @plugin 'jimeh/tmux-themepack'
+set -g @themepack 'powerline/default/gray'
 
 run '~/.tmux/plugins/tpm/tpm'
