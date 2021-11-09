@@ -1,7 +1,12 @@
 #!/bin/sh
 
 echo "Insitializing..... may take a few seeconds."
-sudo apt install -y tree sshpass tmux 1>/dev/null 2>/dev/null
+if [ $(uname -s) = "Darwin" ]
+then
+    sudo apt install -y tree sshpass tmux 1>/dev/null 2>/dev/null
+else
+    brew install tree sshpass tmux 1>/dev/null 2>/dev/null
+fi
 
 # echo "Setting ZSH to default shell :: Please enter your password."
 # chsh -s /usr/bin/zsh $USER
@@ -17,17 +22,14 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/
 
 sed -i "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" ~/.zshrc
 
-echo "Installing Awesome color scheme"
-git clone https://github.com/seebi/dircolors-solarized.git dirco_for_script_color_option 2>/dev/null
-git clone https://github.com/arcticicestudio/nord-dircolors.git 2>/dev/null
-cp nord-dircolors/src/dir_colors ~/.oh-my-zsh/nord.dircolors
-rm -rf nord-dircolors/
-cp dirco_for_script_color_option/dircolors.256dark ~/.oh-my-zsh/dircolors.256dark
-rm -rf dirco_for_script_color_option/
-
 echo "Installing Bat and fd-Find"
-sudo apt install bat -y 1>/dev/null 2>/dev/null
-sudo apt install fd-find -y 1>/dev/null 2>/dev/null
+if [ $(uname -s) = "Darwin" ]
+then
+    sudo apt install bat -y 1>/dev/null 2>/dev/null
+    sudo apt install fd-find -y 1>/dev/null 2>/dev/null
+else
+    brew install vim bat fd 1>/dev/null 2>/dev/null
+fi
 
 echo "Installing Tmux - Upon first start, press Prefix then type :source-file ~/.tmux.conf, then press Prefix->I to install plugins properly."
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm 2>/dev/null
@@ -40,8 +42,13 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
 ~/.fzf/install --all 1>/dev/null 2>/dev/null
 
 echo "Installing colored ls"
-wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd64.deb 2>/dev/null
-apt install -y ./lsd_0.20.1_amd64.deb 1>/dev/null 2>/dev/null && rm lsd_0.20.1_amd64.deb
+if [ $(uname -s) = "Darwin" ]
+then
+    wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd64.deb 2>/dev/null
+    apt install -y ./lsd_0.20.1_amd64.deb 1>/dev/null 2>/dev/null && rm lsd_0.20.1_amd64.deb
+else
+    brew install lsd 1>/dev/null 2>/dev/null
+fi
 
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/add_to_rc 2>/dev/null
 cat add_to_rc >> ~/.zshrc

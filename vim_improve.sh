@@ -1,6 +1,11 @@
 #!/usr/bin/zsh
 echo "Installing vim"
-sudo apt install -y vim 1>/dev/null 2>/dev/null
+if [ $(uname -s) = "Darwin" ]
+then
+    sudo apt install -y vim 1>/dev/null 2>/dev/null
+else
+    brew install vim 1>/dev/null 2>/dev/null
+fi
 
 echo "Installing Lightline"
 git clone https://github.com/itchyny/lightline.vim ~/.vim/pack/plugins/start/lightline 2>/dev/null

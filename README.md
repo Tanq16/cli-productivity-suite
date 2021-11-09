@@ -13,7 +13,7 @@ sudo apt install curl vim
 
 The first step is to install zsh. Enter your password when prompted to make zsh default (or do it on your own as per your wish). Execute the following on your terminal -
 ```bash
-sudo apt install -y zsh wget git
+sudo apt install -y zsh wget git # Or `brew install wget git` for MacOS
 wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null
 sh install.sh
 rm install.sh
@@ -53,7 +53,7 @@ p10k configure
 
 **FiraCode Nerd Font Mono** (recommended) font can be downloaded from [here](https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip).
 
-The fuzzy search is another awesome feature to have. Read the specifics at the github page [here](https://github.com/junegunn/fzf) and learn about the features a bit more [here](https://medium.com/better-programming/boost-your-command-line-productivity-with-fuzzy-finder-985aa162ba5d).
+The fuzzy search is another awesome feature to have and is installed as a part of the commands scripts above. Read the specifics at the github page [here](https://github.com/junegunn/fzf) and learn about the features a bit more [here](https://medium.com/better-programming/boost-your-command-line-productivity-with-fuzzy-finder-985aa162ba5d).
 
 ## Bonus: Basic Vim quick changes
 
