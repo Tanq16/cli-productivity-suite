@@ -74,3 +74,13 @@ during the installation. You could re-enable the same by deleting the line in yo
 sed -i "s/export BAT_PAGER=''//" ~/.zshrc
 ```
 
+## Bonus: Fix slow Oh-My-Zsh Paste
+Pasting on modified zsh shells can be slow ue to magic functions that oh-my-zsh installs. A quick fix for this is to comment those functions in the file at location `$HOME/.oh-my.zsh/lib/misc.zsh`. This can also be easily done via the `sed`. The following can be pasted in a file and run as `bash file` or `zsh file` or as an executable after chmoding the file.
+
+```bash
+#!/bin/zsh
+sed -i "s/autoload -Uz bracketed-paste-magic/#autoload -Uz bracketed-paste-magic/" ~/.oh-my-zsh/lib/misc.sh
+sed -i "s/zle -N bracketed-paste bracketed-paste-magic/#zle -N bracketed-paste bracketed-paste-magic/" ~/.oh-my-zsh/lib/misc.sh
+sed -i "s/autoload -Uz url-quote-magic/#autoload -Uz url-quote-magic/" ~/.oh-my-zsh/lib/misc.sh
+sed -i "s/zle -N self-insert url-quote-magic/#zle -N self-insert url-quote-magic/" ~/.oh-my-zsh/lib/misc.sh
+```
