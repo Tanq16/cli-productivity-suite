@@ -5,7 +5,7 @@ if [ $(uname -s) = "Darwin" ]
 then
     sudo apt install -y tree sshpass tmux 1>/dev/null 2>/dev/null
 else
-    brew install tree sshpass tmux 1>/dev/null 2>/dev/null
+    brew install tree tmux 1>/dev/null 2>/dev/null
 fi
 
 # echo "Setting ZSH to default shell :: Please enter your password."
