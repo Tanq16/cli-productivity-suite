@@ -13,6 +13,7 @@ export BAT_PAGER=''
 
 alias f='fzf'
 alias gitn='git --no-pager'
+alias awsn='aws --no-cli-pager'
 alias vim='vim -p'
 alias ascii='ascii -adx'
 alias tt='tmux new -s default'
