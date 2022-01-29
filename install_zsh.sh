@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Insitializing..... may take a few seeconds."
-if [ $(uname -s) = "Darwin" ]
+if [ $(uname -s) != "Darwin" ]
 then
     sudo apt install -y tree sshpass tmux 1>/dev/null 2>/dev/null
 else
@@ -23,7 +23,7 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/
 sed -i "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" ~/.zshrc
 
 echo "Installing Bat and fd-Find"
-if [ $(uname -s) = "Darwin" ]
+if [ $(uname -s) != "Darwin" ]
 then
     sudo apt install bat -y 1>/dev/null 2>/dev/null
     sudo apt install fd-find -y 1>/dev/null 2>/dev/null
@@ -42,7 +42,7 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
 ~/.fzf/install --all 1>/dev/null 2>/dev/null
 
 echo "Installing colored ls"
-if [ $(uname -s) = "Darwin" ]
+if [ $(uname -s) != "Darwin" ]
 then
     wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd64.deb 2>/dev/null
     apt install -y ./lsd_0.20.1_amd64.deb 1>/dev/null 2>/dev/null && rm lsd_0.20.1_amd64.deb
