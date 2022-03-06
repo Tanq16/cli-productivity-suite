@@ -4,7 +4,7 @@ Use this script to easily install **zsh** and the custom shell experience of **O
 
 ## Requirements
 
-The system should have `curl` installed. `vim` is required for the bonus script. If not, do it like so&rarr;
+The system should have `curl` installed. `vim` is required for the bonus script. If not, do it like so &rarr;
 ```bash
 sudo apt install curl vim # Or `brew install curl vim` for MacOS
 ```
