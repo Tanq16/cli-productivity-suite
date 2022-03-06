@@ -3,7 +3,7 @@
 echo "Insitializing..... may take a few seeconds."
 if [ $(uname -s) != "Darwin" ]
 then
-    sudo apt install -y tree sshpass tmux 1>/dev/null 2>/dev/null
+    sudo apt install -y tree tmux 1>/dev/null 2>/dev/null
 else
     brew install tree tmux 1>/dev/null 2>/dev/null
 fi
@@ -16,9 +16,9 @@ sed -i "s/robbyrussell/powerlevel10k\/powerlevel10k/" ~/.zshrc
 
 echo "Custom shell installed."
 echo "Installing Auto-suggestions"
-git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions 2>/dev/null
+git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions 2>/dev/null
 echo "Installing Syntax highlighting"
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting 2>/dev/null
+git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting 2>/dev/null
 
 sed -i "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" ~/.zshrc
 
@@ -32,8 +32,8 @@ else
 fi
 
 echo "Installing Tmux - Upon first start, press Prefix then type :source-file ~/.tmux.conf, then press Prefix->I to install plugins properly."
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm 2>/dev/null
-git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
+git clone --depth=1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm 2>/dev/null
+git clone --depth=1 https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/tmuxconf 2>/dev/null
 mv tmuxconf ~/.tmux.conf
 
@@ -44,8 +44,14 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
 echo "Installing colored ls"
 if [ $(uname -s) != "Darwin" ]
 then
-    wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd64.deb 2>/dev/null
-    apt install -y ./lsd_0.20.1_amd64.deb 1>/dev/null 2>/dev/null && rm lsd_0.20.1_amd64.deb
+    if [ $(uname -i) != "x86_64" ]
+        a=$(curl -s https://github.com/Peltoche/lsd/releases/latest | grep -oE "tag.+\"" | cut -d '/' -f2 | cut -d "\"" -f1) && \
+        wget "https://github.com/Peltoche/lsd/releases/download/$a/lsd_$a""_amd64.deb" && \
+        apt install -y "./lsd_$a""_amd64.deb" && rm "lsd_$a""_amd64.deb"
+    else
+        a=$(curl -s https://github.com/Peltoche/lsd/releases/latest | grep -oE "tag.+\"" | cut -d '/' -f2 | cut -d "\"" -f1) && \
+        wget "https://github.com/Peltoche/lsd/releases/download/$a/lsd_$a""_arm64.deb" && \
+        apt install -y "./lsd_$a""_arm64.deb" && rm "lsd_$a""_arm64.deb"
 else
     brew install lsd 1>/dev/null 2>/dev/null
 fi
