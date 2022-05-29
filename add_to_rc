@@ -29,7 +29,7 @@ alias ip4="ip a | grep inet | cut -d ' ' -f6 | grep -vE ':'"
 alias pubip="curl -s ipinfo.io | jq -M '.ip' | cut -d '\"' -f2"
 alias sshide='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null"'
 alias ruid='python3 -c "import uuid; print(uuid.uuid4())"'
-alias sruid='ruid | grep -oE ".{4}-.{4}-.{4}"'
+alias sruid='ruid | grep -oE ".{4}-.{4}-.{4}" | cat'
 
 # Colored man pages
 export LESS_TERMCAP_mb=$'\e[1;32m'
