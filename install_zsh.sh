@@ -43,7 +43,6 @@ fi
 
 echo "Installing Tmux - On first start, press Prefix (ctrl+b) then press shift-i to install plugins properly."
 git clone --depth=1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm 2>/dev/null
-git clone --depth=1 https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/tmuxconf 2>/dev/null
 mv tmuxconf ~/.tmux.conf
 
