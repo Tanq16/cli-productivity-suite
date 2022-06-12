@@ -11,12 +11,15 @@ fi
 # echo "Setting ZSH to default shell :: Please enter your password."
 # chsh -s /usr/bin/zsh $USER
 
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k 2>/dev/null
+# git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k 2>/dev/null
+git clone https://github.com/spaceship-prompt/spaceship-prompt.git "$ZSH_CUSTOM/themes/spaceship-prompt" --depth=1
+ln -s "$ZSH_CUSTOM/themes/spaceship-prompt/spaceship.zsh-theme" "$ZSH_CUSTOM/themes/spaceship.zsh-theme"
 if [ $(uname -s) != "Darwin" ]
 then
-    sed -i "s/robbyrussell/powerlevel10k\/powerlevel10k/" ~/.zshrc
+    # sed -i "s/robbyrussell/powerlevel10k\/powerlevel10k/" ~/.zshrc
+    sed -i "s/robbyrussell/spaceship/" ~/.zshrc
 else
-    sed -ie "s/robbyrussell/powerlevel10k\/powerlevel10k/" ~/.zshrc
+    sed -ie "s/robbyrussell/spaceship/" ~/.zshrc
 fi
 
 echo "Custom shell installed."
@@ -66,6 +69,9 @@ else
 fi
 
 curl -sLf https://spacevim.org/install.sh | bash
+wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/spacevim_config 2>/dev/null
+mkdir ~/.SpaceVim.d
+mv spacevim_config ~/.SpaceVim.d/
 
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/add_to_rc 2>/dev/null
 if [ $(uname -s) != "Darwin" ]
