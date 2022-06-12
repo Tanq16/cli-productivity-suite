@@ -65,6 +65,8 @@ else
     brew install lsd 1>/dev/null 2>/dev/null
 fi
 
+curl -sLf https://spacevim.org/install.sh | bash
+
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/add_to_rc 2>/dev/null
 if [ $(uname -s) != "Darwin" ]
 then
@@ -80,6 +82,7 @@ cp .zshrc temptemp
 cat temptemp | grep -vE "^#" | grep -vE "^$" > .zshrc
 rm temptemp
 
+echo "\n\n\n\n\n\n\n\n"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "If you don't see shapes properly, install powerline fonts (Read the README)"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
