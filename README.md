@@ -23,41 +23,28 @@ rm install.sh # cleanup
 Once done, execute the following to install all other magic and enter the password whenever prompted.
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh.sh)"
+zsh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh.sh)"
 ```
 
-Or, clone the repo and run the `install_zsh.sh` script.
-
-Restart the shell (log out and back in on a linux machine or close the shell and start again on WSL). Execute `p10k configure` after logging in (preferably after installation of the font). This time, set the options according to the way the prompt must look. For any wierd looking prompts, see Post Installation steps below.
+Or, clone the repo and run the `install_zsh.sh` script. Finally, restart the shell
 
 ## Features
 
 This script installs the following &rarr;
-1. Zsh
-2. OH-MY-ZSH custom shell with Powerlevel10k theme
-3. Fuzzy finder for awesome productivity
+
+1. Oh-My-Zsh custom shell with [spaceship-prompt](https://spaceship-prompt.sh/) theme
+2. Fuzzy finder (`fzf`) for awesome productivity
 3. Syntax highlighting for command line
-4. Auto-completion on command line
-5. Tmux with mouse and other quality of life improvements
-6. SpaceVim for a flashy vim experience
+3. Auto-completion on command line
+4. Tmux with mouse and other quality of life improvements
+5. SpaceVim for a flashy vim experience
+6. Nord theme for tmux and vim
 
 ## Post Installation
 
-If the prompt looks funny or has an unintended look or the options for lock, debian logo, etc. were not visible, change the font of the terminal you use to a powerline-font or something that has ligatures and icon support. Highest recommendation from the author &rarr; FiraCode Nerd Font, Ubuntu Mono Powerline Derivative.
+Highly recommended font for this suite &rarr; **FiraCode Nerd Font Mono**, which can be downloaded from [here](https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip).
 
-To install powerline fonts from repositories on debian systems, use &rarr;
-
-```bash
-sudo apt install fonts-powerline
-```
-
-After this reconfigure the powerlevel10k using &rarr;
-
-```bash
-p10k configure
-```
-
-**FiraCode Nerd Font Mono** (recommended) font can be downloaded from [here](https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip).
+Vim and tmux are both configured to use the [Nord](https://www.nordtheme.com/) theme, so it's better to install that same theme to your terminal emulator for a seamless experience. Nord can be installed for all general purpose terminal emulators like iTerm2, Windows Terminal, etc.
 
 The fuzzy search by `fzf` is another awesome feature to have and is installed as a part of the scripts above. Read the specifics at the github page [here](https://github.com/junegunn/fzf) and learn about the features a bit more [here](https://medium.com/better-programming/boost-your-command-line-productivity-with-fuzzy-finder-985aa162ba5d).
 
