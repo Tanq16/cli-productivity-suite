@@ -23,7 +23,7 @@ rm install.sh # cleanup
 Once done, execute the following to install all other magic and enter the password whenever prompted.
 
 ```bash
-zsh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh.sh)"
 ```
 
 Or, clone the repo and run the `install_zsh.sh` script. Finally, restart the shell
