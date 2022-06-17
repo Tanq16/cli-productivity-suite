@@ -64,6 +64,7 @@ then
         wget "https://github.com/Peltoche/lsd/releases/download/$a/lsd_""$a""_arm64.deb" && \
         apt install -y "./lsd_""$a""_arm64.deb" && \
         rm "lsd_""$a""_arm64.deb"
+    fi
 else
     brew install lsd 1>/dev/null 2>/dev/null
 fi
