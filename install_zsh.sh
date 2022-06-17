@@ -12,8 +12,8 @@ fi
 # chsh -s /usr/bin/zsh $USER
 
 # git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k 2>/dev/null
-git clone https://github.com/spaceship-prompt/spaceship-prompt.git "~/.oh-my-zsh/custom/themes/spaceship-prompt" --depth=1
-ln -s "~/.oh-my-zsh/custom/themes/spaceship-prompt/spaceship.zsh-theme" "~/.oh-my-zsh/custom/themes/spaceship.zsh-theme"
+git clone https://github.com/spaceship-prompt/spaceship-prompt.git ~/.oh-my-zsh/custom/themes/spaceship-prompt --depth=1
+ln -s ~/.oh-my-zsh/custom/themes/spaceship-prompt/spaceship.zsh-theme ~/.oh-my-zsh/custom/themes/spaceship.zsh-theme
 if [ $(uname -s) != "Darwin" ]
 then
     # sed -i "s/robbyrussell/powerlevel10k\/powerlevel10k/" ~/.zshrc
@@ -23,8 +23,8 @@ else
 fi
 
 echo "Custom shell installed."
-git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions" 2>/dev/null
-git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" 2>/dev/null
+git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions 2>/dev/null
+git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting 2>/dev/null
 
 if [ $(uname -s) != "Darwin" ]
 then
@@ -42,12 +42,12 @@ else
 fi
 
 echo "Installing Tmux"
-git clone --depth=1 https://github.com/tmux-plugins/tpm "~/.tmux/plugins/tpm" 2>/dev/null
+git clone --depth=1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm 2>/dev/null
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/tmuxconf 2>/dev/null
-mv tmuxconf "~/.tmux.conf"
+mv tmuxconf ~/.tmux.conf
 
 echo "Installing fuzzy finder"
-git clone --depth 1 https://github.com/junegunn/fzf.git "~/.fzf" 2>/dev/null
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
 ~/.fzf/install --all 1>/dev/null 2>/dev/null
 
 echo "Installing colored ls"
