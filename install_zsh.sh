@@ -54,6 +54,7 @@ echo "Installing colored ls"
 if [ $(uname -s) != "Darwin" ]
 then
     if [ $(uname -p) != "x86_64" ]
+    then
         a=$(curl -L -s https://github.com/Peltoche/lsd/releases/latest | grep -oE "tag.+\"" | cut -d '/' -f2 | grep -vE "^[^0-9]" | cut -d "\"" -f1 | head -n 1) && \
         wget "https://github.com/Peltoche/lsd/releases/download/$a/lsd_""$a""_amd64.deb" && \
         apt install -y "./lsd_""$a""_amd64.deb" && \
