@@ -30,6 +30,9 @@ alias sshide='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null
 alias ruid='python3 -c "import uuid; print(uuid.uuid4())"'
 alias sruid='ruid | grep -oE ".{4}-.{4}-.{4}" | cat'
 
+fencrypt(){openssl aes-256-ecb -a -in "$1" -out "$1.enc"}
+fdecrypt(){openssl aes-256-ecb -a -d -in "$1" -out "$(echo $1 | sed 's/\.enc//')"}
+
 # Colored man pages
 export LESS_TERMCAP_mb=$'\e[1;32m'
 export LESS_TERMCAP_md=$'\e[1;32m'
