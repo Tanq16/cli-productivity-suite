@@ -69,6 +69,10 @@ fi
 
 curl -sLf https://spacevim.org/install.sh | bash
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/spacevim_config 2>/dev/null
+if [ $(uname -s) != "Darwin" ]
+then
+    sed -i "s/\/opt\/homebrew/\/usr/" ./spacevim_config
+fi
 mkdir ~/.SpaceVim.d
 mv spacevim_config ~/.SpaceVim.d/init.toml
 
@@ -94,7 +98,7 @@ echo "\n\n\n\n\n\n\n\n"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "If you don't see shapes properly, install powerline fonts (Read the README)"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-echo "Starting powerlevel config in 7 seconds."
+echo "Starting powerlevel config in 5 seconds."
 echo "Ater the configuration, close all shell instances and restart shell for all plugins to take effect"
-sleep 7
+sleep 5
 exec zsh -l
