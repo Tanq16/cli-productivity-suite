@@ -3,9 +3,9 @@
 echo "Insitializing..... may take a few seeconds."
 if [ $(uname -s) != "Darwin" ]
 then
-    sudo apt install -y tree tmux 1>/dev/null 2>/dev/null
+    sudo apt install -y tree tmux jq 1>/dev/null 2>/dev/null
 else
-    brew install tree tmux 1>/dev/null 2>/dev/null
+    brew install tree tmux jq 1>/dev/null 2>/dev/null
 fi
 
 # echo "Setting ZSH to default shell :: Please enter your password."
@@ -72,7 +72,7 @@ fi
 curl -sLf https://spacevim.org/install.sh | bash
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/spacevim_config 2>/dev/null
 mkdir ~/.SpaceVim.d
-mv spacevim_config ~/.SpaceVim.d/
+mv spacevim_config ~/.SpaceVim.d/init.toml
 
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/add_to_rc 2>/dev/null
 if [ $(uname -s) != "Darwin" ]
