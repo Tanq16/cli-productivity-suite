@@ -11,12 +11,10 @@ fi
 # echo "Setting ZSH to default shell :: Please enter your password."
 # chsh -s /usr/bin/zsh $USER
 
-# git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k 2>/dev/null
 git clone https://github.com/spaceship-prompt/spaceship-prompt.git ~/.oh-my-zsh/custom/themes/spaceship-prompt --depth=1
 ln -s ~/.oh-my-zsh/custom/themes/spaceship-prompt/spaceship.zsh-theme ~/.oh-my-zsh/custom/themes/spaceship.zsh-theme
 if [ $(uname -s) != "Darwin" ]
 then
-    # sed -i "s/robbyrussell/powerlevel10k\/powerlevel10k/" ~/.zshrc
     sed -i "s/robbyrussell/spaceship/" ~/.zshrc
 else
     sed -ie "s/robbyrussell/spaceship/" ~/.zshrc
@@ -82,9 +80,12 @@ else
     sed -ie "s/fdfind/fd/" ./add_to_rc
     sed -ie "s/batcat/bat/" ./add_to_rc
     sed -ie "s/alias bat=/\# alias bat=/" ./add_to_rc
+    sed -ie "s/alias ip4/alias ip4='ifconfig | grep -oE \"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\" | grep -v \"127.0.0.1\" | grep -vE \".+\.255$\"' #/" ./add_to_rc
 fi
-cat add_to_rc >> ~/.zshrc
-rm add_to_rc
+cat ./add_to_rc >> ~/.zshrc
+rm ./add_to_rc
+rm ./add_to_rce
+rm ./.zshrce
 cp .zshrc temptemp
 cat temptemp | grep -vE "^#" | grep -vE "^$" > .zshrc
 rm temptemp
