@@ -1,3 +1,4 @@
+# Exports
 export FZF_DEFAULT_OPTS="
 --layout=reverse
 --info=inline
@@ -10,11 +11,18 @@ export FZF_DEFAULT_OPTS="
 export FZF_DEFAULT_COMMAND='fdfind --follow --hidden'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export BAT_PAGER=''
+export LESS_TERMCAP_mb=$'\e[1;32m'
+export LESS_TERMCAP_md=$'\e[1;32m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_se=$'\e[0m'
+export LESS_TERMCAP_so=$'\e[01;33m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_us=$'\e[1;4;31m'
 
+# Aliases
 alias f='fzf'
 alias gitn='git --no-pager'
 alias awsn='aws --no-cli-pager'
-alias ascii='ascii -adx'
 alias tt='tmux new -s default'
 alias t='tmux a -t default'
 alias ts='tmux new -s'
@@ -30,22 +38,14 @@ alias sshide='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null
 alias ruid='python3 -c "import uuid; print(uuid.uuid4())"'
 alias sruid='ruid | grep -oE ".{4}-.{4}-.{4}" | cat'
 
+# Functions
 fencrypt(){openssl aes-256-ecb -a -in "$1" -out "$1.enc"}
 fdecrypt(){openssl aes-256-ecb -a -d -in "$1" -out "$(echo $1 | sed 's/\.enc//')"}
-
-# Colored man pages
-export LESS_TERMCAP_mb=$'\e[1;32m'
-export LESS_TERMCAP_md=$'\e[1;32m'
-export LESS_TERMCAP_me=$'\e[0m'
-export LESS_TERMCAP_se=$'\e[0m'
-export LESS_TERMCAP_so=$'\e[01;33m'
-export LESS_TERMCAP_ue=$'\e[0m'
-export LESS_TERMCAP_us=$'\e[1;4;31m'
-
-# Host related (usually not for use within containers)
-alias dockernonerm='for i in $(docker images -f dangling=true -q); do docker image rm $i; done'
 forlinear(){
     for i in {0..$1}
     do eval $2
     done
 }
+
+# Host related (usually not for use within containers)
+alias dockernonerm='for i in $(docker images -f dangling=true -q); do docker image rm $i; done'
