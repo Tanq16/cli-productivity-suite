@@ -32,7 +32,7 @@ alias c=clear
 alias l='lsd -l'
 alias la='lsd -la'
 alias bat=batcat
-alias ip4="ip a | grep inet | cut -d ' ' -f6 | grep -vE ':'"
+alias ip4="ip a | grep inet | cut -d ' ' -f6 | grep -vE ':' | cut -d '/' -f1 | grep -v '127.0.0.1'"
 alias pubip="curl -s ipinfo.io | jq -M '.ip' | cut -d '\"' -f2"
 alias sshide='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null"'
 alias ruid='python3 -c "import uuid; print(uuid.uuid4())"'
