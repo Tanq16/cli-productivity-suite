@@ -46,6 +46,28 @@ forlinear(){
     do eval $2
     done
 }
+reprint() {
+    if [[ -z $1 ]]; then
+        cat /dev/random | head -c 400 | base64 | tr -d '=+/' | head -c 400; echo ""
+    elif [[ -z $2 && $1 =~ "[0-9]+" ]]; then
+        cat /dev/random | head -c $1 | base64 | tr -d '=+/' | head -c $1; echo ""
+    elif [[ $1 == "seq" ]]; then
+        if [[ -z $2 ]]; then
+            echo "provide length for sequence"
+        else
+            alpha={a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,x,y,z}
+            eval echo -n $alpha$alpha$alpha$alpha | tr -d " " | head -c $2; echo ""
+        fi
+    elif [[ $1 == "rep" ]]; then
+        if [[ -z $2 || -z $3 ]]; then
+            echo "provide number of reps followed by string for repetition"
+        else
+            for i in {1..$2}; do echo -n $3; done; echo ""
+        fi
+    else
+        echo "Usage: reprint [[len_random]|seq|rep] [len_seq|len_rep] [char_rep]"
+    fi
+}
 
 # Host related (usually not for use within containers)
 alias dockernonerm='for i in $(docker images -f dangling=true -q); do docker image rm $i; done'
