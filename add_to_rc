@@ -48,9 +48,9 @@ forlinear(){
 }
 reprint() {
     if [[ -z $1 ]]; then
-        cat /dev/random | head -c 400 | base64 | tr -d '=+/' | head -c 400; echo ""
+        cat /dev/random | head -c 400 | base64 | tr -d '=+/\n' | head -c 400; echo ""
     elif [[ -z $2 && $1 =~ "[0-9]+" ]]; then
-        cat /dev/random | head -c $1 | base64 | tr -d '=+/' | head -c $1; echo ""
+        cat /dev/random | head -c $1 | base64 | tr -d '=+/\n' | head -c $1; echo ""
     elif [[ $1 == "seq" ]]; then
         if [[ -z $2 ]]; then
             echo "provide length for sequence"
