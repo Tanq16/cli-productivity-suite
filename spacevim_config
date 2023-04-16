@@ -27,10 +27,10 @@
     enable_vimfiler_welcome = false
 
 # Enable autocomplete layer
-[[layers]]
-name = 'autocomplete'
-auto_completion_return_key_behavior = "complete"
-auto_completion_tab_key_behavior = "smart"
+# [[layers]]
+# name = 'autocomplete'
+# auto_completion_return_key_behavior = "complete"
+# auto_completion_tab_key_behavior = "smart"
 
 [[layers]]
 name = 'shell'
