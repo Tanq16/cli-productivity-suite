@@ -9,7 +9,7 @@
 
 Use this to easily install a custom and funky shell experience along with a cool `vim` and `tmux` installation. Before anything else though, install the [Nord](https://www.nordtheme.com/) theme for the most seamless experience with `tmux` and `vim`. You could also change configurations for other preferred themes.
 
-Also install a "nerd" font for you terminal emulator, because ligatures are cool. Recommended one is [Fira Code Nerd Font Mono](https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip).
+Also install a "nerd" font for you terminal emulator, because ligatures are cool. Recommended one is [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip).
 
 Don't forget to read the "Post Installation" section.
 
