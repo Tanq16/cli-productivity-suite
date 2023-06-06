@@ -29,6 +29,7 @@ alias t='tmux -u a -t default'
 alias ts='tmux -u new -s'
 alias ta='tmux -u a -t'
 alias tls='tmux list-sessions'
+alias vim=nvim
 alias c=clear
 alias l='lsd -l'
 alias la='lsd -la'
