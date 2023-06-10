@@ -8,9 +8,6 @@ else
     brew install tree tmux jq 1>/dev/null 2>/dev/null
 fi
 
-# echo "Setting ZSH to default shell :: Please enter your password."
-# chsh -s /usr/bin/zsh $USER
-
 git clone https://github.com/spaceship-prompt/spaceship-prompt.git ~/.oh-my-zsh/custom/themes/spaceship-prompt --depth=1
 ln -s ~/.oh-my-zsh/custom/themes/spaceship-prompt/spaceship.zsh-theme ~/.oh-my-zsh/custom/themes/spaceship.zsh-theme
 if [ $(uname -s) != "Darwin" ]
@@ -20,7 +17,7 @@ else
     sed -ie "s/robbyrussell/spaceship/" ~/.zshrc
 fi
 
-echo "Custom shell installed."
+echo "Custom shell installed. Adding plugins!"
 git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions 2>/dev/null
 git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting 2>/dev/null
 
@@ -31,18 +28,20 @@ else
     sed -ie "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" ~/.zshrc
 fi
 
-echo "Installing Bat and fd-Find"
+echo "Installing NeoVIM, Bat and fd-Find"
 if [ $(uname -s) != "Darwin" ]
 then
     sudo apt install bat fd-find -y 1>/dev/null 2>/dev/null
+    # TODO get .deb frm releases docker-tool builder
 else
-    brew install bat fd 1>/dev/null 2>/dev/null
+    brew install bat fd neovim 1>/dev/null 2>/dev/null
 fi
 
 echo "Installing Tmux"
 git clone --depth=1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm 2>/dev/null
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/tmuxconf 2>/dev/null
 mv tmuxconf ~/.tmux.conf
+TMUX_PLUGIN_MANAGER_PATH=~/.tmux/plugins ~/.tmux/plugins/tpm/bin/install_plugins 1>/dev/null 2>/dev/null
 
 echo "Installing fuzzy finder"
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 2>/dev/null
@@ -67,38 +66,38 @@ else
     brew install lsd 1>/dev/null 2>/dev/null
 fi
 
-curl -sLf https://spacevim.org/install.sh | bash
-wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/spacevim_config 2>/dev/null
+echo "Installing NvChad for NeoVIM."
+rm -rf ~/.config/nvim 2>/dev/null
+rm -rf ~/.local/share/nvim 2>/dev/null
+git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1 1>/dev/null 2>/dev/null
 if [ $(uname -s) != "Darwin" ]
 then
-    sed -i "s/\/opt\/homebrew/\/usr/" ./spacevim_config
+    sed -i "s/local input =/local input = N --/" ~/.config/nvim/lua/core/bootstrap.lua
+    sed -i "s/dofile(vim.g/vim.cmd([[ set guicursor= ]])\ndofile(vim.g/" ~/.config/nvim/init.lua
+else
+    sed -ie "s/local input =/local input = N --/" ~/.config/nvim/lua/core/bootstrap.lua
+    sed -ie "s/dofile(vim.g/vim.cmd([[ set guicursor= ]])\ndofile(vim.g/" ~/.config/nvim/init.lua
 fi
-mkdir ~/.SpaceVim.d
-mv spacevim_config ~/.SpaceVim.d/init.toml
+nvim --headless -c 'quitall'
 
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/add_to_rc 2>/dev/null
 if [ $(uname -s) != "Darwin" ]
 then
-    echo "finishing up"
+    echo ""
 else
     sed -ie "s/fdfind/fd/" ./add_to_rc
     sed -ie "s/batcat/bat/" ./add_to_rc
     sed -ie "s/alias bat=/\# alias bat=/" ./add_to_rc
     sed -ie "s/alias ip4/alias ip4='ifconfig | grep -oE \"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\" | grep -v \"127.0.0.1\" | grep -vE \".+\.255$\"' #/" ./add_to_rc
 fi
-cat ./add_to_rc >> ~/.zshrc
-rm ./add_to_rc
-rm ./add_to_rce
-rm ./.zshrce
-cp .zshrc temptemp
-cat temptemp | grep -vE "^#" | grep -vE "^$" > .zshrc
-rm temptemp
+cat ./add_to_rc >> ./temptemp
+cat temptemp | grep -vE "^#" | grep -vE "^$" > ~/.zshrc
+rm ./temptemp ./add_to_rc ./add_to_rce ./.zshrce 2>/dev/null
 
 echo "\n\n\n\n\n\n\n\n"
+echo "If you don't see shapes properly, make sure to install the font properly (Read the README)"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-echo "If you don't see shapes properly, install powerline fonts (Read the README)"
-echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-echo "Starting powerlevel config in 5 seconds."
-echo "Ater the configuration, close all shell instances and restart shell for all plugins to take effect"
+echo "Starting in 5 seconds."
+echo "Ater the configuration, restart the shell (terminal app for ease) for everything to take effect"
 sleep 5
 exec zsh -l
