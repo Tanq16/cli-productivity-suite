@@ -31,26 +31,8 @@ jobs:
           cd neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo
           cd build && cpack -G DEB
       
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          path: neovim/build/nvim-linux64.deb
-          name: nvim-linux64.deb
-
-  release:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Create release
-        uses: actions/create-release@v2
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Neovim Deb
-          body: |
-            This release contains deb file for amd64 architecture.
-
-          artifacts:
-            - path: neovim/build/nvim-linux64.deb
-              name: nvim-linux64.deb
+          files: neovim/build/nvim-linux64.deb
