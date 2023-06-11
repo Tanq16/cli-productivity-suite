@@ -22,8 +22,8 @@ jobs:
 
       - name: Set up Neovim Build Dependencies
         run: |
-          mkdir /debs && apt update -y && apt upgrade -y
-          apt install -y ninja-build gettext cmake unzip curl git file
+          mkdir /debs && sudo apt update -y && sudo apt upgrade -y
+          sudo apt install -y ninja-build gettext cmake unzip curl git file
           git clone --depth=1 https://github.com/neovim/neovim
 
       - name: Build Neovim for amd64
