@@ -30,9 +30,11 @@ jobs:
         run: |
           cd neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo
           cd build && cpack -G DEB
+          mv nvim-linux64.deb ../..
       
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: neovim/build/nvim-linux64.deb
+          files: nvim-linux64.deb
+          tag_name: latest
