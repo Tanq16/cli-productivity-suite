@@ -1,0 +1,50 @@
+name: Build and Release NeoVIM Deb Files
+on:
+  push:
+    branches:
+      - main
+    schedule:
+    - cron: '0 0 2 * *'
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'run'
+        required: false 
+        type: boolean
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Neovim Build Dependencies
+        run: |
+          mkdir /debs && apt update -y && apt upgrade -y
+          apt install -y ninja-build gettext cmake unzip curl git file
+          git clone --depth=1 https://github.com/neovim/neovim
+
+      - name: Build Neovim for amd64
+        run: |
+          cd neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo
+          cd build && cpack -G DEB
+        working-directory: ./neovim
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          draft: false
+          prerelease: false
+
+      - name: Upload amd64 Deb File
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./neovim/build/nvim-linux64.deb
+          asset_name: nvim-linux64.deb
+          asset_content_type: application/octet-stream
