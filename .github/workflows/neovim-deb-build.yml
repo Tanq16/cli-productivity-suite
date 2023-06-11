@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Neovim Build Dependencies
         run: |
@@ -32,7 +32,7 @@ jobs:
           cd build && cpack -G DEB
       
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: neovim/build/nvim-linux64.deb
           name: nvim-linux64.deb
