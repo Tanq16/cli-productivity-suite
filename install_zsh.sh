@@ -44,9 +44,14 @@ rm -rf ~/.vim* 1>/dev/null 2>/dev/null
 if [ $(uname -s) != "Darwin" ]
 then
     sudo apt install bat fd-find -y 1>/dev/null 2>/dev/null
-    wget https://github.com/Tanq16/cli-productivity-suite/releases/download/x86_64-deb/nvim-linux64.deb 1>/dev/null 2>/dev/null
-    sudo apt install ./nvim-linux64.deb 1>/dev/null 2>/dev/null
-    rm nvim-linux64.deb
+    if [ $(uname -p) != "x86_64" ]
+    then
+        echo "Assuming NeoVIM installed for ARM linux..."
+    else
+        wget https://github.com/Tanq16/cli-productivity-suite/releases/download/x86_64-deb/nvim-linux64.deb 1>/dev/null 2>/dev/null
+        sudo apt install ./nvim-linux64.deb 1>/dev/null 2>/dev/null
+        rm nvim-linux64.deb
+    fi
 else
     brew install bat fd neovim 1>/dev/null 2>/dev/null
 fi

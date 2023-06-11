@@ -21,17 +21,29 @@ Don't forget to read the "Post Installation" section.
 3. Syntax highlighting for command line
 3. Auto-completion on command line
 4. Tmux with mouse and other quality of life improvements
-5. SpaceVim for a flashy vim experience
+5. NvChad + NeoVIM for a flashy vim experience
 6. Nord theme for tmux and vim
 
 </details>
 
 ## Installation
 
-The system should have `git`, `zsh`, `wget`, `curl` and `vim` installed. If not, do it like so &rarr;
+The system should have `git`, `zsh`, `wget`, and `curl` installed. If not, do it like so &rarr;
 
 ```bash
-sudo apt install git zsh wget curl vim # Or `brew install git zsh wget curl vim` for MacOS
+sudo apt install git zsh wget curl # Or `brew install git zsh wget curl` for MacOS
+```
+
+If you are using a linux-based ARM machine like a Raspberry Pi, then make do the following prior to running the script for a seamless NeoVIM installation &rarr;
+
+```bash
+sudo apt update -y && sudo apt upgrade -y
+sudo apt install -y ninja-build gettext cmake unzip curl git file
+cd ~ && git clone --depth=1 https://github.com/neovim/neovim
+cd ~/neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo
+cd build && cpack -G DEB
+sudo apt install ./nvim-linux64.deb -y
+cd ~ && rm -rf neovim
 ```
 
 Next, install oh my zsh as follows &rarr;
