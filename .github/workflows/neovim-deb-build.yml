@@ -34,5 +34,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          path: neovim/nvim-linux64.deb
+          path: neovim/build/nvim-linux64.deb
           name: nvim-linux64.deb
