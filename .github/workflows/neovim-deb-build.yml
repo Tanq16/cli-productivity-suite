@@ -43,17 +43,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Get release version
-        run: |
-          echo "::set-output name=version::$(cat VERSION)"
-
       - name: Create release
         uses: actions/create-release@v2
         with:
           tag_name: ${{ github.ref }}
-          release_name: Neovim ${{ steps.get-release-version.outputs.version }}
+          release_name: Neovim Deb
           body: |
-            This release contains deb files for amd64 architecture.
+            This release contains deb file for amd64 architecture.
 
           artifacts:
             - path: neovim/build/nvim-linux64.deb
