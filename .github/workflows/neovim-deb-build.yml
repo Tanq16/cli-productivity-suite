@@ -36,4 +36,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: nvim-linux64.deb
-          tag_name: latest
+          tag_name: x86_64-deb

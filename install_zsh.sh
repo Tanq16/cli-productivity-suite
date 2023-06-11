@@ -1,5 +1,16 @@
 #!/bin/sh
 
+echo "If you have some other vim config installed, press ⌃+c now and remove that."
+echo "After setting up appropriately, start the script again. Sleeping for 20 seconds!"
+for i in {1..20}
+do
+    echo -n '.'
+    sleep 1
+done
+
+echo ""
+echo ""
+
 echo "Insitializing..... may take a few seeconds."
 if [ $(uname -s) != "Darwin" ]
 then
@@ -29,10 +40,13 @@ else
 fi
 
 echo "Installing NeoVIM, Bat and fd-Find"
+rm -rf ~/.vim* 1>/dev/null 2>/dev/null
 if [ $(uname -s) != "Darwin" ]
 then
     sudo apt install bat fd-find -y 1>/dev/null 2>/dev/null
-    # TODO get .deb frm releases docker-tool builder
+    wget https://github.com/Tanq16/cli-productivity-suite/releases/download/x86_64-deb/nvim-linux64.deb 1>/dev/null 2>/dev/null
+    sudo apt install ./nvim-linux64.deb 1>/dev/null 2>/dev/null
+    rm nvim-linux64.deb
 else
     brew install bat fd neovim 1>/dev/null 2>/dev/null
 fi
