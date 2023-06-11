@@ -30,21 +30,9 @@ jobs:
         run: |
           cd neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo
           cd build && cpack -G DEB
-        working-directory: ./neovim
-
-      - name: Create Release
-        uses: actions/create-release@v1
-        id: create_release
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
         with:
-          tag_name: v${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
-          draft: false
-          prerelease: false
-
-      - name: Upload amd64 Deb File
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./neovim/build/nvim-linux64.deb
-          asset_name: nvim-linux64.deb
-          asset_content_type: application/octet-stream
+          path: neovim/nvim-linux64.deb
+          name: nvim-linux64.deb
