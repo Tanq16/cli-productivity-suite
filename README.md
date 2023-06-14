@@ -1,5 +1,3 @@
-# README is a WIP
-
 # Command Line Productivity Suite
 
 * [Introduction](#introduction)
@@ -9,9 +7,9 @@
 
 ## Introduction
 
-Use this to easily install a custom and funky shell experience along with a cool `vim` and `tmux` installation. Before anything else though, install the [Nord](https://www.nordtheme.com/) theme for the most seamless experience with `tmux` and `vim`. You could also change configurations for other preferred themes.
+Use this repo to easily install a custom, cool and funky shell experience along with an awesome `neovim` and `tmux` installation. Before anything else though, install the [Nord](https://www.nordtheme.com/) theme for the most seamless experience with `tmux` and `neovim`.
 
-Also install a "nerd" font for you terminal emulator, because ligatures are cool. Recommended one is [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip).
+Also, install a "nerd" font for your terminal emulator. My recommendation is [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip).
 
 Don't forget to read the "Post Installation" section.
 
@@ -24,28 +22,22 @@ Don't forget to read the "Post Installation" section.
 3. Auto-completion on command line
 4. Tmux with mouse and other quality of life improvements
 5. NvChad + NeoVIM for a flashy vim experience
-6. Nord theme for tmux and vim
+6. Nord theme for tmux and neovim
 
 </details>
 
 ## Installation
 
-The system should have `git`, `zsh`, `wget`, and `curl` installed. If not, do it like so &rarr;
+Get started by installing the initial set of tools &rarr;
 
 ```bash
-sudo apt install git zsh wget curl # Or `brew install git zsh wget curl` for MacOS
+sudo apt install git zsh wget curl
 ```
 
-If you are using a linux-based ARM machine like a Raspberry Pi, then make do the following prior to running the script for a seamless NeoVIM installation &rarr;
+If you're on MacOS, use this &rarr;
 
 ```bash
-sudo apt update -y && sudo apt upgrade -y
-sudo apt install -y ninja-build gettext cmake unzip curl git file
-cd ~ && git clone --depth=1 https://github.com/neovim/neovim
-cd ~/neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo
-cd build && cpack -G DEB
-sudo apt install ./nvim-linux64.deb -y
-cd ~ && rm -rf neovim
+brew install git zsh wget curl
 ```
 
 Next, install oh my zsh as follows &rarr;
@@ -56,41 +48,35 @@ sh install.sh
 rm install.sh # cleanup
 ```
 
-Then, execute the following to install all other magic and enter the password whenever (if) prompted &rarr;
+Then, execute the following to install all other magic and enter the password whenever (if) prompted.
+
+For Linux &rarr;
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_linux.sh)"
 ```
 
-Finally, close the shell completely and start a new instance.
-
-If something goes wrong or you see an error, remove everything with the following &rarr;
+For MacOS &rarr;
 
 ```bash
-rm -rf .oh-my-zsh .fzf .fzf.zsh .tmux .tmux.conf .tmux-themepack .vim .vimrc .SpaceVim .SpaceVim.d .zshrc
-# The old ZSH rc file may be postfixed with `.pre-oh-my-zsh` or something similar.
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_macos.sh)"
+```
+
+Finally, close the shell ***completely*** (close the terminal app or end the SSH session) and start a new instance.
+
+If something goes wrong or you see an error, you can remove everything with the following command from the home directory &rarr;
+
+```bash
+rm -rf .oh-my-zsh .fzf .fzf.zsh .tmux .tmux.conf .tmux-themepack .vim* .SpaceVim* .config/nvim .local/share/nvim .zshrc
 ```
 
 ## Post Installation
 
-`tmux` is installed by default with the above script. To make full use of the plugins installed, the first run must be used to install those plugins. This can be done by using the aliases set in the rc-file as follows &rarr;
+- `tmux` is installed by default with the above script. Use `tt` to launch a default session.
+- `bat`, an alternative of the `cat` command with colored output is also installed by default. 
+- `nvim` is installed with NvChad configuration, but `nvim` doesn't allow setting a theme when running headless, so use `<space>+th` to launch the theme selector inside `nvim`, type and select `nord` to match everything up.
 
-* Use `tt` to launch a default session
-* Use `Ctrl + b` followed by `Shift + i` to install the plugins
-* This takes 3-4 seconds after which the changes take effect and the awesome tmux can be used
-
-`bat`, an alternative of the `cat` command with colored output is also installed by default. `bat` (maintainer-default) has pager enabled, which is disabled by the above script using &rarr;
-
-```bash
-export BAT_PAGER=''
-```
-
-within the rc-file. This can be re-enabled by deleting the line in `.zshrc` or running the following command &rarr;
-
-```bash
-sed -i "s/export BAT_PAGER=''//" ~/.zshrc
-# `sed -ie "s/export BAT_PAGER=''//" ~/.zshrc`     (for MacOS) but this will save .zshrce as backup
-```
+`bat` (maintainer-default) has pager enabled, which is disabled by the installation script using `export BAT_PAGER=''` within the rc-file. This can be re-enabled by deleting the line in `.zshrc`.
 
 ## Bonus (Helpful Tips)
 
@@ -102,9 +88,10 @@ The fuzzy search `fzf` is another awesome feature to have and is installed as a 
 
 Pasting on modified zsh shell can be slow due to magic functions that `oh-my-zsh` installs. A quick fix is to comment those functions in `~/.oh-my.zsh/lib/misc.zsh`. This can also be easily done via the `sed`. The following can be pasted in a file and run as `bash <file>` or `zsh <file>` or as an executable after chmoding the file.
 
+> Replace `-i` flags with `-ie` flags for MacOS
+
 ```bash
 #!/bin/zsh
-# Replace `-i` flags with `-ie` flags for MacOS
 sed -i "s/autoload -Uz bracketed-paste-magic/#autoload -Uz bracketed-paste-magic/" ~/.oh-my-zsh/lib/misc.zsh
 sed -i "s/zle -N bracketed-paste bracketed-paste-magic/#zle -N bracketed-paste bracketed-paste-magic/" ~/.oh-my-zsh/lib/misc.zsh
 sed -i "s/autoload -Uz url-quote-magic/#autoload -Uz url-quote-magic/" ~/.oh-my-zsh/lib/misc.zsh

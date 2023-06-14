@@ -5,8 +5,7 @@ echo "If you have some other vim config installed, press ⌃+c now and remove th
 echo "After setting up appropriately, start the script again. Sleeping for 20 seconds!"
 for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do echo -n '.'; sleep 1; done; echo ""
 
-echo "\n\n"
-echo "Initializing....."
+echo "\n"
 echo "Installing several packages; may take a few minutes. Hang tight!\n"
 
 # apt installs
@@ -74,7 +73,7 @@ echo -n '.'
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/add_to_rc 1>/dev/null 2>/dev/null
 cat ~/.zshrc >> ./temptemp
 cat ./add_to_rc >> ./temptemp
-cat temptemp | grep -vE "^#" | grep -vE "^$" > ~/.zshrc
+cat ./temptemp | grep -vE "^#" | grep -vE "^$" > ~/.zshrc
 rm ./temptemp ./add_to_rc 1>/dev/null 2>/dev/null
 
 echo "\n\n"
