@@ -64,12 +64,6 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-su
 
 Finally, close the shell ***completely*** (close the terminal app or end the SSH session) and start a new instance.
 
-If something goes wrong or you see an error, you can remove everything with the following command from the home directory &rarr;
-
-```bash
-rm -rf .oh-my-zsh .fzf .fzf.zsh .tmux .tmux.conf .tmux-themepack .vim* .SpaceVim* .config/nvim .local/share/nvim .zshrc
-```
-
 ## Post Installation
 
 - `tmux` is installed by default with the above script. Use `tt` to launch a default session.
@@ -96,4 +90,10 @@ sed -i "s/autoload -Uz bracketed-paste-magic/#autoload -Uz bracketed-paste-magic
 sed -i "s/zle -N bracketed-paste bracketed-paste-magic/#zle -N bracketed-paste bracketed-paste-magic/" ~/.oh-my-zsh/lib/misc.zsh
 sed -i "s/autoload -Uz url-quote-magic/#autoload -Uz url-quote-magic/" ~/.oh-my-zsh/lib/misc.zsh
 sed -i "s/zle -N self-insert url-quote-magic/#zle -N self-insert url-quote-magic/" ~/.oh-my-zsh/lib/misc.zsh
+```
+
+If something goes wrong or you see an error during installation, you can remove everything with the following command from the home directory and start from scratch again &rarr;
+
+```bash
+rm -rf .oh-my-zsh .fzf .fzf.zsh .tmux .tmux.conf .tmux-themepack .vim* .SpaceVim* .config/nvim .local/share/nvim .zshrc
 ```
