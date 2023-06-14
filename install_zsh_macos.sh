@@ -1,3 +1,6 @@
+# WIP!
+
+
 #!/bin/sh
 
 echo "If you have some other vim config installed, press ⌃+c now and remove that."
@@ -109,6 +112,8 @@ else
     sed -ie "s/alias bat=/\# alias bat=/" ./add_to_rc
     sed -ie "s/alias ip4/alias ip4='ifconfig | grep -oE \"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\" | grep -v \"127.0.0.1\" | grep -vE \".+\.255$\"' #/" ./add_to_rc
 fi
+
+cat ~/.zshrc >> ./temptemp
 cat ./add_to_rc >> ./temptemp
 cat temptemp | grep -vE "^#" | grep -vE "^$" > ~/.zshrc
 rm ./temptemp ./add_to_rc ./add_to_rce ./.zshrce 2>/dev/null
