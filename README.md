@@ -9,9 +9,9 @@
 
 Use this repo to easily install a custom, cool and funky shell experience along with an awesome `neovim` and `tmux` installation. Before anything else though, install the [Nord](https://www.nordtheme.com/) theme for the most seamless experience with `tmux` and `neovim`.
 
-Also, install a "nerd" font for your terminal emulator. My recommendation is [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip).
+Also, install a "nerd" font for your terminal emulator. My recommendation is [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip). Don't forget to read the "Post Installation" section.
 
-Don't forget to read the "Post Installation" section.
+The scripts have been tested on Ubuntu and MacOS for any architecture. MacOS needs `brew` to be installed. For any other linux distro, change the `apt` command to the appropriate package manager.
 
 <details>
 <summary>Everything that the script installs is in this expandable block.</summary>
