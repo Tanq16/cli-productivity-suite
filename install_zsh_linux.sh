@@ -25,7 +25,7 @@ echo -n '.'
 rm -rf ~/.vim* 1>/dev/null 2>/dev/null
 rm -rf ~/.config/nvim 2>/dev/null
 rm -rf ~/.local/share/nvim 2>/dev/null
-sudo apt remove vim neovim 1>/dev/null 2>/dev/null
+sudo apt remove vim neovim -y 1>/dev/null 2>/dev/null
 wget https://github.com/neovim/neovim/archive/refs/tags/stable.tar.gz 1>/dev/null 2>/dev/null
 tar -xvf stable.tar.gz 1>/dev/null 2>/dev/null
 cd neovim-stable
