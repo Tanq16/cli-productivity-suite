@@ -1,4 +1,4 @@
-set -g default-terminal "xterm-256color" # TERM env var should be "xterm-256color" for Ctrl+arrow keys to work.
+set-option -sa terminal-overrides ",xterm*:Tc"
 set -g mouse on
 # Start numbering at 1
 set -g base-index 1
@@ -28,6 +28,7 @@ bind -n m-v paste-buffer
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'nhdaly/tmux-better-mouse-mode'
-set -g @plugin "arcticicestudio/nord-tmux"
+set -g @plugin 'catppuccin/tmux'
+set -g @catppuccin_flavor 'mocha'
 
 run '~/.tmux/plugins/tpm/tpm'

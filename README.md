@@ -7,7 +7,7 @@
 
 ## Introduction
 
-Use this repo to easily install a custom, cool and funky shell experience along with an awesome `neovim` and `tmux` installation. Before anything else though, install the [Nord](https://www.nordtheme.com/) theme for the most seamless experience with `tmux` and `neovim`.
+Use this repo to easily install a custom, cool and funky shell experience along with an awesome `neovim` and `tmux` installation. Before anything else though, install the [Catppuccin](https://catppuccin-website.vercel.app/) theme (with the `Mocha` configuration) for the most seamless experience with `tmux` and `neovim`.
 
 Also, install a "nerd" font for your terminal emulator. My recommendation is [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip). Don't forget to read the "Post Installation" section.
 
@@ -22,7 +22,7 @@ The scripts have been tested on Ubuntu and MacOS for any architecture. MacOS nee
 3. Auto-completion on command line
 4. Tmux with mouse and other quality of life improvements
 5. NvChad + NeoVIM for a flashy vim experience
-6. Nord theme for tmux and neovim
+6. Catppuccin theme for tmux and neovim
 
 </details>
 
@@ -68,7 +68,7 @@ Finally, close the shell ***completely*** (close the terminal app or end the SSH
 
 - `tmux` is installed by default with the above script. Use `tt` to launch a default session.
 - `bat`, an alternative of the `cat` command with colored output is also installed by default. 
-- `nvim` is installed with NvChad configuration, but `nvim` doesn't allow setting a theme when running headless, so use `<space>+th` to launch the theme selector inside `nvim`, type and select `nord` to match everything up.
+- `nvim` is installed with NvChad configuration, but `nvim` doesn't allow setting a theme when running headless, so use `<space>+th` to launch the theme selector inside `nvim`, type and select `catppuccin` to match everything up.
 
 `bat` (maintainer-default) has pager enabled, which is disabled by the installation script using `export BAT_PAGER=''` within the rc-file. This can be re-enabled by deleting the line in `.zshrc`.
 
