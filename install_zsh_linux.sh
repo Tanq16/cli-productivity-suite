@@ -38,7 +38,7 @@ echo -n '.'
 sudo apt install ./nvim-linux64.deb 1>/dev/null 2>/dev/null
 cd ../.. && rm -rf stable.tar.gz neovim-stable 1>/dev/null 2>/dev/null
 git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1 1>/dev/null 2>/dev/null
-sed -i "s/local input =/local input = N --/" ~/.config/nvim/lua/core/bootstrap.lua
+sed -i "s/local input =/local input = \"N\" --/" ~/.config/nvim/lua/core/bootstrap.lua
 sed -i "s/dofile(vim.g/vim.cmd([[ set guicursor= ]])\ndofile(vim.g/" ~/.config/nvim/init.lua
 echo -n '.'
 nvim --headless -c 'quitall' 1>/dev/null 2>/dev/null
