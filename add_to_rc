@@ -39,10 +39,10 @@ alias pubip="curl -s ipinfo.io | jq -M '.ip' | cut -d '\"' -f2"
 alias sshide='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null"'
 alias ruid='python3 -c "import uuid; print(uuid.uuid4())"'
 alias sruid='ruid | grep -oE ".{4}-.{4}-.{4}" | cat'
+alias utcnow='date -u +"%Y-%m-%dT%H:%M:%S+00:00"'
 
 # Functions
 ipinfo(){curl ipinfo.io/$1/json | jq '{CITY:.city, REGION:.region, COUNTRY:.country, POSTAL:.postal, OWNER:.org}'}
-timediff(){python3 -c 'import datetime;x=datetime.datetime.fromtimestamp('$1');y=datetime.datetime.fromtimestamp('$2');diff=abs(x-y).total_seconds();years=divmod(diff,31536000);days=divmod(years[1],86400);hours=divmod(days[1],3600);mins=divmod(hours[1],60);seconds=divmod(mins[1],1);print("\nDifference (seconds):", int(diff), "\nDifference (human readable):", int(years[0]), "years", int(days[0]), "days", int(hours[0]), "hours", int(mins[0]), "mins", int(seconds[0]), "seconds\n")'}
 fencrypt(){openssl aes-256-ecb -a -in "$1" -out "$1.enc"}
 fdecrypt(){openssl aes-256-ecb -a -d -in "$1" -out "$(echo $1 | sed 's/\.enc//')"}
 forlinear(){
@@ -73,5 +73,5 @@ reprint() {
     fi
 }
 
-# Host related (usually not for use within containers)
+# Host-only (usually not for use within containers)
 alias dockernonerm='for i in $(docker images -f dangling=true -q); do docker image rm $i; done'
