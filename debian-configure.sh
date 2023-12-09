@@ -1,4 +1,4 @@
-su # become root
+su - # become root
 usermod -aG sudo tanq # add your user to sudo group
 visudo # check that sudo group is allowed for all
 # restart the system
