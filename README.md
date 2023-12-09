@@ -97,3 +97,5 @@ If something goes wrong or you see an error during installation, you can remove 
 ```bash
 rm -rf .oh-my-zsh .fzf .fzf.zsh .tmux .tmux.conf .tmux-themepack .vim* .SpaceVim* .config/nvim .local/share/nvim .zshrc
 ```
+
+Lastly, the commands list for setting up a base Debian 12 installation from scratch for optimum readiness is given in the `debian-configure.sh` file.
