@@ -39,8 +39,8 @@ sudo apt update -y && sudo apt upgrade -y && sudo apt dist-upgrade -y
 Now, install a couple tools including `nala` (fast frontend for `apt`) &rarr;
 
 ```bash
-sudo apt install -y nala openssh-server openssh-client \
-	gnome-shell-extension-manager curl wget tilix htop
+sudo apt install -y nala openssh-server openssh-client tilix \
+	gnome-shell-extension-manager curl wget htop wl-clipboard
 ```
 
 Disable cups-browsed service permanently to remove the wait during a restart &rarr;
