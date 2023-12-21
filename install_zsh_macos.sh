@@ -27,7 +27,7 @@ rm -rf ~/.config/nvim 2>/dev/null
 rm -rf ~/.local/share/nvim 2>/dev/null
 git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1 1>/dev/null 2>/dev/null
 sed -ie "s/local input =/local input = \"N\" --/" ~/.config/nvim/lua/core/bootstrap.lua
-sed -ie "s/dofile(vim.g/vim.cmd([[ set guicursor= ]])\ndofile(vim.g/" ~/.config/nvim/init.lua
+sed -ie "s/dofile(vim.g/vim.cmd([[ set guicursor=n-v-c-i:ver25 ]])\ndofile(vim.g/" ~/.config/nvim/init.lua
 nvim --headless -c 'quitall' 1>/dev/null 2>/dev/null
 echo -n '.'
 
