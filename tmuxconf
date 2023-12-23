@@ -1,3 +1,5 @@
+# for proper theming for vim and other applications when inside tmux; sets 24 bit color 
+set-option -sa terminal-overrides ",xterm*:Tc"
 set -g mouse on
 # Start numbering at 1
 set -g base-index 1
