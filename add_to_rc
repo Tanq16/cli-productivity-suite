@@ -73,6 +73,8 @@ reprint() {
         echo "Usage: reprint [[len_random]|seq|rep] [len_seq|len_rep] [char_rep]"
     fi
 }
+keymap-for-cursor-shape() { echo -ne '\e[5 q' }
+zle-line-init() { keymap-for-cursor-shape }
 
 # Host-only (usually not for use within containers)
 alias dockernonerm='for i in $(docker images -f dangling=true -q); do docker image rm $i; done'
