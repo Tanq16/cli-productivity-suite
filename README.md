@@ -7,11 +7,13 @@
 
 ## Introduction
 
-Use this repo to easily install a custom, cool and funky shell experience along with an awesome `neovim` and `tmux` installation. Before anything else though, install the [Catppuccin](https://catppuccin-website.vercel.app/) theme (with the `Mocha` configuration) for your terminal to get the most seamless experience with `tmux` and `neovim`.
+Use this repo to easily install a custom, cool and funky shell experience along with an awesome `neovim` and `tmux` config.
 
-Also, install a "nerd" font for your terminal emulator. My recommendation is [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip). Don't forget to read the "Post Installation" section.
+First, make sure you have the [Catppuccin](https://catppuccin-website.vercel.app/) theme (with the `Mocha` configuration) for your terminal.
 
-The scripts have been tested on x86-64 variants of Debian and Ubuntu. The MacOS script works for both Intel and M-series chips. MacOS does need `brew` to be installed however.
+Then, install a "nerd" font for your terminal emulator. My recommendation is [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip).
+
+This suite works on x86-64 Debian, x86-64 Ubuntu, x86-64 MacOS, and Apple Silicon MacOS. MacOS also needs `brew`.
 
 ## Installation
 
