@@ -57,19 +57,19 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 1>/dev/null 2>/de
 echo -n '.'
 
 # colored ls - lsd
-a=$(curl -s https://api.github.com/repos/lsd-rs/lsd/releases/latest | grep "browser_download_url" | grep "amd64" | grep -v "musl" | cut -d '"' -f4)
-wget "$a" 1>/dev/null 2>/dev/null
-b=$(echo $a | cut -d '/' -f9)
-sudo apt install -y "$b" 1>/dev/null 2>/dev/null
-rm "$b"
+a=$(curl -s https://api.github.com/repos/lsd-rs/lsd/releases/latest | grep -E "browser_download_url.*" | grep -i "linux" | grep -i "x86_64" | grep -i "gnu" | cut -d '"' -f4)
+wget "$a" -O test.tar.gz 1>/dev/null 2>/dev/null
+tar -xzf test.tar.gz 1>/dev/null 2>/dev/null
+sudo mv lsd-*/lsd /usr/bin/lsd
+rm -rf lsd-* test.tar.gz
 echo -n '.'
 
 # RC file setup
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/linux.rcfile 1>/dev/null 2>/dev/null
 cat ~/.zshrc >> ./temptemp
-cat ./add_to_rc >> ./temptemp
+cat ./linux.rcfile >> ./temptemp
 cat ./temptemp | grep -vE "^#" | grep -vE "^$" > ~/.zshrc
-rm ./temptemp ./add_to_rc 1>/dev/null 2>/dev/null
+rm ./temptemp ./linux.rcfile 1>/dev/null 2>/dev/null
 
 printf "\n\nIf you don't see shapes properly after this, make sure to install the font properly (Read the README)\n\nNOTE: After the new shell spawns, quit the terminal app or SSH session for everything to take effect then start again\n\nStarting in 10 seconds."
 for i in $(seq 10); do echo -n '.'; sleep 1; done;
