@@ -1,15 +1,11 @@
 #!/bin/sh
 
-echo ""
-echo "If you have some other vim config installed, press ⌃+c now and remove that."
-echo "After setting up appropriately, start the script again. Sleeping for 20 seconds!"
-for i in $(seq 20); do echo -n '.'; sleep 1; done; echo ""
-
-echo "\n"
-echo "Installing several packages; may take a few minutes. Hang tight!\n"
+printf "\nIf you have some other vim config installed, press ⌃+c now and remove that.\nAfter setting up appropriately, start the script again. Sleeping for 20 seconds."
+for i in $(seq 20); do echo -n '.'; sleep 1; done
+printf "\n\nInstalling several packages; may take a few minutes. Hang tight.\n"
 
 # apt installs
-sudo apt update -y 1>/dev/null 2>/dev/null && sudo apt install -y tar wget tree tmux ripgrep jq ninja-build gettext make cmake unzip curl git file gcc bat fd-find 1>/dev/null 2>/dev/null
+sudo apt update -y 1>/dev/null 2>/dev/null && sudo apt install -y tar wget tree tmux ripgrep jq ninja-build gettext neofetch make cmake unzip curl git file gcc bat fd-find 1>/dev/null 2>/dev/null
 echo -n '.'
 
 # OMZ and plugins
@@ -20,6 +16,12 @@ git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-m
 git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting 2>/dev/null
 sed -i "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" ~/.zshrc
 echo -n '.'
+
+# Fix slow ZSH paste
+sed -i "s/autoload -Uz bracketed-paste-magic/#autoload -Uz bracketed-paste-magic/" ~/.oh-my-zsh/lib/misc.zsh
+sed -i "s/zle -N bracketed-paste bracketed-paste-magic/#zle -N bracketed-paste bracketed-paste-magic/" ~/.oh-my-zsh/lib/misc.zsh
+sed -i "s/autoload -Uz url-quote-magic/#autoload -Uz url-quote-magic/" ~/.oh-my-zsh/lib/misc.zsh
+sed -i "s/zle -N self-insert url-quote-magic/#zle -N self-insert url-quote-magic/" ~/.oh-my-zsh/lib/misc.zsh
 
 # NeoVIM setup
 rm -rf ~/.vim* 1>/dev/null 2>/dev/null
@@ -55,32 +57,20 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 1>/dev/null 2>/de
 echo -n '.'
 
 # colored ls - lsd
-if [ $(uname -p) != "x86_64" ]
-then
-    a=$(curl -L -s https://github.com/Peltoche/lsd/releases/latest | grep -oE "tag.+\"" | cut -d '/' -f2 | grep -vE "^[^0-9]" | cut -d "\"" -f1 | head -n 1) && \
-    wget "https://github.com/Peltoche/lsd/releases/download/$a/lsd_""$a""_arm64.deb" 1>/dev/null 2>/dev/null && \
-    sudo apt install -y "./lsd_""$a""_arm64.deb" 1>/dev/null 2>/dev/null && \
-    rm "lsd_""$a""_arm64.deb"
-else
-    a=$(curl -L -s https://github.com/Peltoche/lsd/releases/latest | grep -oE "tag.+\"" | cut -d '/' -f2 | grep -vE "^[^0-9]" | cut -d "\"" -f1 | head -n 1) && \
-    wget "https://github.com/Peltoche/lsd/releases/download/$a/lsd_""$a""_amd64.deb" 1>/dev/null 2>/dev/null && \
-    sudo apt install -y "./lsd_""$a""_amd64.deb" 1>/dev/null 2>/dev/null && \
-    rm "lsd_""$a""_amd64.deb"
-fi
+a=$(curl -s https://api.github.com/repos/lsd-rs/lsd/releases/latest | grep "browser_download_url" | grep "amd64" | grep -v "musl" | cut -d '"' -f4)
+wget "$a" 1>/dev/null 2>/dev/null
+b=$(echo $a | cut -d '/' -f9)
+sudo apt install -y "$b" 1>/dev/null 2>/dev/null
+rm "$b"
 echo -n '.'
 
 # RC file setup
-wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/add_to_rc 1>/dev/null 2>/dev/null
+wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/linux.rcfile 1>/dev/null 2>/dev/null
 cat ~/.zshrc >> ./temptemp
 cat ./add_to_rc >> ./temptemp
 cat ./temptemp | grep -vE "^#" | grep -vE "^$" > ~/.zshrc
 rm ./temptemp ./add_to_rc 1>/dev/null 2>/dev/null
 
-echo "\n\n"
-echo "If you don't see shapes properly after this, make sure to install the font properly (Read the README)"
-echo ""
-echo "NOTE: After the new shell spawns, quit the terminal app or SSH session for everything to take effect then start again"
-echo ""
-echo "Starting in 10 seconds!"
-for i in 1 2 3 4 5 6 7 8 9 10; do echo -n '.'; sleep 1; done; echo ""
+printf "\n\nIf you don't see shapes properly after this, make sure to install the font properly (Read the README)\n\nNOTE: After the new shell spawns, quit the terminal app or SSH session for everything to take effect then start again\n\nStarting in 10 seconds."
+for i in $(seq 10); do echo -n '.'; sleep 1; done;
 exec zsh -l

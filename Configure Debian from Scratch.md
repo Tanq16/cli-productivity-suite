@@ -39,8 +39,8 @@ sudo apt update -y && sudo apt upgrade -y && sudo apt dist-upgrade -y
 Now, install a couple tools including `nala` (fast frontend for `apt`) &rarr;
 
 ```bash
-sudo apt install -y nala openssh-server openssh-client tilix \
-	gnome-shell-extension-manager curl wget htop wl-clipboard
+sudo apt install -y nala openssh-server openssh-client wget \
+	gnome-shell-extension-manager curl htop wl-clipboard
 ```
 
 Disable cups-browsed service permanently to remove the wait during a restart &rarr;
@@ -69,6 +69,17 @@ sudo groupadd docker
 sudo usermod -aG docker $USER
 ```
 
+Download and install the JetBrainsMono Nerd Font &rarr;
+
+```bash
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip && \
+mkdir /tmp/fontest && mv JetBrainsMono.zip /tmp/fontest && cd /tmp/fontest && \
+unzip JetBrainsMono.zip && \
+sudo mkdir /usr/share/fonts/truetype/jetbrains-nerdfont && \
+sudo mv *.ttf /usr/share/fonts/truetype/jetbrains-nerdfont/ && \
+sudo fc-cache -fv
+```
+
 Now some QoL updates &rarr;
 
 ```bash
@@ -77,16 +88,9 @@ rm -rf Documents/ Music/ Public/ Templates/ Videos/
 nano .config/user-dirs.dirs # change unwanted ones to $HOME only
 ```
 
-After these steps, ***restart the system***.
+After these steps, ***restart the system***. This can be done using `sudo reboot`.
 
 Now, we install the cli productivity suite &rarr;
-
-```bash
-sudo nala install \
-	tar wget tree tmux jq ninja-build \
-	gettext make cmake unzip git file \
-	gcc bat fd-find zsh
-```
 
 ```bash
 wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null
@@ -95,71 +99,25 @@ wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2
 ```
 
 ```bash
-git clone https://github.com/spaceship-prompt/spaceship-prompt.git ~/.oh-my-zsh/custom/themes/spaceship-prompt --depth=1 && \
-ln -s ~/.oh-my-zsh/custom/themes/spaceship-prompt/spaceship.zsh-theme ~/.oh-my-zsh/custom/themes/spaceship.zsh-theme && \
-sed -i "s/robbyrussell/spaceship/" ~/.zshrc && \
-git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions && \
-git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting && \
-sed -i "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" ~/.zshrc && \
-rm -rf ~/.vim* ~/.config/nvim ~/.local/share/nvim
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_linux.sh)"
+```
+
+Now, restart the shell completely. Next, download the `kitty` terminal &rarr;
+
+```bash
+curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
 ```
 
 ```bash
-sudo nala remove vim neovim -y && \
-wget https://github.com/neovim/neovim/archive/refs/tags/stable.tar.gz && \
-tar -xvf stable.tar.gz && \
-cd neovim-stable && \
-make CMAKE_BUILD_TYPE=RelWithDebInfo && \
-cd build && \
-cpack -G DEB && \
-sudo nala install ./nvim-linux64.deb && \
-cd ../.. && rm -rf stable.tar.gz neovim-stable && \
-git clone https://github.com/NvChad/NvChad ~/.config/nvim && \
-sed -i "s/local input =/local input = \"N\" --/" ~/.config/nvim/lua/core/bootstrap.lua && \
-sed -i "s/dofile(vim.g/vim.cmd([[ set guicursor= ]])\ndofile(vim.g/" ~/.config/nvim/init.lua && \
-nvim --headless -c 'quitall'
+ln -sf ~/.local/kitty.app/bin/kitty ~/.local/kitty.app/bin/kitten ~/.local/bin/
+cp ~/.local/kitty.app/share/applications/kitty.desktop ~/.local/share/applications/
+cp ~/.local/kitty.app/share/applications/kitty-open.desktop ~/.local/share/applications/
+sed -i "s|Icon=kitty|Icon=/home/$USER/.local/kitty.app/share/icons/hicolor/256x256/apps/kitty.png|g" ~/.local/share/applications/kitty*.desktop
+sed -i "s|Exec=kitty|Exec=/home/$USER/.local/kitty.app/bin/kitty|g" ~/.local/share/applications/kitty*.desktop
 ```
 
 ```bash
-git clone --depth=1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm && \
-wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/tmuxconf && \
-mv tmuxconf ~/.tmux.conf && \
-TMUX_PLUGIN_MANAGER_PATH=~/.tmux/plugins ~/.tmux/plugins/tpm/bin/install_plugins && \
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && \
-~/.fzf/install --all
-```
 
-```bash
-a=$(curl -L -s https://github.com/lsd-rs/lsd/releases/ | grep -oE "tag.+\"" | cut -d '/' -f2 | grep -vE "^[^v]" | cut -d "\"" -f1 | head -n 1) && \
-wget "https://github.com/lsd-rs/lsd/releases/download/$a/lsd-""$a""-x86_64-unknown-linux-gnu.tar.gz" && \
-tar -xvf "lsd-""$a""-x86_64-unknown-linux-gnu.tar.gz" && \
-sudo mv "lsd-""$a""-x86_64-unknown-linux-gnu/lsd" /usr/bin/lsd && \
-rm -rf "lsd-""$a""-x86_64-unknown-linux-gnu.tar.gz" "lsd-""$a""-x86_64-unknown-linux-gnu"
-```
-
-```bash
-wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/add_to_rc && \
-cat ~/.zshrc >> ./temptemp && \
-cat ./add_to_rc >> ./temptemp && \
-cat ./temptemp | grep -vE "^#" | grep -vE "^$" > ~/.zshrc && \
-rm ./temptemp ./add_to_rc && \
-exec zsh -l
-```
-
-Now once again, ***restart the system***. This can be done using `sudo reboot`.
-
-Lastly, we download catpuccin theme for `tilix` and the jetbrains nerd font &rarr;
-
-```bash
-wget https://raw.githubusercontent.com/catppuccin/tilix/main/src/Catppuccin-Mocha.json && \
-mkdir -p ~/.config/tilix/schemes/ && \
-mv Catppuccin-Mocha.json ~/.config/tilix/schemes && \
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip && \
-mkdir /tmp/fontest && mv JetBrainsMono.zip /tmp/fontest && cd /tmp/fontest && \
-unzip JetBrainsMono.zip && \
-sudo mkdir /usr/share/fonts/truetype/jetbrains-nerdfont && \
-sudo mv *.ttf /usr/share/fonts/truetype/jetbrains-nerdfont/ && \
-sudo fc-cache -fv
 ```
 
 **Bonus**: Setup custom DNS &rarr;

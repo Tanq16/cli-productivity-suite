@@ -7,28 +7,15 @@
 
 ## Introduction
 
-Use this repo to easily install a custom, cool and funky shell experience along with an awesome `neovim` and `tmux` installation. Before anything else though, install the [Catppuccin](https://catppuccin-website.vercel.app/) theme (with the `Mocha` configuration) for the most seamless experience with `tmux` and `neovim`.
+Use this repo to easily install a custom, cool and funky shell experience along with an awesome `neovim` and `tmux` installation. Before anything else though, install the [Catppuccin](https://catppuccin-website.vercel.app/) theme (with the `Mocha` configuration) for your terminal to get the most seamless experience with `tmux` and `neovim`.
 
 Also, install a "nerd" font for your terminal emulator. My recommendation is [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip). Don't forget to read the "Post Installation" section.
 
-The scripts have been tested on Ubuntu and MacOS for any architecture. MacOS needs `brew` to be installed. For any other linux distro, change the `apt` command to the appropriate package manager.
-
-<details>
-<summary>Everything that the script installs is in this expandable block.</summary>
-
-1. Oh-My-Zsh custom shell with [spaceship-prompt](https://spaceship-prompt.sh/) theme
-2. Fuzzy finder (`fzf`) for awesome productivity
-3. Syntax highlighting for command line
-3. Auto-completion on command line
-4. Tmux with mouse and other quality of life improvements
-5. NvChad + NeoVIM for a flashy vim experience
-6. Catppuccin theme for tmux and neovim
-
-</details>
+The scripts have been tested on x86-64 variants of Debian and Ubuntu. The MacOS script works for both Intel and M-series chips. MacOS does need `brew` to be installed however.
 
 ## Installation
 
-Get started by installing the initial set of tools &rarr;
+Get started by installing the minimum set of tools &rarr;
 
 ```bash
 sudo apt install git zsh wget curl
@@ -50,13 +37,13 @@ rm install.sh # cleanup
 
 Then, execute the following to install all other magic and enter the password whenever (if) prompted.
 
-For Linux &rarr;
+For Linux, use &rarr;
 
 ```bash
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_linux.sh)"
 ```
 
-For MacOS &rarr;
+For MacOS, use &rarr;
 
 ```bash
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_macos.sh)"
@@ -76,13 +63,9 @@ Finally, close the shell ***completely*** (close the terminal app or end the SSH
 
 A handy shortcut in `tmux` added by the above scripts is `Alt + \` to split into two vertical panes and `Alt + Shift + \` to split into two horizontal panes. Focus can be navigated among the split panes by using `Shift + <arrow keys>`.
 
-**Tmux on iTerm** can be very useful if certain settings are enabled to allow copy to Mac clipboard upon selection of content within the `tmux` terminal draw. `tmux` plugins installed as a part of the scripts above also enable mouse support.
-
-The fuzzy search `fzf` is another awesome feature to have and is installed as a part of the scripts above. Read the specifics at the maintainer [github page](https://github.com/junegunn/fzf) and learn about the features a bit more [here](https://medium.com/better-programming/boost-your-command-line-productivity-with-fuzzy-finder-985aa162ba5d).
-
 Pasting on modified zsh shell can be slow due to magic functions that `oh-my-zsh` installs. A quick fix is to comment those functions in `~/.oh-my.zsh/lib/misc.zsh`. This can also be easily done via the `sed`. The following can be pasted in a file and run as `bash <file>` or `zsh <file>` or as an executable after chmoding the file.
 
-> Replace `-i` flags with `-ie` flags for MacOS
+> Replace `-i` flags with `-i'' -e` flags for MacOS
 
 ```bash
 #!/bin/zsh
@@ -95,7 +78,7 @@ sed -i "s/zle -N self-insert url-quote-magic/#zle -N self-insert url-quote-magic
 If something goes wrong or you see an error during installation, you can remove everything with the following command from the home directory and start from scratch again &rarr;
 
 ```bash
-rm -rf .oh-my-zsh .fzf .fzf.zsh .tmux .tmux.conf .tmux-themepack .vim* .SpaceVim* .config/nvim .local/share/nvim .zshrc
+rm -rf .oh-my-zsh .fzf .fzf.zsh .tmux .tmux.conf .tmux-themepack .vim* .config/nvim .local/share/nvim .zshrc
 ```
 
-Lastly, the commands list for setting up a base Debian 12 installation from scratch for optimum readiness is given in the `Configure Debian from Scratch` markdown file.
+Lastly, the commands list for setting up a base Debian machine from scratch for optimum readiness is given in the `Configure Debian from Scratch` markdown file.
