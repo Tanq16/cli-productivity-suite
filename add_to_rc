@@ -19,6 +19,8 @@ export LESS_TERMCAP_so=$'\e[01;33m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[1;4;31m'
 export SPACESHIP_TIME_SHOW=true
+export HISTCONTROL=ignoreboth
+export PATH:$PATH:/opt/executables
 
 # Aliases
 alias f='fzf'
@@ -35,7 +37,7 @@ alias l='lsd -l'
 alias la='lsd -la'
 alias bat=batcat
 alias ip4="ip a | grep inet | cut -d ' ' -f6 | grep -vE ':' | cut -d '/' -f1 | grep -v '127.0.0.1'"
-alias pubip="curl -s ipinfo.io | jq -M '.ip' | cut -d '\"' -f2"
+alias pubip="curl -s ipinfo.io | jq -r -M '.ip'"
 alias sshide='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null"'
 alias ruid='python3 -c "import uuid; print(uuid.uuid4())"'
 alias sruid='ruid | grep -oE ".{4}-.{4}-.{4}" | cat'
@@ -43,7 +45,7 @@ alias utcnow='date -u +"%Y-%m-%dT%H:%M:%S+00:00"'
 alias sessionrec='script -f $HOME/session-$(date +"%d-%b-%y_%H-%M-%S").log'
 
 # Functions
-ipinfo(){curl ipinfo.io/$1/json | jq '{CITY:.city, REGION:.region, COUNTRY:.country, POSTAL:.postal, OWNER:.org}'}
+ipinfo(){curl -s ipinfo.io/$1/json | jq '{CITY:.city, REGION:.region, COUNTRY:.country, POSTAL:.postal, OWNER:.org}'}
 fencrypt(){openssl aes-256-ecb -a -in "$1" -out "$1.enc"}
 fdecrypt(){openssl aes-256-ecb -a -d -in "$1" -out "$(echo $1 | sed 's/\.enc//')"}
 forlinear(){
@@ -73,6 +75,7 @@ reprint() {
         echo "Usage: reprint [[len_random]|seq|rep] [len_seq|len_rep] [char_rep]"
     fi
 }
+# Set cursor to vertical line
 keymap-for-cursor-shape() { echo -ne '\e[5 q' }
 zle-line-init() { keymap-for-cursor-shape }
 
