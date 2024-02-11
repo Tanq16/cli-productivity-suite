@@ -72,7 +72,7 @@ sudo usermod -aG docker $USER
 Download and install the JetBrainsMono Nerd Font &rarr;
 
 ```bash
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip && \
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/JetBrainsMono.zip && \
 mkdir /tmp/fontest && mv JetBrainsMono.zip /tmp/fontest && cd /tmp/fontest && \
 unzip JetBrainsMono.zip && \
 sudo mkdir /usr/share/fonts/truetype/jetbrains-nerdfont && \
