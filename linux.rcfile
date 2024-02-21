@@ -20,7 +20,6 @@ export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[1;4;31m'
 export SPACESHIP_TIME_SHOW=true
 export HISTCONTROL=ignoreboth
-export PATH=$PATH:/opt/executables
 
 # Aliases
 alias f='fzf'
@@ -78,6 +77,8 @@ reprint() {
 # Set cursor to vertical line
 keymap-for-cursor-shape() { echo -ne '\e[5 q' }
 zle-line-init() { keymap-for-cursor-shape }
+
+export PATH=$PATH:/opt/executables:/usr/local/go/bin
 
 # Host-only (usually not for use within containers)
 alias dockernonerm='for i in $(docker images -f dangling=true -q); do docker image rm $i; done'
