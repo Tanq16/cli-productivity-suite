@@ -1,17 +1,11 @@
 #!/bin/sh
 
-# WORK IN PROGRESS
-
-echo ""
-echo "If you have some other vim config installed, press ⌃+c now and remove that."
-echo "After setting up appropriately, start the script again. Sleeping for 20 seconds!"
-for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do echo -n '.'; sleep 1; done; echo ""
-
-echo "\n"
-echo "Installing several packages; may take a few minutes. Hang tight!\n"
+printf "\nIf you have some other vim config installed, press ⌃+c now and remove that.\nAfter setting up appropriately, start the script again. Sleeping for 20 seconds."
+for i in $(seq 20); do echo -n '.'; sleep 1; done
+printf "\n\nInstalling several packages; may take a few minutes. Hang tight.\n"
 
 # brew installs
-brew install tree tmux jq bat fd neovim lsd wget git 1>/dev/null 2>/dev/null
+brew install tree tmux jq bat fd neovim neofetch ripgrep lsd wget git 1>/dev/null 2>/dev/null
 echo -n '.'
 
 # OMZ and plugins
@@ -22,6 +16,12 @@ git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-m
 git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting 2>/dev/null
 sed -i '' -e "s/plugins=/plugins=(git zsh-autosuggestions zsh-syntax-highlighting) #/" ~/.zshrc
 echo -n '.'
+
+# Fix slow ZSH paste
+sed -i '' -e "s/autoload -Uz bracketed-paste-magic/#autoload -Uz bracketed-paste-magic/" ~/.oh-my-zsh/lib/misc.zsh
+sed -i '' -e "s/zle -N bracketed-paste bracketed-paste-magic/#zle -N bracketed-paste bracketed-paste-magic/" ~/.oh-my-zsh/lib/misc.zsh
+sed -i '' -e "s/autoload -Uz url-quote-magic/#autoload -Uz url-quote-magic/" ~/.oh-my-zsh/lib/misc.zsh
+sed -i '' -e "s/zle -N self-insert url-quote-magic/#zle -N self-insert url-quote-magic/" ~/.oh-my-zsh/lib/misc.zsh
 
 # NeoVIM setup
 rm -rf ~/.vim* 1>/dev/null 2>/dev/null
@@ -38,26 +38,18 @@ git clone --depth=1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm 1>/d
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/tmuxconf 1>/dev/null 2>/dev/null
 mv tmuxconf ~/.tmux.conf
 TMUX_PLUGIN_MANAGER_PATH=~/.tmux/plugins ~/.tmux/plugins/tpm/bin/install_plugins 1>/dev/null 2>/dev/null
+echo -n '.'
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 1>/dev/null 2>/dev/null
 ~/.fzf/install --all 1>/dev/null 2>/dev/null
 echo -n '.'
 
 # RC file setup
-wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/add_to_rc 2>/dev/null
-sed -i '' -e "s/fdfind/fd/" ./add_to_rc
-sed -i '' -e "s/batcat/bat/" ./add_to_rc
-sed -i '' -e "s/alias bat=/\# alias bat=/" ./add_to_rc
-sed -i '' -e "s/alias ip4/alias ip4='ifconfig | grep -oE \"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\" | grep -v \"127.0.0.1\" | grep -vE \".+\.255$\"' #/" ./add_to_rc
+wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/macos.rcfile 2>/dev/null
 cat ~/.zshrc >> ./temptemp
-cat ./add_to_rc >> ./temptemp
+cat ./macos.rcfile >> ./temptemp
 cat ./temptemp | grep -vE "^#" | grep -vE "^$" > ~/.zshrc
-rm ./temptemp ./add_to_rc ./add_to_rce ./.zshrce 1>/dev/null 2>/dev/null
+rm ./temptemp ./macos.rcfile 1>/dev/null 2>/dev/null
 
-echo "\n\n"
-echo "If you don't see shapes properly after this, make sure to install the font properly (Read the README)"
-echo ""
-echo "NOTE: After the new shell spawns, quit the terminal app or SSH session for everything to take effect then start again"
-echo ""
-echo "Starting in 10 seconds!"
-for i in 1 2 3 4 5 6 7 8 9 10; do echo -n '.'; sleep 1; done; echo ""
+printf "\n\nIf you don't see shapes properly after this, make sure to install the font properly (Read the README)\n\nNOTE: After the new shell spawns, quit the terminal app or SSH session for everything to take effect then start again\n\nStarting in 10 seconds."
+for i in $(seq 10); do echo -n '.'; sleep 1; done;
 exec zsh -l
