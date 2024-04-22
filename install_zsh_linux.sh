@@ -39,9 +39,7 @@ cpack -G DEB 1>/dev/null 2>/dev/null
 echo -n '.'
 sudo apt install ./nvim-linux64.deb 1>/dev/null 2>/dev/null
 cd ../.. && rm -rf stable.tar.gz neovim-stable 1>/dev/null 2>/dev/null
-git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1 1>/dev/null 2>/dev/null
-sed -i "s/local input =/local input = \"N\" --/" ~/.config/nvim/lua/core/bootstrap.lua
-sed -i "s/dofile(vim.g/vim.cmd([[ set guicursor=n-v-c-i:ver25 ]])\ndofile(vim.g/" ~/.config/nvim/init.lua
+git clone https://github.com/NvChad/starter ~/.config/nvim 1>/dev/null 2>/dev/null
 echo -n '.'
 nvim --headless -c 'quitall' 1>/dev/null 2>/dev/null
 echo -n '.'

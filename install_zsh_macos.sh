@@ -27,9 +27,8 @@ sed -i '' -e "s/zle -N self-insert url-quote-magic/#zle -N self-insert url-quote
 rm -rf ~/.vim* 1>/dev/null 2>/dev/null
 rm -rf ~/.config/nvim 2>/dev/null
 rm -rf ~/.local/share/nvim 2>/dev/null
-git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1 1>/dev/null 2>/dev/null
-sed -i '' -e "s/local input =/local input = \"N\" --/" ~/.config/nvim/lua/core/bootstrap.lua
-sed -i '' -e "s/dofile(vim.g/vim.cmd([[ set guicursor=n-v-c-i:ver25 ]])\ndofile(vim.g/" ~/.config/nvim/init.lua
+git clone https://github.com/NvChad/starter ~/.config/nvim 1>/dev/null 2>/dev/null
+echo -n '.'
 nvim --headless -c 'quitall' 1>/dev/null 2>/dev/null
 echo -n '.'
 

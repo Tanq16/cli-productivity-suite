@@ -3,17 +3,15 @@
 * [Introduction](#introduction)
 * [Installation](#installation)
 * [Post Installation](#post-installation)
-* [Bonus (Helpful Tips)](#bonus-helpful-tips)
+* [Bonus Tips](#bonus-tips)
 
 ## Introduction
 
-Use this repo to easily install a custom, cool and funky shell experience along with an awesome `neovim` and `tmux` config.
+Use this repo to easily install a custom, cool and funky shell experience along with an awesome `neovim` and `tmux` config. This repo also carries a config file for the recommended `Kitty` terminal.
 
-First, make sure you have the [Catppuccin](https://catppuccin-website.vercel.app/) theme (with the `Mocha` configuration) for your terminal.
+First, make sure you have the [Catppuccin](https://catppuccin-website.vercel.app/) theme (with the `Mocha` configuration) for your terminal. Then, install a `nerd` font for your terminal. My recommendation is [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip).
 
-Then, install a "nerd" font for your terminal emulator. My recommendation is [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip).
-
-This suite works on x86-64 Debian, x86-64 Ubuntu, x86-64 MacOS, and Apple Silicon MacOS. MacOS also needs `brew`.
+This suite has been tested on and works for x86-64 Debian, x86-64 Ubuntu, x86-64 MacOS, and Apple Silicon MacOS. (PS: MacOS should alreadt have `brew` installed.)
 
 ## Installation
 
@@ -32,9 +30,7 @@ brew install git zsh wget curl
 Next, install oh my zsh as follows &rarr;
 
 ```bash
-wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null
-sh install.sh
-rm install.sh # cleanup
+wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null && sh install.sh
 ```
 
 Then, execute the following to install all other magic and enter the password whenever (if) prompted.
@@ -57,30 +53,22 @@ Finally, close the shell ***completely*** (close the terminal app or end the SSH
 
 - `tmux` is installed by default with the above script. Use `tt` to launch a default session.
 - `bat`, an alternative of the `cat` command with colored output is also installed by default. 
-- `nvim` is installed with NvChad configuration, but `nvim` doesn't allow setting a theme when running headless, so use `<space>+th` to launch the theme selector inside `nvim`, type and select `catppuccin` to match everything up.
+- `nvim` is installed with NvChad configuration, but `nvim` needs a couple other small steps to get up and running smoothly &rarr;
+    - First, run the Vim command `:MasonInstallAll`
+    - Next, run Vim command `:Lazy sync` and once again run `:MasonInstallAll`
+    - NeoVim doesn't allow setting a theme while headless, so use `<space>+th` and select `catppuccin` to match everything
+- Run cleanup as follows &rarr; `rm install.sh && rm -rf fzf`
 
-`bat` (maintainer-default) has pager enabled, which is disabled by the installation script using `export BAT_PAGER=''` within the rc-file. This can be re-enabled by deleting the line in `.zshrc`.
+PS: `bat` (maintainer-default) has pager enabled, which is disabled by the installation script using `export BAT_PAGER=''` within the rc-file. This can be re-enabled by deleting that line in `.zshrc`.
 
-## Bonus (Helpful Tips)
+## Bonus Tips
 
 A handy shortcut in `tmux` added by the above scripts is `Alt + \` to split into two vertical panes and `Alt + Shift + \` to split into two horizontal panes. Focus can be navigated among the split panes by using `Shift + <arrow keys>`.
 
-Pasting on modified zsh shell can be slow due to magic functions that `oh-my-zsh` installs. A quick fix is to comment those functions in `~/.oh-my.zsh/lib/misc.zsh`. This can also be easily done via the `sed`. The following can be pasted in a file and run as `bash <file>` or `zsh <file>` or as an executable after chmoding the file.
+Pasting on modified zsh shell can be slow due to magic functions that `oh-my-zsh` installs. A quick fix is to comment those functions in `~/.oh-my.zsh/lib/misc.zsh`. This is already done by this suite. If you need to re-enable this, simply uninstall the suite, restart your terminal and comment the necessary `sed` lines in the scripts before re-installing.
 
-> Replace `-i` flags with `-i'' -e` flags for MacOS
-
-```bash
-#!/bin/zsh
-sed -i "s/autoload -Uz bracketed-paste-magic/#autoload -Uz bracketed-paste-magic/" ~/.oh-my-zsh/lib/misc.zsh
-sed -i "s/zle -N bracketed-paste bracketed-paste-magic/#zle -N bracketed-paste bracketed-paste-magic/" ~/.oh-my-zsh/lib/misc.zsh
-sed -i "s/autoload -Uz url-quote-magic/#autoload -Uz url-quote-magic/" ~/.oh-my-zsh/lib/misc.zsh
-sed -i "s/zle -N self-insert url-quote-magic/#zle -N self-insert url-quote-magic/" ~/.oh-my-zsh/lib/misc.zsh
-```
-
-If something goes wrong or you see an error during installation, you can remove everything with the following command from the home directory and start from scratch again &rarr;
+If something goes wrong or you you want to re-install, you can remove everything with the following command from the home directory and start from scratch again (i.e., the installation section, theme and font will be already configured) &rarr;
 
 ```bash
-rm -rf .oh-my-zsh .fzf .fzf.zsh .tmux .tmux.conf .tmux-themepack .vim* .config/nvim .local/share/nvim .zshrc
+rm -rf .oh-my-zsh .fzf .fzf.zsh .tmux .tmux.conf .tmux-themepack .vimrc .viminfo .vim .config/nvim .local/share/nvim .zshrc
 ```
-
-Lastly, the commands list for setting up a base Debian machine from scratch for optimum readiness is given in the `Configure Debian from Scratch` markdown file.
