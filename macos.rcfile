@@ -20,6 +20,7 @@ export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[1;4;31m'
 export SPACESHIP_TIME_SHOW=true
 export HISTCONTROL=ignoreboth
+export PATH=$PATH:/opt/homebrew/bin
 
 # Aliases
 alias f='fzf'
