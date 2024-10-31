@@ -33,7 +33,7 @@ set -g @catppuccin_flavor 'mocha'
 run '~/.config/tmux/plugins/tmux/catppuccin.tmux' # needed to load colors before setup
 set -g @catppuccin_window_status_style 'rounded'
 set -g status-right-length 100
-set -g status-right "#{E:@catppuccin_status_directory}#{E:@catppuccin_status_session}#{E:@catppuccin_status_uptime}"
+set -g status-right "#{E:@catppuccin_status_directory}#{E:@catppuccin_status_session}"
 set -g status-left ""
 set -g @catppuccin_window_text " #W"
 set -g @catppuccin_window_current_text " #W"
