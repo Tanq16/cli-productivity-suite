@@ -6,6 +6,7 @@ printf "\n\nInstalling several packages; may take a few minutes. Hang tight.\n"
 
 # brew installs
 brew install tree tmux jq bat fd neovim neofetch ripgrep lsd wget git 1>/dev/null 2>/dev/null
+brew install --cask nikitabobko/tap/aerospace 1>/dev/null 2>/dev/null
 printf '.'
 
 # OMZ and plugins
