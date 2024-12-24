@@ -1,4 +1,9 @@
+<div align="center">
+
+<img src="logo.png" width=300px>
+    
 # Command Line Productivity Suite
+</div>
 
 * [Introduction](#introduction)
 * [Installation](#installation)
