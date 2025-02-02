@@ -5,10 +5,8 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "cli-suite",
-	Short: "CLI Productivity Suite installer and manager",
-	Long: `A command line tool to install, update, fix and delete the CLI Productivity Suite.
-Complete documentation is available at https://github.com/tanq16/cli-productivity-suite`,
+	Use:   "cli-productivity-suite",
+	Short: "CLI Productivity Suite manager that installs a funky shell and general tools for MacOS and Linux",
 }
 
 func Execute() error {
