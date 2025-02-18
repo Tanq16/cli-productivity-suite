@@ -13,8 +13,9 @@ set-option -g history-limit 99999
 set-option -g status-position top
 # No delay for escape key press
 set -sg escape-time 0
-# Highlight color
-set mode-style "bg=colour96"
+# Highlight color aligning with catppuccin
+set-hook -g after-new-window 'setw mode-style "fg=#1E1E2E,bg=#F5E0DC"'
+set-hook -g session-created 'setw mode-style "fg=#1E1E2E,bg=#F5E0DC"'
 
 # Reload tmux config
 bind-key -T copy-mode MouseDragEnd1Pane send -X copy-selection
