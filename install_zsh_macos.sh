@@ -30,6 +30,7 @@ rm -rf ~/.config/nvim 2>/dev/null
 rm -rf ~/.local/share/nvim 2>/dev/null
 git clone https://github.com/NvChad/starter ~/.config/nvim 1>/dev/null 2>/dev/null
 printf '.'
+sed -i '' -e 's/theme =.*/theme = "catppuccin", transparency = true, --/' ~/.config/nvim/lua/chadrc.lua
 nvim --headless -c 'quitall' 1>/dev/null 2>/dev/null
 printf '.'
 
