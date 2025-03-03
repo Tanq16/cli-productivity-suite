@@ -74,6 +74,16 @@ reprint() {
         echo "Usage: reprint [[len_random]|seq|rep] [len_seq|len_rep] [char_rep]"
     fi
 }
+
+# OSC52 sequence copy for remote systems through tmux
+rcopy() {
+  local data
+  data=$(cat)
+  local encoded
+  encoded=$(printf "%s" "$data" | base64 | tr -d '\n')
+  printf "\033]52;c;%s\a" "$encoded"
+}
+
 # Set cursor to vertical line
 keymap-for-cursor-shape() { echo -ne '\e[5 q' }
 zle-line-init() { keymap-for-cursor-shape }
