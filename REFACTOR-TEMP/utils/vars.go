@@ -1,4 +1,4 @@
-package config
+package utils
 
 var LinuxPackages = []string{
 	"tree",

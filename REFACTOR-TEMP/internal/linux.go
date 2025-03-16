@@ -1,4 +1,4 @@
-package installer
+package internal
 
 import (
 	"bufio"
@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/rs/zerolog/log"
-	"github.com/tanq16/cli-productivity-suite/internal/utils"
+	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
 func InstallOhMyZsh() error {
