@@ -78,12 +78,12 @@ printf '[+] Installed Go'
 
 # personal executables
 mkdir -p $HOME/shell/executables
-/usr/local/go/bin/go install github.com/Tanq16/ai-context@latest 1>/dev/null 2>/dev/null
-/usr/local/go/bin/go install github.com/Tanq16/nottif@latest 1>/dev/null 2>/dev/null
-/usr/local/go/bin/go install github.com/Tanq16/danzo@latest 1>/dev/null 2>/dev/null
-mv /usr/local/go/bin/ai-context $HOME/shell/executables/ai-context
-mv /usr/local/go/bin/nottif $HOME/shell/executables/nottif
-mv /usr/local/go/bin/danzo $HOME/shell/executables/danzo
+/usr/local/go/bin/go install github.com/tanq16/ai-context@latest 1>/dev/null 2>/dev/null
+/usr/local/go/bin/go install github.com/tanq16/nottif@latest 1>/dev/null 2>/dev/null
+/usr/local/go/bin/go install github.com/tanq16/danzo@latest 1>/dev/null 2>/dev/null
+mv $HOME/go/bin/ai-context $HOME/shell/executables/ai-context
+mv $HOME/go/bin/nottif $HOME/shell/executables/nottif
+mv $HOME/go/bin/danzo $HOME/shell/executables/danzo
 printf '\r\033[K'
 printf '[+] Installed personal executables'
 
@@ -95,4 +95,5 @@ cat ./temptemp | grep -vE "^#" | grep -vE "^$" > ~/.zshrc
 rm ./temptemp ./linux.rcfile 1>/dev/null 2>/dev/null
 
 printf "\n\nNew shell spawns in 10 seconds; quit the terminal app for everything to take effect then start again.\n"
+sleep 10
 exec zsh -l

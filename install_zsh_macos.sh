@@ -53,4 +53,5 @@ printf '\r\033[L'
 printf '[+] Setup RC files'
 
 printf "\n\nNew shell spawns in 10 seconds; quit the terminal for everything to take effect then start again.\n"
+sleep 10
 exec zsh -l
