@@ -1,14 +1,15 @@
 <div align="center">
 
-<img src="logo.png" width=300px>
+<img src="logo.png" width=275px>
     
 # Command Line Productivity Suite
 </div>
 
-* [Introduction](#introduction)
-* [Installation](#installation)
-* [Post Installation Steps](#post-installation-steps)
-* [Bonus Tips](#bonus-tips)
+<div align="center">
+
+[Introduction](#introduction) &bull; [Installation](#installation) &bull; [Post Installation Steps](#post-installation-steps) &bull; [Bonus Tips](#bonus-tips)
+
+</div>
 
 ## Introduction
 
@@ -16,35 +17,54 @@ As a non-standard way of managing and installing dotfiles, I use this repo to ea
 
 Before installing the suite, install the Catppuccin theme with `Mocha` configuration for your terminal. Then, install a `nerd` font (I recommend [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip)).
 
-*This suite has been tested on and works for Debian & MacOS. (PS: MacOS requires `brew` to be installed.)*
+*This suite has been tested on and works for Debian & MacOS.*
 
 ## Installation
+
+### Linux
 
 First, install the basic tools &rarr;
 
 ```bash
-# Linux
 sudo apt install git zsh wget curl
-
-# MacOS
-brew install git zsh wget curl
 ```
 
-Next, install *oh my zsh* as follows &rarr;
+Next, install *oh my zsh* &rarr;
 
 ```bash
 wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null && sh install.sh
-# after installtion completes and you're in new shell, clearup by running - rm install.sh
 ```
 
-Next, execute the suite script using the direct command below to install all the other magic. You will need to enter the password whenever prompted.
+After installtion, cleanup with - `rm install.sh`
+
+Next, run the suite script to install all the other magic (password will be required).
 
 ```bash
-# Linux
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_linux.sh)"
-
-# MacOS
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_macos.sh)"
+```
+
+Finally, close the shell ***completely*** (close the terminal app or end the SSH session) and start a new instance.
+
+### MacOS
+
+First, install the basic tools &rarr;
+
+```bash
+brew install git zsh wget curl
+```
+
+Next, install *oh my zsh* &rarr;
+
+```bash
+wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null && sh install.sh
+```
+
+After installtion, cleanup with - `rm install.sh`
+
+Next, run the suite script to install all the other magic (password will be required).
+
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_linux.sh)"
 ```
 
 Finally, close the shell ***completely*** (close the terminal app or end the SSH session) and start a new instance.

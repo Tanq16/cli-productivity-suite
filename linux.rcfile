@@ -75,13 +75,19 @@ reprint() {
     fi
 }
 
-# OSC52 sequence copy for remote systems through tmux
+# OSC52 sequence copy for remote systems (+ fix for tmux)
 rcopy() {
-  local data
-  data=$(cat)
-  local encoded
-  encoded=$(printf "%s" "$data" | base64 | tr -d '\n')
-  printf "\033]52;c;%s\a" "$encoded"
+    local data
+    data=$(cat)
+    local encoded
+    encoded=$(printf "%s" "$data" | base64)
+    # Explicitly tell tmux to pass the sequence through
+    if [ -n "$TMUX" ]; then
+        printf "\ePtmux;\e\e]52;c;%s\a\e\\" "$encoded"
+    else
+        printf "\e]52;c;%s\a" "$encoded"
+    fi
+    printf "%s" "$data"
 }
 
 # Set cursor to vertical line
