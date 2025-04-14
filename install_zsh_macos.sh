@@ -36,6 +36,7 @@ printf '[+] Installed NeoVIM'
 # TMUX & FZF
 git clone --depth=1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm 1>/dev/null 2>/dev/null
 wget https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/tmuxconf 1>/dev/null 2>/dev/null
+sed -i '' -e 's/bind-key -T copy-mode MouseDragEnd1Pane send -X copy-selection/bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe "pbcopy"/' ./tmuxconf # fix copy on select in tmux for macOS
 mv tmuxconf ~/.tmux.conf
 TMUX_PLUGIN_MANAGER_PATH=~/.tmux/plugins ~/.tmux/plugins/tpm/bin/install_plugins 1>/dev/null 2>/dev/null
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf 1>/dev/null 2>/dev/null

@@ -18,7 +18,6 @@ set-hook -g after-new-window 'setw mode-style "fg=#1E1E2E,bg=#F5E0DC"'
 set-hook -g session-created 'setw mode-style "fg=#1E1E2E,bg=#F5E0DC"'
 
 bind-key -T copy-mode MouseDragEnd1Pane send -X copy-selection
-# bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "pbcopy" # ENABLE FOR MAC
 bind -n m-= next-window
 bind -n m-- previous-window
 bind -n S-Right select-pane -R
