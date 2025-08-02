@@ -40,7 +40,7 @@ After installtion, cleanup with - `rm install.sh`
 Next, run the suite script to install all the other magic (password will be required).
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_macos.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_linux.sh)"
 ```
 
 Finally, close the shell ***completely*** (close the terminal app or end the SSH session) and start a new instance.
@@ -64,7 +64,7 @@ After installtion, cleanup with - `rm install.sh`
 Next, run the suite script to install all the other magic (password will be required).
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_linux.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_macos.sh)"
 ```
 
 Finally, close the shell ***completely*** (close the terminal app or end the SSH session) and start a new instance.
