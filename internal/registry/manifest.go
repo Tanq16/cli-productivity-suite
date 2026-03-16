@@ -1,0 +1,468 @@
+package registry
+
+var AllTools = []Tool{
+	// ========== GitHub Release Binaries (Public) ==========
+	{
+		Name: "bat", BinaryName: "bat", Kind: GitHubRelease, Category: Public,
+		Repo: "sharkdp/bat", Description: "Cat clone with syntax highlighting",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
+			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "aarch64"},
+			ExcludeSubstrings:   []string{"musl"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "*/bat",
+		},
+	},
+	{
+		Name: "fd", BinaryName: "fd", Kind: GitHubRelease, Category: Public,
+		Repo: "sharkdp/fd", Description: "Simple fast alternative to find",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
+			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "aarch64"},
+			ExcludeSubstrings:   []string{"musl"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "*/fd",
+		},
+	},
+	{
+		Name: "ripgrep", BinaryName: "rg", Kind: GitHubRelease, Category: Public,
+		Repo: "BurntSushi/ripgrep", Description: "Fast recursive grep",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
+			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "aarch64"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "*/rg",
+		},
+	},
+	{
+		Name: "lsd", BinaryName: "lsd", Kind: GitHubRelease, Category: Public,
+		Repo: "lsd-rs/lsd", Description: "Next gen ls command",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
+			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "aarch64"},
+			ExcludeSubstrings:   []string{"musl"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "*/lsd",
+		},
+	},
+	{
+		Name: "jq", BinaryName: "jq", Kind: GitHubRelease, Category: Public,
+		Repo: "jqlang/jq", Description: "Command-line JSON processor",
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "macos"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
+	{
+		Name: "yq", BinaryName: "yq", Kind: GitHubRelease, Category: Public,
+		Repo: "mikefarah/yq", Description: "YAML processor",
+		Asset: AssetPattern{
+			OSPatterns:        map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:      map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ExcludeSubstrings: []string{".tar.gz", ".zip"},
+			ArchiveFormat:     "none",
+		},
+	},
+	{
+		Name: "fzf", BinaryName: "fzf", Kind: GitHubRelease, Category: Public,
+		Repo: "junegunn/fzf", Description: "Fuzzy finder",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "fzf",
+		},
+	},
+	{
+		Name: "gh", BinaryName: "gh", Kind: GitHubRelease, Category: Public,
+		Repo: "cli/cli", Description: "GitHub CLI",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "*/bin/gh",
+		},
+	},
+	{
+		Name: "uv", BinaryName: "uv", Kind: GitHubRelease, Category: Public,
+		Repo: "astral-sh/uv", Description: "Python package manager",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
+			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "aarch64"},
+			ExcludeSubstrings:   []string{"musl"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "*/uv",
+		},
+	},
+	{
+		Name: "bun", BinaryName: "bun", Kind: GitHubRelease, Category: Public,
+		Repo: "oven-sh/bun", Description: "JavaScript runtime",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:        map[string]string{"amd64": "x64", "arm64": "aarch64"},
+			ExcludeSubstrings:   []string{"profile", "baseline"},
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "*/bun",
+		},
+	},
+	{
+		Name: "nuclei", BinaryName: "nuclei", Kind: GitHubRelease, Category: Public,
+		Repo: "projectdiscovery/nuclei", Description: "Vulnerability scanner",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "nuclei",
+		},
+	},
+	{
+		Name: "naabu", BinaryName: "naabu", Kind: GitHubRelease, Category: Public,
+		Repo: "projectdiscovery/naabu", Description: "Port scanner",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "naabu",
+		},
+	},
+	{
+		Name: "katana", BinaryName: "katana", Kind: GitHubRelease, Category: Public,
+		Repo: "projectdiscovery/katana", Description: "Web crawler",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "katana",
+		},
+	},
+	{
+		Name: "subfinder", BinaryName: "subfinder", Kind: GitHubRelease, Category: Public,
+		Repo: "projectdiscovery/subfinder", Description: "Subdomain discovery",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "subfinder",
+		},
+	},
+	{
+		Name: "proxify", BinaryName: "proxify", Kind: GitHubRelease, Category: Public,
+		Repo: "projectdiscovery/proxify", Description: "HTTP proxy",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "proxify",
+		},
+	},
+	{
+		Name: "terraform", BinaryName: "terraform", Kind: DirectDownload, Category: Public,
+		Repo: "hashicorp/terraform", Description: "Infrastructure as code",
+		URL:  "https://releases.hashicorp.com/terraform/{version_bare}/terraform_{version_bare}_{os}_{arch}.zip",
+		Asset: AssetPattern{
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "terraform",
+		},
+	},
+	{
+		Name: "trufflehog", BinaryName: "trufflehog", Kind: GitHubRelease, Category: Public,
+		Repo: "trufflesecurity/trufflehog", Description: "Secret scanner",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "trufflehog",
+		},
+	},
+	{
+		Name: "gobuster", BinaryName: "gobuster", Kind: GitHubRelease, Category: Public,
+		Repo: "OJ/gobuster", Description: "Directory/DNS brute-forcer",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "Linux", "darwin": "Darwin"},
+			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "arm64"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "gobuster",
+		},
+	},
+	{
+		Name: "grpcurl", BinaryName: "grpcurl", Kind: GitHubRelease, Category: Public,
+		Repo: "fullstorydev/grpcurl", Description: "curl for gRPC",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "osx"},
+			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "arm64"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "grpcurl",
+		},
+	},
+	{
+		Name: "ffuf", BinaryName: "ffuf", Kind: GitHubRelease, Category: Public,
+		Repo: "ffuf/ffuf", Description: "Fast web fuzzer",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "ffuf",
+		},
+	},
+	{
+		Name: "gron", BinaryName: "gron", Kind: GitHubRelease, Category: Public,
+		Repo: "tomnomnom/gron", Description: "Make JSON greppable",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "tgz",
+			BinaryPathInArchive: "gron",
+		},
+	},
+	{
+		Name: "sq", BinaryName: "sq", Kind: GitHubRelease, Category: Public,
+		Repo: "neilotoole/sq", Description: "Data wrangler",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "sq",
+		},
+	},
+	{
+		Name: "kubelogin", BinaryName: "kubelogin", Kind: GitHubRelease, Category: Public,
+		Repo: "Azure/kubelogin", Description: "Azure Kubernetes login",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "bin/*/kubelogin",
+		},
+	},
+	{
+		Name: "upx", BinaryName: "upx", Kind: GitHubRelease, Category: Public,
+		Repo: "upx/upx", Description: "Binary packer",
+		Platforms: []string{"linux"},
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "tar.xz",
+			BinaryPathInArchive: "*/upx",
+		},
+	},
+
+	// ========== Direct Download ==========
+	{
+		Name: "kubectl", BinaryName: "kubectl", Kind: DirectDownload, Category: Public,
+		Description: "Kubernetes CLI",
+		StableURL:   "https://dl.k8s.io/release/stable.txt",
+		URL:         "https://dl.k8s.io/release/{version}/bin/{os}/{arch}/kubectl",
+	},
+
+	// ========== Own Public Tools (Tanq16) ==========
+	{
+		Name: "anbu", BinaryName: "anbu", Kind: GitHubRelease, Category: Public,
+		Repo: "Tanq16/anbu", Description: "Anbu tool",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "anbu*",
+		},
+	},
+	{
+		Name: "danzo", BinaryName: "danzo", Kind: GitHubRelease, Category: Public,
+		Repo: "Tanq16/danzo", Description: "Danzo tool",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "danzo",
+		},
+	},
+	{
+		Name: "nits", BinaryName: "nits", Kind: GitHubRelease, Category: Public,
+		Repo: "Tanq16/nits", Description: "Nits tool",
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
+	{
+		Name: "ai-context", BinaryName: "ai-context", Kind: GitHubRelease, Category: Public,
+		Repo: "Tanq16/ai-context", Description: "AI context builder",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "ai-context",
+		},
+	},
+
+	// ========== Own Private Tools (Tanq16) ==========
+	{
+		Name: "gcli", BinaryName: "gcli", Kind: GitHubRelease, Category: Private,
+		Repo: "Tanq16/gcli", Description: "Private CLI tool", IsPrivate: true,
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
+	{
+		Name: "box-cli", BinaryName: "box-cli", Kind: GitHubRelease, Category: Private,
+		Repo: "Tanq16/box-cli", Description: "Private box CLI", IsPrivate: true,
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
+	{
+		Name: "claudex", BinaryName: "claudex", Kind: GitHubRelease, Category: Private,
+		Repo: "Tanq16/claudex", Description: "Private Claudex tool", IsPrivate: true,
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
+	{
+		Name: "toon", BinaryName: "toon", Kind: GitHubRelease, Category: Private,
+		Repo: "Tanq16/toon", Description: "Private Toon tool", IsPrivate: true,
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
+	{
+		Name: "cybernest", BinaryName: "cybernest", Kind: GitHubRelease, Category: Private,
+		Repo: "Tanq16/cybernest", Description: "Private Cybernest tool", IsPrivate: true,
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
+
+	// ========== System Packages ==========
+	{
+		Name: "system-packages", Kind: SystemPackage, Category: System,
+		Description: "Core system packages",
+		AptPkgs:     []string{"tmux", "git", "tree", "wget", "curl", "zsh", "openssl", "nmap", "ncat", "cmake", "gcc", "make", "ninja-build", "gettext", "unzip", "file", "ffmpeg"},
+		BrewPkgs:    []string{"tmux", "git", "tree", "wget", "curl", "openssl", "nmap", "ffmpeg", "go"},
+	},
+	{
+		Name: "aerospace", Kind: SystemPackage, Category: System,
+		Description: "macOS tiling window manager",
+		Platforms:   []string{"darwin"},
+		BrewCasks:   []string{"nikitabobko/tap/aerospace"},
+	},
+	{
+		Name: "upx-macos", Kind: SystemPackage, Category: System,
+		Description: "Binary packer (macOS via brew)",
+		Platforms:   []string{"darwin"},
+		BrewPkgs:    []string{"upx"},
+	},
+
+	// ========== Cloud CLIs ==========
+	{
+		Name: "aws-cli", Kind: CloudCLI, Category: CloudCLICat,
+		Description: "AWS CLI v2",
+	},
+	{
+		Name: "azure-cli", Kind: CloudCLI, Category: CloudCLICat,
+		Description: "Azure CLI",
+	},
+	{
+		Name: "gcloud-cli", Kind: CloudCLI, Category: CloudCLICat,
+		Description: "Google Cloud CLI",
+	},
+
+	// ========== Language Runtimes ==========
+	{
+		Name: "neovim", Kind: LanguageRuntime, Category: Runtime,
+		Description: "Neovim text editor (0.11+ for NvChad)",
+	},
+	{
+		Name: "go-sdk", Kind: LanguageRuntime, Category: Runtime,
+		Description: "Go programming language SDK",
+	},
+	{
+		Name: "python", Kind: LanguageRuntime, Category: Runtime,
+		Description: "Python 3.14 via uv + py-default venv",
+	},
+
+	// ========== Config Files ==========
+	{
+		Name: "tmux-config", Kind: ConfigFile, Category: Config,
+		Description: "Tmux configuration",
+		ConfigSrc:   "tmux.conf",
+		ConfigDest:  "~/.tmux.conf",
+	},
+	{
+		Name: "kitty-config", Kind: ConfigFile, Category: Config,
+		Description: "Kitty terminal configuration",
+		ConfigSrc:   "kittyconf",
+		ConfigDest:  "~/.config/kitty/kitty.conf",
+	},
+	{
+		Name: "aerospace-config", Kind: ConfigFile, Category: Config,
+		Description: "Aerospace WM configuration",
+		Platforms:   []string{"darwin"},
+		ConfigSrc:   "macos.aerospaceconf",
+		ConfigDest:  "~/.aerospace.toml",
+	},
+	{
+		Name: "rcfile", Kind: ConfigFile, Category: Config,
+		Description: "Zsh RC file (complete .zshrc)",
+		ConfigSrc:   "rcfile",
+		ConfigDest:  "~/.zshrc",
+	},
+
+	// ========== Shell Plugins ==========
+	{
+		Name: "spaceship-prompt", Kind: ShellPlugin, Category: Shell,
+		Description: "Spaceship ZSH theme",
+		CloneURL:    "https://github.com/spaceship-prompt/spaceship-prompt.git",
+		CloneDest:   "~/.oh-my-zsh/custom/themes/spaceship-prompt",
+		PostClone:   "spaceship",
+	},
+	{
+		Name: "zsh-autosuggestions", Kind: ShellPlugin, Category: Shell,
+		Description: "ZSH autosuggestions plugin",
+		CloneURL:    "https://github.com/zsh-users/zsh-autosuggestions.git",
+		CloneDest:   "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions",
+	},
+	{
+		Name: "zsh-syntax-highlighting", Kind: ShellPlugin, Category: Shell,
+		Description: "ZSH syntax highlighting plugin",
+		CloneURL:    "https://github.com/zsh-users/zsh-syntax-highlighting.git",
+		CloneDest:   "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting",
+	},
+	{
+		Name: "tpm", Kind: ShellPlugin, Category: Shell,
+		Description: "Tmux Plugin Manager",
+		CloneURL:    "https://github.com/tmux-plugins/tpm.git",
+		CloneDest:   "~/.tmux/plugins/tpm",
+		PostClone:   "tpm",
+	},
+	{
+		Name: "nvchad", Kind: ShellPlugin, Category: Shell,
+		Description: "NvChad Neovim configuration",
+		CloneURL:    "https://github.com/NvChad/starter.git",
+		CloneDest:   "~/.config/nvim",
+		PostClone:   "nvchad",
+	},
+	{
+		Name: "nvm", Kind: ShellPlugin, Category: Shell,
+		Description: "Node Version Manager",
+		CloneURL:    "https://github.com/nvm-sh/nvm.git",
+		CloneDest:   "~/.nvm",
+		PostClone:   "nvm",
+	},
+	{
+		Name: "nuclei-templates", Kind: ShellPlugin, Category: Shell,
+		Description: "Nuclei vulnerability templates",
+		CloneURL:    "https://github.com/projectdiscovery/nuclei-templates.git",
+		CloneDest:   "~/nuclei-templates",
+	},
+}

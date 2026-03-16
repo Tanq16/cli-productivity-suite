@@ -1,107 +1,130 @@
 <div align="center">
+  <img src=".github/assets/logo.png" alt="CLI Productivity Suite Logo" width="200">
+  <h1>CLI Productivity Suite</h1>
 
-<img src="logo.png" width=275px>
-    
-# Command Line Productivity Suite
+  <a href="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml"><img alt="Build Workflow" src="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml/badge.svg"></a>&nbsp;<a href="https://github.com/tanq16/cli-productivity-suite/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/tanq16/cli-productivity-suite"></a><br><br>
+  <a href="#capabilities">Capabilities</a> &bull; <a href="#installation">Installation</a> &bull; <a href="#usage">Usage</a> &bull; <a href="#tips-and-notes">Tips & Notes</a>
 </div>
 
-<div align="center">
+---
 
-[Introduction](#introduction) &bull; [Installation](#installation) &bull; [Post Installation Steps](#post-installation-steps) &bull; [Bonus Tips](#bonus-tips)
+A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driven development environment on Linux and macOS. It installs and tracks ~50 tools across these categories:
 
-</div>
+- **CLI utilities** — bat, fd, ripgrep, lsd, jq, yq, fzf, gron, sq, and more
+- **Security tools** — nuclei, naabu, katana, subfinder, ffuf, gobuster, trufflehog, proxify
+- **Cloud & infra** — AWS CLI, Azure CLI, gcloud CLI, terraform, kubectl, kubelogin
+- **Language runtimes** — Go SDK, Python 3.14 (via uv), Node.js LTS (via nvm)
+- **Editor & shell** — Neovim (0.11+) with NvChad, spaceship-prompt, zsh plugins, tmux with TPM
+- **Config files** — complete `.zshrc`, tmux.conf, kitty.conf, aerospace.toml (macOS)
 
-## Introduction
+## Capabilities
 
-As a non-standard way of managing and installing dotfiles, I use this repo to easily install a cool and funky shell experience along with an awesome `neovim` and `tmux` (also with cool and funky config). This repo also carries Linux and MacOS config files for the `Kitty` terminal (I recommend running Kitty with this suite). Overall, I also recommend using the [Catppuccin](https://catppuccin-website.vercel.app/) theme.
-
-Before installing the suite, install the Catppuccin theme with `Mocha` configuration for your terminal. Then, install a `nerd` font (I recommend [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip)).
-
-*This suite has been tested on and works for Debian & MacOS.*
+| Category | Commands | Description |
+|----------|----------|-------------|
+| Setup | `cps init` | Full environment setup — system packages, ~50 tools, cloud CLIs, language runtimes, shell plugins, and config files |
+| Monitoring | `cps check` | Compare installed versions against latest releases |
+| Updates | `cps update`, `cps install <tool>` | Update all installed tools or install a single tool by name |
+| Maintenance | `cps clean` | Remove all CPS-managed files and directories |
 
 ## Installation
 
-### Linux
+### Binary
 
-First, install the basic tools &rarr;
-
-```bash
-sudo apt install git zsh wget curl
-```
-
-Next, install *oh my zsh* &rarr;
+Download from [releases](https://github.com/tanq16/cli-productivity-suite/releases):
 
 ```bash
-wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null && sh install.sh
+# Linux/macOS
+ARCH=$(uname -m); [ "$ARCH" = "x86_64" ] && ARCH=amd64; [ "$ARCH" = "aarch64" ] && ARCH=arm64
+curl -sL https://github.com/tanq16/cli-productivity-suite/releases/latest/download/cps-$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCH -o cps
+chmod +x cps
+sudo mv cps /usr/local/bin/
 ```
 
-After installtion, cleanup with - `rm install.sh`
-
-Next, run the suite script to install all the other magic (password will be required).
+### Build from Source
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_linux.sh)"
+git clone https://github.com/tanq16/cli-productivity-suite
+cd cli-productivity-suite
+make build
 ```
 
-Finally, close the shell ***completely*** (close the terminal app or end the SSH session) and start a new instance.
+### Prerequisites
 
-### MacOS
+- [Oh My Zsh](https://ohmyz.sh/) must be installed before running `cps init`
+- Git must be available in PATH
+- Install a nerd font for your terminal emulator — recommended: [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip)
 
-First, install the basic tools &rarr;
+## Usage
+
+### `init`
+
+Full environment setup with all tools, plugins, and configs.
 
 ```bash
-brew install git zsh wget curl
+# Public tools only
+cps init
+
+# Include private repos
+cps init --gh-token YOUR_GITHUB_PAT
 ```
 
-Next, install *oh my zsh* &rarr;
+### `check`
+
+Compare installed tool versions against latest releases.
 
 ```bash
-wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null && sh install.sh
+cps check              # All installed tools
+cps check --public     # Public tools only
+cps check --private    # Private tools only
+cps check --system     # System packages only
 ```
 
-After installtion, cleanup with - `rm install.sh`
+### `update`
 
-Next, run the suite script to install all the other magic (password will be required).
+Update installed tools to their latest versions.
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/Tanq16/cli-productivity-suite/master/install_zsh_macos.sh)"
+cps update             # Update all
+cps update --public    # Public tools only
 ```
 
-Finally, close the shell ***completely*** (close the terminal app or end the SSH session) and start a new instance.
+### `install`
 
-## Post Installation Steps
-
-- `tmux` is installed by default in the suite. Use `tt` to launch a default session. Check config for more commands
-- `bat`, an alternative of `cat` with colored output is also installed by default
-- `aerospace` (only for MacOS) is also installed, but needs a couple extra steps &rarr;
-    - Refer to bonus tips section below for some config tips
-    - Create a file at `$HOME/.aerospace.toml` and add the contents of `macos.aerospaceconf` from this repo to that file
-    - Start the app and allow the accessibility settings requested by it
-    - Modify the config as needed and apply by pressing `⌥+⬆+;` followed by `escape` key
-- `nvim` is installed with ***NvChad*** configuration, but `nvim` needs a few small steps to get up and running smoothly &rarr;
-    - First, run the Vim command `:MasonInstallAll`
-    - Next, run Vim command `:Lazy sync` and exit
-    - Start `nvim` once again and run `:MasonInstallAll`
-    - NeoVim doesn't allow setting a theme while headless, so use `<space>+th` and select `catppuccin` to match the colorshceme with everything else
-
-***PS:*** `bat` has pager enabled by default, which I disable in the shell rc-file using `export BAT_PAGER=''`. To re-enable, delete that line in `.zshrc`.
-
-## Bonus Tips
-
-A handy shortcut in `tmux` that I added is `Alt + \` to split into two vertical panes and `Alt + Shift + \` to split into two horizontal panes. Focus can be navigated among the split panes by using `Shift + <arrow keys>`.
-
-Pasting on a modified `zsh` shell can be slow due to magic functions in `oh-my-zsh`. I fixed this in the suite by commenting those functions in `~/.oh-my.zsh/lib/misc.zsh`. If you need to re-enable these, uninstall the suite, restart your terminal and comment the necessary `sed` lines in the scripts before re-installing.
-
-If something goes wrong or you you want to re-install, you can uninstall the suite using command below. Then, start from scratch again &rarr;
+Install or update a single tool by name.
 
 ```bash
-rm -rf $HOME/.oh-my-zsh $HOME/.fzf $HOME/.fzf.zsh $HOME/.tmux $HOME/.tmux.conf $HOME/.tmux-themepack $HOME/.vimrc $HOME/.viminfo $HOME/.vim $HOME/.config/nvim $HOME/.local/share/nvim $HOME/.zshrc
+cps install bat
+cps install terraform
+cps install --gh-token TOKEN gcli
 ```
 
-I like to disable all Keyboard shortcuts in MacOS except for screenshots. Additionally, I keep the following settings for some other configurations &rarr;
+### `clean`
 
-- `Only in Stage Manager` - Click wallpaper to reveal desktop
-- `Off` - Automatically rearrange Spaces based on most recent use
-- `Off` - When switching an application, switch to a Space with open windows for the application
-- `On` - Group windows by application
-- `On` - Displays have separate Spaces
+Remove all CPS-managed files and directories with confirmation.
+
+```bash
+cps clean
+```
+
+**Global flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--debug` | Enable debug logging |
+| `--for-ai` | AI-friendly output (markdown tables, no color) |
+| `--gh-token` | GitHub PAT for private repos (env: `CPS_GITHUB_PAT`) |
+
+## Tips and Notes
+
+- All binary tools are installed to `~/shell/executables/` — add this to your PATH (the deployed `.zshrc` handles this automatically)
+- Neovim is installed from GitHub releases (0.11+) on Linux to meet NvChad requirements; macOS uses brew
+- State is tracked in `~/.config/cps/state.json` — this file records installed versions for `check` and `update` commands
+- Use `CPS_GITHUB_PAT` environment variable to avoid passing `--gh-token` on every command
+- Running `cps init` is idempotent — it skips tools that are already at the latest version
+- Cloud CLIs (AWS, Azure, gcloud) require sudo on Linux for system-level installation
+- The `.zshrc` deployed by `cps init` is a complete replacement — it includes Oh My Zsh config, all tool integrations, aliases, and functions
+- `cps clean` removes `~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.nvm`, `~/nuclei-templates`, `~/google-cloud-sdk`, and `~/.config/cps` — it does not touch Oh My Zsh, deployed config files, or system packages
+
+## License
+
+[MIT](LICENSE)
