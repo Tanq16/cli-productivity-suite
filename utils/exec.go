@@ -19,7 +19,7 @@ func RunCmd(cmd *exec.Cmd) error {
 	err := cmd.Run()
 	output := strings.TrimSpace(buf.String())
 	if GlobalDebugFlag && output != "" {
-		log.Debug().Str("cmd", cmd.String()).Msg(output)
+		log.Debug().Str("package", "utils").Str("cmd", cmd.String()).Msg(output)
 	}
 	if err != nil {
 		if output != "" {

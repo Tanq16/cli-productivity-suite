@@ -5,11 +5,12 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/tanq16/cli-productivity-suite/internal/github"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
 	"github.com/tanq16/cli-productivity-suite/internal/registry"
 	"github.com/tanq16/cli-productivity-suite/internal/state"
-	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
 type GitHubReleaseInstaller struct{}
@@ -24,7 +25,7 @@ func (g *GitHubReleaseInstaller) Check(tool *registry.Tool, p platform.Platform,
 }
 
 func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) Result {
-	utils.PrintDebug(fmt.Sprintf("installing %s from %s", tool.Name, tool.Repo))
+	log.Debug().Str("package", "installer").Msgf("installing %s from %s", tool.Name, tool.Repo)
 
 	release, err := gh.LatestRelease(tool.Repo)
 	if err != nil {

@@ -38,34 +38,26 @@ func (c *CloudCLIInstaller) Install(tool *registry.Tool, p platform.Platform, _ 
 func (c *CloudCLIInstaller) installAWSCLI(p platform.Platform, st *state.State) Result {
 	utils.PrintInfo("installing AWS CLI v2")
 
-	tmpDir, err := os.MkdirTemp("", "cps-awscli-*")
-	if err != nil {
-		return Result{Tool: "aws-cli", Err: err}
-	}
-	defer os.RemoveAll(tmpDir)
-
-	var url string
-	switch {
-	case p.OS == platform.Linux && p.Arch == platform.AMD64:
-		url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
-	case p.OS == platform.Linux && p.Arch == platform.ARM64:
-		url = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip"
-	case p.OS == platform.Darwin:
-		url = "https://awscli.amazonaws.com/AWSCLIV2.pkg"
-	}
-
 	if p.OS == platform.Darwin {
-		// macOS uses pkg installer
-		pkgPath := filepath.Join(tmpDir, "AWSCLIV2.pkg")
-		if err := downloadToFile(url, pkgPath); err != nil {
-			return Result{Tool: "aws-cli", Err: err}
-		}
-		cmd := exec.Command("sudo", "installer", "-pkg", pkgPath, "-target", "/")
+		cmd := exec.Command("brew", "install", "awscli")
 		if err := utils.RunCmd(cmd); err != nil {
-			return Result{Tool: "aws-cli", Err: fmt.Errorf("aws cli pkg install failed: %w", err)}
+			return Result{Tool: "aws-cli", Err: fmt.Errorf("brew install awscli failed: %w", err)}
 		}
 	} else {
-		// Linux uses zip + install script
+		var url string
+		switch p.Arch {
+		case platform.AMD64:
+			url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+		case platform.ARM64:
+			url = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip"
+		}
+
+		tmpDir, err := os.MkdirTemp("", "cps-awscli-*")
+		if err != nil {
+			return Result{Tool: "aws-cli", Err: err}
+		}
+		defer os.RemoveAll(tmpDir)
+
 		zipPath := filepath.Join(tmpDir, "awscliv2.zip")
 		if err := downloadToFile(url, zipPath); err != nil {
 			return Result{Tool: "aws-cli", Err: err}

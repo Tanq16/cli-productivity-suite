@@ -36,7 +36,6 @@ func (s *SystemPackageInstaller) installApt(tool *registry.Tool, st *state.State
 	}
 	utils.PrintInfo(fmt.Sprintf("installing apt packages: %s", strings.Join(tool.AptPkgs, ", ")))
 
-	// This runs via sudo _privileged context or directly if already root
 	args := append([]string{"apt-get", "install", "-y"}, tool.AptPkgs...)
 	cmd := exec.Command("sudo", args...)
 	cmd.Stdout = nil

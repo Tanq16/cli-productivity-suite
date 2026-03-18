@@ -39,16 +39,6 @@ func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platf
 func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.State) Result {
 	utils.PrintInfo("installing Neovim")
 
-	if p.OS == platform.Darwin {
-		cmd := exec.Command("brew", "install", "neovim")
-		if err := utils.RunCmd(cmd); err != nil {
-			return Result{Tool: "neovim", Err: fmt.Errorf("brew install neovim failed: %w", err)}
-		}
-		st.SetToolVersion("neovim", "brew-managed")
-		return Result{Tool: "neovim", Version: "brew-managed"}
-	}
-
-	// Linux: download pre-built tar.gz from GitHub stable release
 	var archStr string
 	switch p.Arch {
 	case platform.AMD64:
@@ -57,7 +47,15 @@ func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.
 		archStr = "arm64"
 	}
 
-	url := fmt.Sprintf("https://github.com/neovim/neovim/releases/download/stable/nvim-linux-%s.tar.gz", archStr)
+	var osStr string
+	switch p.OS {
+	case platform.Darwin:
+		osStr = "macos"
+	default:
+		osStr = "linux"
+	}
+
+	url := fmt.Sprintf("https://github.com/neovim/neovim/releases/download/stable/nvim-%s-%s.tar.gz", osStr, archStr)
 
 	tmpDir, err := os.MkdirTemp("", "cps-neovim-*")
 	if err != nil {
@@ -70,6 +68,12 @@ func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.
 		return Result{Tool: "neovim", Err: fmt.Errorf("download failed: %w", err)}
 	}
 
+	// macOS: remove quarantine attribute
+	if p.OS == platform.Darwin {
+		xattrCmd := exec.Command("xattr", "-c", tarPath)
+		utils.RunCmd(xattrCmd) // best-effort
+	}
+
 	// Remove existing installation and extract
 	nvimDir := filepath.Join(p.ShellDir(), "nvim")
 	os.RemoveAll(nvimDir)
@@ -79,7 +83,7 @@ func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.
 	}
 
 	// Move extracted directory to ~/shell/nvim
-	extractedDir := filepath.Join(tmpDir, fmt.Sprintf("nvim-linux-%s", archStr))
+	extractedDir := filepath.Join(tmpDir, fmt.Sprintf("nvim-%s-%s", osStr, archStr))
 	if err := os.Rename(extractedDir, nvimDir); err != nil {
 		return Result{Tool: "neovim", Err: fmt.Errorf("move to %s failed: %w", nvimDir, err)}
 	}
@@ -98,16 +102,6 @@ func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.
 func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.State) Result {
 	utils.PrintInfo("installing Go SDK")
 
-	if p.OS == platform.Darwin {
-		cmd := exec.Command("brew", "install", "go")
-		if err := utils.RunCmd(cmd); err != nil {
-			return Result{Tool: "go-sdk", Err: fmt.Errorf("brew install go failed: %w", err)}
-		}
-		st.SetToolVersion("go-sdk", "brew-managed")
-		return Result{Tool: "go-sdk", Version: "brew-managed"}
-	}
-
-	// Linux: download from go.dev
 	type goDL struct {
 		Version string `json:"version"`
 		Stable  bool   `json:"stable"`
@@ -141,7 +135,7 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 			continue
 		}
 		for _, f := range r.Files {
-			if f.OS == "linux" && f.Arch == p.Arch.String() && f.Kind == "archive" {
+			if f.OS == p.OS.String() && f.Arch == p.Arch.String() && f.Kind == "archive" {
 				downloadURL = fmt.Sprintf("https://go.dev/dl/%s", f.Filename)
 				version = r.Version
 				break
@@ -153,7 +147,7 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 	}
 
 	if downloadURL == "" {
-		return Result{Tool: "go-sdk", Err: fmt.Errorf("no Go download found for linux/%s", p.Arch)}
+		return Result{Tool: "go-sdk", Err: fmt.Errorf("no Go download found for %s/%s", p.OS, p.Arch)}
 	}
 
 	tmpDir, err := os.MkdirTemp("", "cps-go-*")
@@ -165,11 +159,6 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 	tarPath := filepath.Join(tmpDir, "go.tar.gz")
 	if err := downloadToFile(downloadURL, tarPath); err != nil {
 		return Result{Tool: "go-sdk", Err: err}
-	}
-
-	// Verify tar file exists before extracting (overwrites existing installation)
-	if _, err := os.Stat(tarPath); err != nil {
-		return Result{Tool: "go-sdk", Err: fmt.Errorf("downloaded tar not found: %w", err)}
 	}
 
 	rmCmd := exec.Command("sudo", "rm", "-rf", "/usr/local/go")

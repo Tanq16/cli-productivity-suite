@@ -3,6 +3,9 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"strings"
+	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -18,6 +21,7 @@ var debugFlag, forAIFlag bool
 var rootCmd = &cobra.Command{
 	Use:               "cps",
 	Short:             "CLI Productivity Suite — manage your dev environment",
+	Version:           AppVersion,
 	CompletionOptions: cobra.CompletionOptions{HiddenDefaultCmd: true},
 }
 
@@ -29,23 +33,44 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Version = AppVersion
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.PersistentFlags().BoolVar(&debugFlag, "debug", false, "Enable debug logging")
 	rootCmd.PersistentFlags().BoolVar(&forAIFlag, "for-ai", false, "AI-friendly output (markdown tables, no color)")
 	rootCmd.MarkFlagsMutuallyExclusive("debug", "for-ai")
 
-	defaultToken := os.Getenv("CPS_GITHUB_PAT")
-	rootCmd.PersistentFlags().StringVar(&ghToken, "gh-token", defaultToken, "GitHub PAT for private repos (env: CPS_GITHUB_PAT)")
+	rootCmd.PersistentFlags().StringVar(&ghToken, "gh-token", "", "GitHub PAT for private repos")
 
-	cobra.OnInitialize(setupLogs)
+	rootCmd.AddCommand(checkCmd)
+	rootCmd.AddCommand(cleanCmd)
+	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(installCmd)
+	rootCmd.AddCommand(updateCmd)
+
+	cobra.OnInitialize(setupLogs, resolveGHToken)
+}
+
+func resolveGHToken() {
+	if ghToken != "" {
+		return
+	}
+	out, err := exec.Command("gh", "auth", "token").Output()
+	if err != nil {
+		return
+	}
+	ghToken = strings.TrimSpace(string(out))
 }
 
 func setupLogs() {
 	if debugFlag {
 		utils.GlobalDebugFlag = true
+		zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+		output := zerolog.ConsoleWriter{
+			Out:        os.Stdout,
+			TimeFormat: time.DateTime,
+			NoColor:    false,
+		}
+		log.Logger = zerolog.New(output).With().Timestamp().Logger()
 		log.Debug().Str("package", "cmd").Msg("debug logging enabled")
 	} else if forAIFlag {
 		utils.GlobalForAIFlag = true

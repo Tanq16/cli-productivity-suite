@@ -19,10 +19,6 @@ var cleanCmd = &cobra.Command{
 	RunE:  runClean,
 }
 
-func init() {
-	rootCmd.AddCommand(cleanCmd)
-}
-
 func runClean(cmd *cobra.Command, args []string) error {
 	p, err := platform.Detect()
 	if err != nil {
@@ -44,7 +40,7 @@ func runClean(cmd *cobra.Command, args []string) error {
 	for _, d := range dirs {
 		utils.PrintGeneric("  " + d)
 	}
-	fmt.Print("\nare you sure? (yes/no): ")
+	utils.PrintGeneric("\nare you sure? (yes/no): ")
 
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()

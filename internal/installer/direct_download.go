@@ -8,11 +8,12 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/tanq16/cli-productivity-suite/internal/github"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
 	"github.com/tanq16/cli-productivity-suite/internal/registry"
 	"github.com/tanq16/cli-productivity-suite/internal/state"
-	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
 type DirectDownloadInstaller struct{}
@@ -27,7 +28,7 @@ func (d *DirectDownloadInstaller) Check(tool *registry.Tool, p platform.Platform
 }
 
 func (d *DirectDownloadInstaller) Install(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) Result {
-	utils.PrintDebug(fmt.Sprintf("installing %s via direct download", tool.Name))
+	log.Debug().Str("package", "installer").Msgf("installing %s via direct download", tool.Name)
 
 	version, err := d.fetchVersion(tool, gh)
 	if err != nil {

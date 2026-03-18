@@ -21,9 +21,6 @@ var installCmd = &cobra.Command{
 	RunE:              runInstall,
 }
 
-func init() {
-	rootCmd.AddCommand(installCmd)
-}
 
 func runInstall(cmd *cobra.Command, args []string) error {
 	toolName := args[0]
@@ -59,6 +56,14 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	if inst == nil {
 		utils.PrintError(fmt.Sprintf("no installer for tool kind: %s", tool.Kind), nil)
 		return fmt.Errorf("no installer for tool kind: %s", tool.Kind)
+	}
+
+	if toolNeedsSudo(*tool, p) {
+		utils.PrintInfo("this tool requires sudo — authenticating")
+		if err := ensureSudo(); err != nil {
+			utils.PrintError("sudo authentication failed", err)
+			return fmt.Errorf("sudo authentication failed: %w", err)
+		}
 	}
 
 	result := inst.Install(tool, p, gh, st)

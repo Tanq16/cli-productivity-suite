@@ -112,14 +112,14 @@ cps clean
 |------|-------------|
 | `--debug` | Enable debug logging |
 | `--for-ai` | AI-friendly output (markdown tables, no color) |
-| `--gh-token` | GitHub PAT for private repos (env: `CPS_GITHUB_PAT`) |
+| `--gh-token` | GitHub PAT for private repos (falls back to `gh auth token`) |
 
 ## Tips and Notes
 
 - All binary tools are installed to `~/shell/executables/` — add this to your PATH (the deployed `.zshrc` handles this automatically)
-- Neovim is installed from GitHub releases (0.11+) on Linux to meet NvChad requirements; macOS uses brew
+- Neovim is installed from GitHub releases (0.11+) on both Linux and macOS to meet NvChad requirements
 - State is tracked in `~/.config/cps/state.json` — this file records installed versions for `check` and `update` commands
-- Use `CPS_GITHUB_PAT` environment variable to avoid passing `--gh-token` on every command
+- If the `gh` CLI is authenticated (`gh auth login`), CPS automatically uses its token — no need to pass `--gh-token`
 - Running `cps init` is idempotent — it skips tools that are already at the latest version
 - Cloud CLIs (AWS, Azure, gcloud) require sudo on Linux for system-level installation
 - The `.zshrc` deployed by `cps init` is a complete replacement — it includes Oh My Zsh config, all tool integrations, aliases, and functions

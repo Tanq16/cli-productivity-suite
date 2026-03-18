@@ -5,14 +5,16 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
-	"golang.org/x/sync/errgroup"
 
+	"github.com/tanq16/cli-productivity-suite/internal/display"
 	"github.com/tanq16/cli-productivity-suite/internal/github"
+	"github.com/tanq16/cli-productivity-suite/internal/highway"
 	"github.com/tanq16/cli-productivity-suite/internal/installer"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
 	"github.com/tanq16/cli-productivity-suite/internal/registry"
@@ -26,9 +28,6 @@ var initCmd = &cobra.Command{
 	RunE:  runInit,
 }
 
-func init() {
-	rootCmd.AddCommand(initCmd)
-}
 
 func runInit(cmd *cobra.Command, args []string) error {
 	p, err := platform.Detect()
@@ -42,6 +41,9 @@ func runInit(cmd *cobra.Command, args []string) error {
 		utils.PrintError("failed to load state", err)
 		return fmt.Errorf("failed to load state: %w", err)
 	}
+
+	ctx, cancel := signal.NotifyContext(cmd.Context(), os.Interrupt)
+	defer cancel()
 
 	gh := github.NewClient(ghToken)
 	reg := registry.New()
@@ -62,99 +64,72 @@ func runInit(cmd *cobra.Command, args []string) error {
 	os.MkdirAll(p.ShellExecDir(), 0755)
 	utils.PrintSuccess("prerequisites OK")
 
-	// Phase 2: System Packages
-	utils.PrintInfo("Phase 2: Installing system packages")
-	for _, tool := range reg.ByKind(registry.SystemPackage) {
-		if !toolForPlatform(tool, p) {
-			continue
+	// --- Sudo phases first (2-4) ---
+	if phaseNeedsSudo(p, registry.SystemPackage, registry.CloudCLI, registry.LanguageRuntime) {
+		utils.PrintInfo("some phases require sudo — authenticating")
+		if err := ensureSudo(); err != nil {
+			utils.PrintError("sudo authentication failed", err)
+			return fmt.Errorf("sudo authentication failed: %w", err)
 		}
-		t := tool
-		result := installer.Dispatch(t.Kind).Install(&t, p, gh, st)
-		printResult(result)
 	}
 
+	disp := display.New()
+
+	// Phase 2: System Packages (sudo on Linux)
+	runPhase(ctx, disp, "Phase 2: System packages", filterPlatformTools(reg.ByKind(registry.SystemPackage), p), 1, p, gh, st)
 	st.Save()
 
-	// Phase 3: Public GitHub Release Binaries (concurrent)
-	utils.PrintInfo("Phase 3: Installing public GitHub release binaries")
+	// Phase 3: Cloud CLIs (sudo on Linux for aws/azure)
+	runPhase(ctx, disp, "Phase 3: Cloud CLIs", reg.ByKind(registry.CloudCLI), 1, p, gh, st)
+	st.Save()
+
+	// Phase 4: Go SDK (sudo on both platforms — installs to /usr/local/go)
+	goSDK := filterByName(reg.ByKind(registry.LanguageRuntime), "go-sdk")
+	runPhase(ctx, disp, "Phase 4: Go SDK", goSDK, 1, p, gh, st)
+	st.Save()
+
+	// --- Sudo no longer needed past this point ---
+
+	// Phase 5: Public GitHub Release Binaries (concurrent)
 	publicGH := filterGitHubPublic(reg.ByKind(registry.GitHubRelease), false)
 	publicGH = filterPlatformTools(publicGH, p)
-	runConcurrentInstalls(cmd.Context(), publicGH, p, gh, st, 5)
+	runPhase(ctx, disp, "Phase 5: Public GitHub releases", publicGH, 2, p, gh, st)
 	st.Save()
 
-	// Phase 4: Direct Downloads
-	utils.PrintInfo("Phase 4: Installing direct download tools")
-	for _, tool := range reg.ByKind(registry.DirectDownload) {
-		t := tool
-		result := installer.Dispatch(t.Kind).Install(&t, p, gh, st)
-		printResult(result)
-	}
-
+	// Phase 6: Direct Downloads
+	runPhase(ctx, disp, "Phase 6: Direct downloads", reg.ByKind(registry.DirectDownload), 1, p, gh, st)
 	st.Save()
 
-	// Phase 5: Own Public Tools (concurrent)
-	utils.PrintInfo("Phase 5: Installing own public tools")
+	// Phase 7: Own Public Tools (concurrent)
 	ownPublic := filterOwnPublic(reg.ByKind(registry.GitHubRelease))
-	runConcurrentInstalls(cmd.Context(), ownPublic, p, gh, st, 5)
+	runPhase(ctx, disp, "Phase 7: Own public tools", ownPublic, 2, p, gh, st)
 	st.Save()
 
-	// Phase 6: Own Private Tools
+	// Phase 8: Own Private Tools
 	if ghToken != "" {
-		utils.PrintInfo("Phase 6: Installing private tools")
 		privateTools := reg.ByCategory(registry.Private)
-		runConcurrentInstalls(cmd.Context(), privateTools, p, gh, st, 5)
+		runPhase(ctx, disp, "Phase 8: Private tools", privateTools, 2, p, gh, st)
 	} else {
-		utils.PrintWarn("Phase 6: Skipping private tools (no --gh-token)", nil)
+		utils.PrintWarn("Phase 8: Skipping private tools (no --gh-token)", nil)
 	}
 	st.Save()
 
-	// Phase 7: Cloud CLIs
-	utils.PrintInfo("Phase 7: Installing cloud CLIs")
-	for _, tool := range reg.ByKind(registry.CloudCLI) {
-		t := tool
-		result := installer.Dispatch(t.Kind).Install(&t, p, gh, st)
-		printResult(result)
-	}
-
+	// Phase 9: Neovim + Python (remaining runtimes, no sudo)
+	nonSudoRuntimes := excludeByName(reg.ByKind(registry.LanguageRuntime), "go-sdk")
+	runPhase(ctx, disp, "Phase 9: Language runtimes", nonSudoRuntimes, 1, p, gh, st)
 	st.Save()
 
-	// Phase 8: Language Runtimes
-	utils.PrintInfo("Phase 8: Installing language runtimes")
-	for _, tool := range reg.ByKind(registry.LanguageRuntime) {
-		t := tool
-		result := installer.Dispatch(t.Kind).Install(&t, p, gh, st)
-		printResult(result)
-	}
-
-	st.Save()
-
-	// Phase 9: Shell Plugins (sequential)
-	utils.PrintInfo("Phase 9: Installing shell plugins")
-	// Disable OMZ slow paste magic
+	// Phase 10: Shell Plugins (sequential)
 	disableOMZSlowPaste(p)
-	for _, tool := range reg.ByKind(registry.ShellPlugin) {
-		t := tool
-		result := installer.Dispatch(t.Kind).Install(&t, p, gh, st)
-		printResult(result)
-	}
-
+	runPhase(ctx, disp, "Phase 10: Shell plugins", reg.ByKind(registry.ShellPlugin), 1, p, gh, st)
 	st.Save()
 
-	// Phase 10: Config Deployment
-	utils.PrintInfo("Phase 10: Deploying configuration files")
-	for _, tool := range reg.ByKind(registry.ConfigFile) {
-		if !toolForPlatform(tool, p) {
-			continue
-		}
-		t := tool
-		result := installer.Dispatch(t.Kind).Install(&t, p, gh, st)
-		printResult(result)
-	}
-
+	// Phase 11: Config Deployment
+	runPhase(ctx, disp, "Phase 11: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), 1, p, gh, st)
 	st.Save()
 
-	// Phase 11: Post-Install
-	utils.PrintInfo("Phase 11: Running post-install tasks")
+	// Phase 12: Post-Install
+	utils.PrintInfo("Phase 12: Running post-install tasks")
 
 	// TPM install plugins
 	tpmInstall := filepath.Join(p.HomeDir, ".tmux", "plugins", "tpm", "bin", "install_plugins")
@@ -186,34 +161,25 @@ func runInit(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runConcurrentInstalls(ctx context.Context, tools []registry.Tool, p platform.Platform, gh *github.Client, st *state.State, limit int) {
-	g, ctx := errgroup.WithContext(ctx)
-	g.SetLimit(limit)
-	results := make([]installer.Result, len(tools))
-
-	for i, tool := range tools {
-		g.Go(func() error {
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			default:
-			}
-			results[i] = installer.Dispatch(tool.Kind).Install(&tool, p, gh, st)
-			return nil
-		})
+func runPhase(ctx context.Context, disp *display.Display, phaseName string, tools []registry.Tool, workers int, p platform.Platform, gh *github.Client, st *state.State) {
+	if len(tools) == 0 {
+		return
 	}
-	g.Wait()
-
-	for _, r := range results {
-		printResult(r)
+	hw := highway.New(workers)
+	jobs := make([]highway.Job, len(tools))
+	for i, t := range tools {
+		jobs[i] = NewInstallJob(t, p, gh, st)
 	}
+	hw.Submit(jobs...)
+	go hw.Run(ctx)
+	disp.StartPhase(phaseName, hw.Progress())
 }
 
 func printResult(r installer.Result) {
 	if r.Err != nil {
 		utils.PrintError(r.Tool, r.Err)
 	} else if r.Skipped {
-		utils.PrintDebug(fmt.Sprintf("%s: already at %s", r.Tool, r.Version))
+		utils.PrintInfo(fmt.Sprintf("%s: already at %s", r.Tool, r.Version))
 	} else if r.WasUpdated {
 		utils.PrintSuccess(fmt.Sprintf("%s: updated to %s", r.Tool, r.Version))
 	} else {
@@ -260,6 +226,34 @@ func filterPlatformTools(tools []registry.Tool, p platform.Platform) []registry.
 	var result []registry.Tool
 	for _, t := range tools {
 		if toolForPlatform(t, p) {
+			result = append(result, t)
+		}
+	}
+	return result
+}
+
+func filterByName(tools []registry.Tool, names ...string) []registry.Tool {
+	nameSet := make(map[string]bool, len(names))
+	for _, n := range names {
+		nameSet[n] = true
+	}
+	var result []registry.Tool
+	for _, t := range tools {
+		if nameSet[t.Name] {
+			result = append(result, t)
+		}
+	}
+	return result
+}
+
+func excludeByName(tools []registry.Tool, names ...string) []registry.Tool {
+	nameSet := make(map[string]bool, len(names))
+	for _, n := range names {
+		nameSet[n] = true
+	}
+	var result []registry.Tool
+	for _, t := range tools {
+		if !nameSet[t.Name] {
 			result = append(result, t)
 		}
 	}

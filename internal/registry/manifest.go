@@ -235,17 +235,6 @@ var AllTools = []Tool{
 			BinaryPathInArchive: "bin/*/kubelogin",
 		},
 	},
-	{
-		Name: "upx", BinaryName: "upx", Kind: GitHubRelease, Category: Public,
-		Repo: "upx/upx", Description: "Binary packer",
-		Platforms: []string{"linux"},
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "tar.xz",
-			BinaryPathInArchive: "*/upx",
-		},
-	},
 
 	// ========== Direct Download ==========
 	{
@@ -347,20 +336,14 @@ var AllTools = []Tool{
 	{
 		Name: "system-packages", Kind: SystemPackage, Category: System,
 		Description: "Core system packages",
-		AptPkgs:     []string{"tmux", "git", "tree", "wget", "curl", "zsh", "openssl", "nmap", "ncat", "cmake", "gcc", "make", "ninja-build", "gettext", "unzip", "file", "ffmpeg"},
-		BrewPkgs:    []string{"tmux", "git", "tree", "wget", "curl", "openssl", "nmap", "ffmpeg", "go"},
+		AptPkgs:     []string{"tmux", "git", "tree", "wget", "curl", "zsh", "openssl", "nmap", "ncat", "cmake", "gcc", "make", "ninja-build", "gettext", "zip", "unzip", "file", "ffmpeg"},
+		BrewPkgs:    []string{"tmux", "git", "tree", "wget", "curl", "openssl", "nmap", "ffmpeg"},
 	},
 	{
 		Name: "aerospace", Kind: SystemPackage, Category: System,
 		Description: "macOS tiling window manager",
 		Platforms:   []string{"darwin"},
 		BrewCasks:   []string{"nikitabobko/tap/aerospace"},
-	},
-	{
-		Name: "upx-macos", Kind: SystemPackage, Category: System,
-		Description: "Binary packer (macOS via brew)",
-		Platforms:   []string{"darwin"},
-		BrewPkgs:    []string{"upx"},
 	},
 
 	// ========== Cloud CLIs ==========

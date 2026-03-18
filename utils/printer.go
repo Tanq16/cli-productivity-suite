@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 	"github.com/rs/zerolog/log"
 )
 
@@ -18,49 +18,49 @@ var (
 
 func PrintInfo(msg string) {
 	if GlobalDebugFlag {
-		log.Info().Msg(msg)
+		log.Info().Str("package", "utils").Msg(msg)
 	} else if GlobalForAIFlag {
 		fmt.Println("[INFO] " + msg)
 	} else {
-		fmt.Println(infoStyle.Render("[INFO]") + " " + msg)
+		lipgloss.Println(infoStyle.Render("→ " + msg))
 	}
 }
 
 func PrintSuccess(msg string) {
 	if GlobalDebugFlag {
-		log.Info().Msg(msg)
+		log.Info().Str("package", "utils").Msg(msg)
 	} else if GlobalForAIFlag {
 		fmt.Println("[OK] " + msg)
 	} else {
-		fmt.Println(successStyle.Render("[OK]") + " " + msg)
+		lipgloss.Println(successStyle.Render("✓ " + msg))
 	}
 }
 
 func PrintError(msg string, err error) {
 	if GlobalDebugFlag {
 		if err != nil {
-			log.Error().Err(err).Msg(msg)
+			log.Error().Str("package", "utils").Err(err).Msg(msg)
 		} else {
-			log.Error().Msg(msg)
+			log.Error().Str("package", "utils").Msg(msg)
 		}
 	} else if GlobalForAIFlag {
 		fmt.Println("[ERROR] " + msg)
 	} else {
-		fmt.Println(errorStyle.Render("[ERROR]") + " " + msg)
+		lipgloss.Println(errorStyle.Render("✗ " + msg))
 	}
 }
 
 func PrintFatal(msg string, err error) {
 	if GlobalDebugFlag {
 		if err != nil {
-			log.Error().Err(err).Msg(msg)
+			log.Error().Str("package", "utils").Err(err).Msg(msg)
 		} else {
-			log.Error().Msg(msg)
+			log.Error().Str("package", "utils").Msg(msg)
 		}
 	} else if GlobalForAIFlag {
-		fmt.Println("[FATAL] " + msg)
+		fmt.Println("[ERROR] " + msg)
 	} else {
-		fmt.Println(errorStyle.Render("[FATAL]") + " " + msg)
+		lipgloss.Println(errorStyle.Render("✗ " + msg))
 	}
 	os.Exit(1)
 }
@@ -68,24 +68,17 @@ func PrintFatal(msg string, err error) {
 func PrintWarn(msg string, err error) {
 	if GlobalDebugFlag {
 		if err != nil {
-			log.Warn().Err(err).Msg(msg)
+			log.Warn().Str("package", "utils").Err(err).Msg(msg)
 		} else {
-			log.Warn().Msg(msg)
+			log.Warn().Str("package", "utils").Msg(msg)
 		}
 	} else if GlobalForAIFlag {
 		fmt.Println("[WARN] " + msg)
 	} else {
-		fmt.Println(warnStyle.Render("[WARN]") + " " + msg)
+		lipgloss.Println(warnStyle.Render("! " + msg))
 	}
 }
 
 func PrintGeneric(msg string) {
 	fmt.Println(msg)
-}
-
-func PrintDebug(msg string) {
-	if !GlobalDebugFlag {
-		return
-	}
-	log.Debug().Msg(msg)
 }

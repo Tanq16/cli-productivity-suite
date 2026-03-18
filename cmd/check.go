@@ -31,7 +31,6 @@ func init() {
 	checkCmd.Flags().BoolVar(&checkFlags.private, "private", false, "Check private tools only")
 	checkCmd.Flags().BoolVar(&checkFlags.system, "system", false, "Check system packages only")
 	checkCmd.Flags().BoolVar(&checkFlags.all, "all", false, "Check all tools")
-	rootCmd.AddCommand(checkCmd)
 }
 
 func runCheck(cmd *cobra.Command, args []string) error {
@@ -93,11 +92,34 @@ func runCheck(cmd *cobra.Command, args []string) error {
 		}
 
 		status := "up-to-date"
-		if cur != lat && lat != "" && lat != "system-managed" && lat != "check-manually" && lat != "embedded" && lat != "git-managed" {
-			status = "update available"
+		switch lat {
+		case "system-managed", "check-manually", "git-managed":
+			status = lat
+		case "not-deployed":
+			status = "not deployed"
+		case "config-differs":
+			status = "config differs"
+		case "skipped":
+			continue // skip this row entirely
+		default:
+			if cur != lat && lat != "" {
+				status = "update available"
+			}
 		}
 		rows = append(rows, []string{t.Name, cur, lat, status})
 	}
+
+	// CPS self-check row (prepended)
+	cpsRow := []string{"cps", AppVersion, "unknown", "up-to-date"}
+	if rel, err := gh.LatestRelease("Tanq16/cli-productivity-suite"); err == nil {
+		cpsRow[2] = rel.TagName
+		if AppVersion == "dev-build" {
+			cpsRow[3] = "dev build"
+		} else if AppVersion != rel.TagName {
+			cpsRow[3] = "update available"
+		}
+	}
+	rows = append([][]string{cpsRow}, rows...)
 
 	if len(rows) == 0 {
 		utils.PrintWarn("no installed tools found in state", nil)
