@@ -3,7 +3,7 @@
   <h1>CLI Productivity Suite</h1>
 
   <a href="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml"><img alt="Build Workflow" src="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml/badge.svg"></a>&nbsp;<a href="https://github.com/tanq16/cli-productivity-suite/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/tanq16/cli-productivity-suite"></a><br><br>
-  <a href="#capabilities">Capabilities</a> &bull; <a href="#installation">Installation</a> &bull; <a href="#usage">Usage</a> &bull; <a href="#tips-and-notes">Tips & Notes</a>
+  <a href="#capabilities">Capabilities</a> &bull; <a href="#installation">Installation</a> &bull; <a href="#usage">Usage</a> &bull; <a href="#tips-and-notes">Tips & Notes</a> &bull; <a href="#deep-removal">Deep Removal</a>
 </div>
 
 ---
@@ -125,6 +125,40 @@ cps clean
 - The `.zshrc` deployed by `cps init` is a complete replacement — it includes Oh My Zsh config, all tool integrations, aliases, and functions
 - `cps clean` removes `~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.nvm`, `~/nuclei-templates`, `~/google-cloud-sdk`, and `~/.config/cps` — it does not touch Oh My Zsh, deployed config files, or system packages
 
-## License
+## Deep Removal
 
-[MIT](LICENSE)
+The `cps clean` command performs a superficial cleanup of CPS-managed directories. For a full removal of everything CPS installs, follow these steps:
+
+**Step 1** — Run `cps clean` to remove the primary managed directories (`~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.nvm`, `~/nuclei-templates`, `~/google-cloud-sdk`, `~/.config/cps`):
+
+```bash
+cps clean
+```
+
+**Step 2** — Remove remaining configs, data directories, Oh My Zsh, and system-level installs:
+
+```bash
+rm -rf \
+  $HOME/.oh-my-zsh \
+  $HOME/.tmux.conf \
+  $HOME/.zshrc \
+  $HOME/.aerospace.toml \
+  $HOME/.config/kitty/kitty.conf \
+  $HOME/.local/share/nvim \
+  && sudo rm -rf /usr/local/go /usr/local/aws-cli /usr/local/bin/cps
+```
+
+**Step 3** — Remove system packages installed by CPS:
+
+Linux (apt):
+
+```bash
+sudo apt-get remove -y tmux git tree wget curl zsh openssl nmap ncat cmake gcc make ninja-build gettext zip unzip file ffmpeg
+```
+
+macOS (brew):
+
+```bash
+brew uninstall tmux git tree wget curl openssl nmap ffmpeg
+brew uninstall --cask nikitabobko/tap/aerospace
+```
