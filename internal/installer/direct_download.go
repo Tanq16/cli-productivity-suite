@@ -94,6 +94,9 @@ func (d *DirectDownloadInstaller) fetchVersion(tool *registry.Tool, gh *github.C
 			return "", err
 		}
 		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			return "", fmt.Errorf("fetching version from %s: HTTP %d", tool.StableURL, resp.StatusCode)
+		}
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return "", err

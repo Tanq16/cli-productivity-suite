@@ -37,8 +37,6 @@ func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platf
 }
 
 func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.State) Result {
-	utils.PrintInfo("installing Neovim")
-
 	var archStr string
 	switch p.Arch {
 	case platform.AMD64:
@@ -97,8 +95,6 @@ func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.
 }
 
 func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.State) Result {
-	utils.PrintInfo("installing Go SDK")
-
 	type goDL struct {
 		Version string `json:"version"`
 		Stable  bool   `json:"stable"`
@@ -115,6 +111,10 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 		return Result{Tool: "go-sdk", Err: err}
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return Result{Tool: "go-sdk", Err: fmt.Errorf("go.dev/dl API returned HTTP %d", resp.StatusCode)}
+	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -171,8 +171,6 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 }
 
 func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, st *state.State) Result {
-	utils.PrintInfo("installing Python 3.14 via uv")
-
 	uvPath := filepath.Join(p.ShellExecDir(), "uv")
 
 	cmd := exec.Command(uvPath, "python", "install", "3.14")

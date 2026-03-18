@@ -36,8 +36,6 @@ func (c *CloudCLIInstaller) Install(tool *registry.Tool, p platform.Platform, _ 
 }
 
 func (c *CloudCLIInstaller) installAWSCLI(p platform.Platform, st *state.State) Result {
-	utils.PrintInfo("installing AWS CLI v2")
-
 	if p.OS == platform.Darwin {
 		cmd := exec.Command("brew", "install", "awscli")
 		if err := utils.RunCmd(cmd); err != nil {
@@ -77,8 +75,6 @@ func (c *CloudCLIInstaller) installAWSCLI(p platform.Platform, st *state.State) 
 }
 
 func (c *CloudCLIInstaller) installAzureCLI(p platform.Platform, st *state.State) Result {
-	utils.PrintInfo("installing Azure CLI")
-
 	if p.OS == platform.Darwin {
 		cmd := exec.Command("brew", "install", "azure-cli")
 		if err := utils.RunCmd(cmd); err != nil {
@@ -96,8 +92,6 @@ func (c *CloudCLIInstaller) installAzureCLI(p platform.Platform, st *state.State
 }
 
 func (c *CloudCLIInstaller) installGcloudCLI(p platform.Platform, st *state.State) Result {
-	utils.PrintInfo("installing Google Cloud CLI")
-
 	tmpDir, err := os.MkdirTemp("", "cps-gcloud-*")
 	if err != nil {
 		return Result{Tool: "gcloud-cli", Err: err}

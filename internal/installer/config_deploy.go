@@ -11,14 +11,10 @@ import (
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
 	"github.com/tanq16/cli-productivity-suite/internal/registry"
 	"github.com/tanq16/cli-productivity-suite/internal/state"
-	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
 type ConfigDeployInstaller struct{}
 
-// resolveConfig returns the embedded config content and destination path for
-// the given tool. Returns (nil, "", nil) when the config should be skipped on
-// the current platform (e.g. aerospace on Linux).
 func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Platform) (content []byte, destPath string, err error) {
 	switch tool.Name {
 	case "tmux-config":
@@ -101,8 +97,6 @@ func (c *ConfigDeployInstaller) Check(tool *registry.Tool, p platform.Platform, 
 }
 
 func (c *ConfigDeployInstaller) Install(tool *registry.Tool, p platform.Platform, _ *github.Client, st *state.State) Result {
-	utils.PrintInfo(fmt.Sprintf("deploying config: %s", tool.Name))
-
 	content, destPath, err := c.resolveConfig(tool, p)
 	if err != nil {
 		return Result{Tool: tool.Name, Err: err}

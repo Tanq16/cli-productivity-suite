@@ -23,12 +23,10 @@ func (s *ShellPluginInstaller) Check(tool *registry.Tool, _ platform.Platform, _
 
 func (s *ShellPluginInstaller) Install(tool *registry.Tool, p platform.Platform, _ *github.Client, st *state.State) Result {
 	dest := expandHome(tool.CloneDest, p.HomeDir)
-	utils.PrintInfo(fmt.Sprintf("installing plugin: %s", tool.Name))
 
 	if _, err := os.Stat(dest); err == nil {
 		cmd := exec.Command("git", "-C", dest, "pull", "--ff-only")
 		if err := utils.RunCmd(cmd); err != nil {
-			utils.PrintWarn(fmt.Sprintf("git pull failed for %s, re-cloning", tool.Name), nil)
 			os.RemoveAll(dest)
 		} else {
 			st.SetToolVersion(tool.Name, "git-managed")
@@ -80,17 +78,16 @@ func (s *ShellPluginInstaller) postCloneSpaceship(tool *registry.Tool, p platfor
 
 func (s *ShellPluginInstaller) postCloneNvChad(tool *registry.Tool, p platform.Platform) Result {
 	dest := expandHome(tool.CloneDest, p.HomeDir)
-
-	// Patch chadrc.lua for catppuccin theme
 	chadrcPath := filepath.Join(dest, "lua", "chadrc.lua")
 	data, err := os.ReadFile(chadrcPath)
 	if err == nil {
 		patched := strings.Replace(string(data), `theme = "`, `theme = "catppuccin", -- `, 1)
 		if string(data) == patched {
-			// Try alternate pattern
 			patched = strings.Replace(string(data), "theme =", `theme = "catppuccin", transparency = true, --`, 1)
 		}
-		os.WriteFile(chadrcPath, []byte(patched), 0644)
+		if err := os.WriteFile(chadrcPath, []byte(patched), 0644); err != nil {
+			return Result{Tool: tool.Name, Err: fmt.Errorf("failed to patch chadrc.lua: %w", err)}
+		}
 	}
 
 	return Result{Tool: tool.Name, Version: "git-managed"}

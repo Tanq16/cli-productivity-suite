@@ -2,6 +2,8 @@ package highway
 
 import (
 	"context"
+	"encoding/json"
+	"sync"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -13,52 +15,141 @@ type Job interface {
 	Marshal() ([]byte, error)
 }
 
+type JobUnmarshaler func(data []byte) (Job, error)
+
 type Highway struct {
-	workers  int
-	jobs     []Job
-	progress chan Progress
+	workers      int
+	statePath    string
+	unmarshalers map[string]JobUnmarshaler
+
+	mu        sync.Mutex
+	pending   []Job
+	completed map[string]bool
+	progress  chan Progress
 }
 
-func New(workers int) *Highway {
-	return &Highway{
-		workers:  workers,
-		progress: make(chan Progress, 100),
+func New(workers int, statePath string) *Highway {
+	if workers < 1 {
+		workers = 1
 	}
+	return &Highway{
+		workers:      workers,
+		statePath:    statePath,
+		unmarshalers: make(map[string]JobUnmarshaler),
+		completed:    make(map[string]bool),
+		progress:     make(chan Progress, 100),
+	}
+}
+
+func (h *Highway) RegisterType(jobType string, unmarshal JobUnmarshaler) {
+	h.unmarshalers[jobType] = unmarshal
 }
 
 func (h *Highway) Submit(jobs ...Job) {
-	h.jobs = append(h.jobs, jobs...)
-}
-
-func (h *Highway) Run(ctx context.Context) error {
-	defer close(h.progress)
-
-	g, ctx := errgroup.WithContext(ctx)
-	g.SetLimit(h.workers)
-
-	for _, j := range h.jobs {
-		g.Go(func() error {
-			if ctx.Err() != nil {
-				h.progress <- Progress{
-					JobID:   j.ID(),
-					Message: "cancelled",
-					Done:    true,
-					Error:   ctx.Err(),
-				}
-				return nil
-			}
-			j.Run(ctx, h.progress)
-			return nil
-		})
-	}
-
-	return g.Wait()
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.pending = append(h.pending, jobs...)
 }
 
 func (h *Highway) Progress() <-chan Progress {
 	return h.progress
 }
 
+func (h *Highway) Run(ctx context.Context) error {
+	g, gCtx := errgroup.WithContext(ctx)
+	g.SetLimit(h.workers)
+
+	h.mu.Lock()
+	jobs := h.pending
+	h.mu.Unlock()
+
+	for _, j := range jobs {
+		if h.isCompleted(j.ID()) {
+			continue
+		}
+		g.Go(func() error {
+			h.executeJob(gCtx, j)
+			return nil
+		})
+	}
+
+	err := g.Wait()
+	close(h.progress)
+
+	if ctx.Err() != nil {
+		h.saveState()
+		return ctx.Err()
+	}
+	h.deleteState()
+	return err
+}
+
+func (h *Highway) executeJob(ctx context.Context, job Job) {
+	if ctx.Err() != nil {
+		h.progress <- Progress{
+			JobID:   job.ID(),
+			Message: "cancelled",
+			Done:    true,
+			Error:   ctx.Err(),
+		}
+		return
+	}
+
+	err := job.Run(ctx, h.progress)
+	if err != nil {
+		h.progress <- Progress{
+			JobID:  job.ID(),
+			Done:   true,
+			Error:  err,
+			ErrMsg: err.Error(),
+		}
+		h.markFailed(job.ID())
+	} else {
+		h.markCompleted(job.ID())
+	}
+}
+
+func (h *Highway) isCompleted(id string) bool {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.completed[id]
+}
+
+func (h *Highway) markCompleted(id string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.completed[id] = true
+}
+
+func (h *Highway) markFailed(id string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.completed[id] = true
+}
+
 func (h *Highway) JobCount() int {
-	return len(h.jobs)
+	return len(h.pending)
+}
+
+// LoadState is a no-op; state persistence is not used in this project
+func (h *Highway) LoadState() error {
+	return nil
+}
+
+func (h *Highway) saveState() error {
+	return nil
+}
+
+func (h *Highway) deleteState() {
+}
+
+type persistedState struct {
+	Completed []string       `json:"completed"`
+	Pending   []persistedJob `json:"pending"`
+}
+
+type persistedJob struct {
+	ID   string          `json:"id"`
+	Type string          `json:"type"`
+	Data json.RawMessage `json:"data"`
 }

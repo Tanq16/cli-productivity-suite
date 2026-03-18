@@ -36,7 +36,6 @@ func (c *Client) do(req *http.Request) (*http.Response, error) {
 			return resp, nil
 		}
 		if attempt < 2 {
-			// Only close and retry if not the last attempt
 			if resp != nil {
 				resp.Body.Close()
 			}
@@ -44,6 +43,9 @@ func (c *Client) do(req *http.Request) (*http.Response, error) {
 		}
 	}
 	if err != nil {
+		if resp != nil {
+			resp.Body.Close()
+		}
 		return nil, err
 	}
 	return resp, nil

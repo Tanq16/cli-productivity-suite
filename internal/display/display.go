@@ -72,13 +72,27 @@ func (d *Display) startPhaseDebug(name string, progress <-chan highway.Progress)
 func (d *Display) startPhaseAI(name string, progress <-chan highway.Progress) {
 	fmt.Printf("[PHASE] %s\n", name)
 	for p := range progress {
-		if !p.Done {
+		if p.Done {
+			if p.Error != nil {
+				fmt.Printf("[ERROR] %s: %s\n", p.JobID, p.Error)
+			} else {
+				fmt.Printf("[OK] %s: %s\n", p.JobID, p.Message)
+			}
 			continue
 		}
-		if p.Error != nil {
-			fmt.Printf("[ERROR] %s: %s\n", p.JobID, p.Error)
-		} else {
-			fmt.Printf("[OK] %s: %s\n", p.JobID, p.Message)
+		if p.Type == highway.ProgressTypeProgress && p.Total > 0 {
+			pct := int(float64(p.Current) / float64(p.Total) * 100)
+			extra := ""
+			if p.Extra != "" {
+				extra = " (" + p.Extra + ")"
+			}
+			fmt.Printf("[INFO] %s: %s %d%%%s\n", p.JobID, p.Message, pct, extra)
+		} else if p.Type == highway.ProgressTypeSubStatus {
+			sub := p.SubStatus
+			if sub == "" {
+				sub = p.Message
+			}
+			fmt.Printf("[INFO] %s: %s\n", p.JobID, sub)
 		}
 	}
 }

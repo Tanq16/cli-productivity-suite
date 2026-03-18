@@ -3,8 +3,8 @@ package highway
 type ProgressType int
 
 const (
-	ProgressTypeSubStatus ProgressType = iota
-	ProgressTypeProgress
+	ProgressTypeProgress  ProgressType = iota
+	ProgressTypeSubStatus
 )
 
 type Progress struct {
@@ -17,4 +17,5 @@ type Progress struct {
 	Total     int64
 	Done      bool
 	Error     error
+	ErrMsg    string
 }

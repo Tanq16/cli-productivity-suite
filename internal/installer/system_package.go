@@ -3,7 +3,6 @@ package installer
 import (
 	"fmt"
 	"os/exec"
-	"strings"
 
 	"github.com/tanq16/cli-productivity-suite/internal/github"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
@@ -34,13 +33,10 @@ func (s *SystemPackageInstaller) installApt(tool *registry.Tool, st *state.State
 	if len(tool.AptPkgs) == 0 {
 		return Result{Tool: tool.Name, Skipped: true}
 	}
-	utils.PrintInfo(fmt.Sprintf("installing apt packages: %s", strings.Join(tool.AptPkgs, ", ")))
 
 	args := append([]string{"apt-get", "install", "-y"}, tool.AptPkgs...)
 	cmd := exec.Command("sudo", args...)
-	cmd.Stdout = nil
-	cmd.Stderr = nil
-	if err := cmd.Run(); err != nil {
+	if err := utils.RunCmd(cmd); err != nil {
 		return Result{Tool: tool.Name, Err: fmt.Errorf("apt install failed: %w", err)}
 	}
 
@@ -50,23 +46,17 @@ func (s *SystemPackageInstaller) installApt(tool *registry.Tool, st *state.State
 
 func (s *SystemPackageInstaller) installBrew(tool *registry.Tool, st *state.State) Result {
 	if len(tool.BrewPkgs) > 0 {
-		utils.PrintInfo(fmt.Sprintf("installing brew packages: %s", strings.Join(tool.BrewPkgs, ", ")))
 		args := append([]string{"install"}, tool.BrewPkgs...)
 		cmd := exec.Command("brew", args...)
-		cmd.Stdout = nil
-		cmd.Stderr = nil
-		if err := cmd.Run(); err != nil {
+		if err := utils.RunCmd(cmd); err != nil {
 			return Result{Tool: tool.Name, Err: fmt.Errorf("brew install failed: %w", err)}
 		}
 	}
 
 	if len(tool.BrewCasks) > 0 {
-		utils.PrintInfo(fmt.Sprintf("installing brew casks: %s", strings.Join(tool.BrewCasks, ", ")))
 		for _, cask := range tool.BrewCasks {
 			cmd := exec.Command("brew", "install", "--cask", cask)
-			cmd.Stdout = nil
-			cmd.Stderr = nil
-			if err := cmd.Run(); err != nil {
+			if err := utils.RunCmd(cmd); err != nil {
 				return Result{Tool: tool.Name, Err: fmt.Errorf("brew cask install %s failed: %w", cask, err)}
 			}
 		}

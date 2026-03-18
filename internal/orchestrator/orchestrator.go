@@ -1,7 +1,6 @@
 package orchestrator
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"os"
@@ -21,14 +20,14 @@ import (
 	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
-type CheckFlags struct {
+type CheckConfig struct {
 	Public  bool
 	Private bool
 	System  bool
 	All     bool
 }
 
-type UpdateFlags struct {
+type UpdateConfig struct {
 	Public      bool
 	Private     bool
 	System      bool
@@ -62,8 +61,12 @@ func RunInit(parentCtx context.Context, ghToken string) {
 	if _, err := exec.LookPath("git"); err != nil {
 		utils.PrintFatal("git not found in PATH", nil)
 	}
-	os.MkdirAll(p.ShellDir(), 0755)
-	os.MkdirAll(p.ShellExecDir(), 0755)
+	if err := os.MkdirAll(p.ShellDir(), 0755); err != nil {
+		utils.PrintFatal(fmt.Sprintf("failed to create %s", p.ShellDir()), err)
+	}
+	if err := os.MkdirAll(p.ShellExecDir(), 0755); err != nil {
+		utils.PrintFatal(fmt.Sprintf("failed to create %s", p.ShellExecDir()), err)
+	}
 	utils.PrintSuccess("prerequisites OK")
 
 	if PhaseNeedsSudo(p, registry.SystemPackage, registry.CloudCLI, registry.LanguageRuntime) {
@@ -144,7 +147,7 @@ func RunInit(parentCtx context.Context, ghToken string) {
 	utils.PrintSuccess("init complete!")
 }
 
-func RunCheck(ghToken string, appVersion string, flags CheckFlags) {
+func RunCheck(ghToken string, appVersion string, cfg CheckConfig) {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
@@ -158,21 +161,21 @@ func RunCheck(ghToken string, appVersion string, flags CheckFlags) {
 	gh := github.NewClient(ghToken)
 	reg := registry.New()
 
-	if !flags.Public && !flags.Private && !flags.System {
-		flags.All = true
+	if !cfg.Public && !cfg.Private && !cfg.System {
+		cfg.All = true
 	}
 
 	var tools []registry.Tool
-	if flags.All {
+	if cfg.All {
 		tools = reg.ForPlatform(p.OS.String())
 	} else {
-		if flags.Public {
+		if cfg.Public {
 			tools = append(tools, reg.ByCategory(registry.Public)...)
 		}
-		if flags.Private {
+		if cfg.Private {
 			tools = append(tools, reg.ByCategory(registry.Private)...)
 		}
-		if flags.System {
+		if cfg.System {
 			tools = append(tools, reg.ByCategory(registry.System)...)
 		}
 	}
@@ -235,7 +238,7 @@ func RunCheck(ghToken string, appVersion string, flags CheckFlags) {
 	utils.PrintTable(headers, rows)
 }
 
-func RunUpdate(parentCtx context.Context, ghToken string, flags UpdateFlags) {
+func RunUpdate(parentCtx context.Context, ghToken string, cfg UpdateConfig) {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
@@ -252,21 +255,21 @@ func RunUpdate(parentCtx context.Context, ghToken string, flags UpdateFlags) {
 	gh := github.NewClient(ghToken)
 	reg := registry.New()
 
-	if !flags.Public && !flags.Private && !flags.System {
-		flags.All = true
+	if !cfg.Public && !cfg.Private && !cfg.System {
+		cfg.All = true
 	}
 
 	var tools []registry.Tool
-	if flags.All {
+	if cfg.All {
 		tools = reg.ForPlatform(p.OS.String())
 	} else {
-		if flags.Public {
+		if cfg.Public {
 			tools = append(tools, reg.ByCategory(registry.Public)...)
 		}
-		if flags.Private {
+		if cfg.Private {
 			tools = append(tools, reg.ByCategory(registry.Private)...)
 		}
-		if flags.System {
+		if cfg.System {
 			tools = append(tools, reg.ByCategory(registry.System)...)
 		}
 	}
@@ -276,7 +279,7 @@ func RunUpdate(parentCtx context.Context, ghToken string, flags UpdateFlags) {
 		if st.ToolVersion(t.Name) == "" {
 			continue
 		}
-		if t.Kind == registry.ConfigFile && !flags.IncludeConf {
+		if t.Kind == registry.ConfigFile && !cfg.IncludeConf {
 			continue
 		}
 		updatable = append(updatable, t)
@@ -385,11 +388,11 @@ func RunClean() {
 	for _, d := range dirs {
 		utils.PrintGeneric("  " + d)
 	}
-	utils.PrintGeneric("\nare you sure? (yes/no): ")
-
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	answer := strings.TrimSpace(strings.ToLower(scanner.Text()))
+	answer, err := utils.PromptInput("\nare you sure? (yes/no):", "yes/no")
+	if err != nil {
+		utils.PrintFatal("failed to read input", err)
+	}
+	answer = strings.TrimSpace(strings.ToLower(answer))
 
 	if answer != "yes" {
 		utils.PrintInfo("clean aborted")
@@ -414,14 +417,20 @@ func runPhase(ctx context.Context, disp *display.Display, phaseName string, tool
 	if len(tools) == 0 {
 		return
 	}
-	hw := highway.New(workers)
+	hw := highway.New(workers, "")
 	jobs := make([]highway.Job, len(tools))
 	for i, t := range tools {
 		jobs[i] = NewInstallJob(t, p, gh, st)
 	}
 	hw.Submit(jobs...)
-	go hw.Run(ctx)
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- hw.Run(ctx)
+	}()
 	disp.StartPhase(phaseName, hw.Progress())
+	if err := <-errCh; err != nil {
+		utils.PrintWarn("phase interrupted", err)
+	}
 }
 
 func printResult(r installer.Result) {
@@ -510,7 +519,7 @@ func excludeByName(tools []registry.Tool, names ...string) []registry.Tool {
 }
 
 func isOwnTool(repo string) bool {
-	return len(repo) > 7 && repo[:7] == "Tanq16/"
+	return strings.HasPrefix(repo, "Tanq16/")
 }
 
 func disableOMZSlowPaste(p platform.Platform) {
@@ -539,5 +548,7 @@ func disableOMZSlowPaste(p platform.Platform) {
 			}
 		}
 	}
-	os.WriteFile(miscPath, []byte(strings.Join(lines, "\n")), 0644)
+	if err := os.WriteFile(miscPath, []byte(strings.Join(lines, "\n")), 0644); err != nil {
+		utils.PrintWarn("failed to disable OMZ slow-paste", err)
+	}
 }

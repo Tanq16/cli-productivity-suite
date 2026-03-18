@@ -21,7 +21,7 @@ func PrintInfo(msg string) {
 	} else if GlobalForAIFlag {
 		fmt.Println("[INFO] " + msg)
 	} else {
-		lipgloss.Println(infoStyle.Render("→ " + msg))
+		fmt.Println(infoStyle.Render("→ " + msg))
 	}
 }
 
@@ -31,7 +31,7 @@ func PrintSuccess(msg string) {
 	} else if GlobalForAIFlag {
 		fmt.Println("[OK] " + msg)
 	} else {
-		lipgloss.Println(successStyle.Render("✓ " + msg))
+		fmt.Println(successStyle.Render("✓ " + msg))
 	}
 }
 
@@ -45,7 +45,7 @@ func PrintError(msg string, err error) {
 	} else if GlobalForAIFlag {
 		fmt.Println("[ERROR] " + msg)
 	} else {
-		lipgloss.Println(errorStyle.Render("✗ " + msg))
+		fmt.Println(errorStyle.Render("✗ " + msg))
 	}
 }
 
@@ -59,7 +59,7 @@ func PrintFatal(msg string, err error) {
 	} else if GlobalForAIFlag {
 		fmt.Println("[ERROR] " + msg)
 	} else {
-		lipgloss.Println(errorStyle.Render("✗ " + msg))
+		fmt.Println(errorStyle.Render("✗ " + msg))
 	}
 	os.Exit(1)
 }
@@ -74,7 +74,7 @@ func PrintWarn(msg string, err error) {
 	} else if GlobalForAIFlag {
 		fmt.Println("[WARN] " + msg)
 	} else {
-		lipgloss.Println(warnStyle.Render("! " + msg))
+		fmt.Println(warnStyle.Render("! " + msg))
 	}
 }
 

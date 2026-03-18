@@ -73,8 +73,9 @@ func setupLogs() {
 	if debugFlag {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		utils.GlobalDebugFlag = true
-	} else if forAIFlag {
-		zerolog.SetGlobalLevel(zerolog.Disabled)
+	}
+	if forAIFlag {
 		utils.GlobalForAIFlag = true
+		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}
 }

@@ -6,13 +6,26 @@ import (
 	"github.com/tanq16/cli-productivity-suite/internal/orchestrator"
 )
 
-var updateFlags orchestrator.UpdateFlags
+var updateFlags struct {
+	Public      bool
+	Private     bool
+	System      bool
+	All         bool
+	IncludeConf bool
+}
 
 var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update installed tools to latest versions",
 	Run: func(cmd *cobra.Command, args []string) {
-		orchestrator.RunUpdate(cmd.Context(), ghToken, updateFlags)
+		cfg := orchestrator.UpdateConfig{
+			Public:      updateFlags.Public,
+			Private:     updateFlags.Private,
+			System:      updateFlags.System,
+			All:         updateFlags.All,
+			IncludeConf: updateFlags.IncludeConf,
+		}
+		orchestrator.RunUpdate(cmd.Context(), ghToken, cfg)
 	},
 }
 

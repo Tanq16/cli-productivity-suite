@@ -40,7 +40,17 @@ func (j *InstallJob) Run(ctx context.Context, progress chan<- highway.Progress) 
 		Type:      highway.ProgressTypeSubStatus,
 	}
 
-	result := installer.Dispatch(j.tool.Kind).Install(&j.tool, j.p, j.gh, j.st)
+	inst := installer.Dispatch(j.tool.Kind)
+	if inst == nil {
+		progress <- highway.Progress{
+			JobID:   j.tool.Name,
+			Message: fmt.Sprintf("no installer for kind %s", j.tool.Kind),
+			Done:    true,
+			Error:   fmt.Errorf("no installer for tool kind: %s", j.tool.Kind),
+		}
+		return nil
+	}
+	result := inst.Install(&j.tool, j.p, j.gh, j.st)
 
 	var msg string
 	if result.Err != nil {

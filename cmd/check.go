@@ -6,13 +6,24 @@ import (
 	"github.com/tanq16/cli-productivity-suite/internal/orchestrator"
 )
 
-var checkFlags orchestrator.CheckFlags
+var checkFlags struct {
+	Public  bool
+	Private bool
+	System  bool
+	All     bool
+}
 
 var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Check for available updates",
 	Run: func(cmd *cobra.Command, args []string) {
-		orchestrator.RunCheck(ghToken, AppVersion, checkFlags)
+		cfg := orchestrator.CheckConfig{
+			Public:  checkFlags.Public,
+			Private: checkFlags.Private,
+			System:  checkFlags.System,
+			All:     checkFlags.All,
+		}
+		orchestrator.RunCheck(ghToken, AppVersion, cfg)
 	},
 }
 
