@@ -13,7 +13,6 @@ var (
 	successStyle = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(2))
 	errorStyle   = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(1))
 	warnStyle    = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(3))
-	debugStyle   = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(8))
 )
 
 func PrintInfo(msg string) {

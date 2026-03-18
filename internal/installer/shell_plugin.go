@@ -26,7 +26,6 @@ func (s *ShellPluginInstaller) Install(tool *registry.Tool, p platform.Platform,
 	utils.PrintInfo(fmt.Sprintf("installing plugin: %s", tool.Name))
 
 	if _, err := os.Stat(dest); err == nil {
-		// Directory exists — git pull
 		cmd := exec.Command("git", "-C", dest, "pull", "--ff-only")
 		if err := utils.RunCmd(cmd); err != nil {
 			utils.PrintWarn(fmt.Sprintf("git pull failed for %s, re-cloning", tool.Name), nil)
@@ -37,7 +36,6 @@ func (s *ShellPluginInstaller) Install(tool *registry.Tool, p platform.Platform,
 		}
 	}
 
-	// Clone
 	if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
@@ -102,7 +100,6 @@ func (s *ShellPluginInstaller) postCloneNvm(tool *registry.Tool, p platform.Plat
 	nvmDir := expandHome(tool.CloneDest, p.HomeDir)
 	nvmScript := filepath.Join(nvmDir, "nvm.sh")
 
-	// Source nvm and install LTS
 	cmd := exec.Command("bash", "-c", fmt.Sprintf(
 		`export NVM_DIR="%s" && . "%s" && nvm install --lts`,
 		nvmDir, nvmScript,

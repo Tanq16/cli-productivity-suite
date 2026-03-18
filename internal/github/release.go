@@ -53,7 +53,6 @@ func MatchAsset(release *Release, pattern registry.AssetPattern, osName, archNam
 	for _, asset := range release.Assets {
 		name := asset.Name
 
-		// Must contain OS and arch patterns
 		if !strings.Contains(name, osPattern) {
 			continue
 		}
@@ -61,7 +60,6 @@ func MatchAsset(release *Release, pattern registry.AssetPattern, osName, archNam
 			continue
 		}
 
-		// Must contain all required substrings
 		matchRequired := true
 		for _, req := range pattern.RequiredSubstrings {
 			if !strings.Contains(name, req) {
@@ -73,7 +71,6 @@ func MatchAsset(release *Release, pattern registry.AssetPattern, osName, archNam
 			continue
 		}
 
-		// Must not contain excluded substrings
 		excluded := false
 		for _, exc := range pattern.ExcludeSubstrings {
 			if strings.Contains(name, exc) {
@@ -85,7 +82,6 @@ func MatchAsset(release *Release, pattern registry.AssetPattern, osName, archNam
 			continue
 		}
 
-		// Check archive format
 		if pattern.ArchiveFormat != "none" && pattern.ArchiveFormat != "" {
 			validFormat := false
 			switch pattern.ArchiveFormat {

@@ -30,23 +30,18 @@ type jobState struct {
 	err       error
 }
 
-// Display manages terminal output for highway phases.
 type Display struct {
 	mu   sync.Mutex
 	jobs map[string]*jobState
 }
 
-// New creates a new Display instance.
 func New() *Display {
 	return &Display{
 		jobs: make(map[string]*jobState),
 	}
 }
 
-// StartPhase blocks until all progress updates from the channel are consumed.
-// It renders live progress in normal mode, line-by-line in AI mode, or structured logs in debug mode.
 func (d *Display) StartPhase(name string, progress <-chan highway.Progress) {
-	// Reset job state for new phase
 	d.jobs = make(map[string]*jobState)
 
 	if utils.GlobalDebugFlag {
@@ -89,10 +84,8 @@ func (d *Display) startPhaseAI(name string, progress <-chan highway.Progress) {
 }
 
 func (d *Display) startPhaseNormal(name string, progress <-chan highway.Progress) {
-	// Print phase header
 	lipgloss.Println(phaseStyle.Render("▸ " + name))
 
-	// Collect updates and render at intervals
 	done := make(chan struct{})
 	go func() {
 		for p := range progress {
@@ -122,7 +115,6 @@ func (d *Display) startPhaseNormal(name string, progress <-chan highway.Progress
 		close(done)
 	}()
 
-	// Render loop at 200ms intervals until channel is drained
 	ticker := time.NewTicker(200 * time.Millisecond)
 	defer ticker.Stop()
 
@@ -130,9 +122,8 @@ func (d *Display) startPhaseNormal(name string, progress <-chan highway.Progress
 	for {
 		select {
 		case <-done:
-			// Clear last live render and print final results
 			d.clearLines(lastRenderedLines)
-			d.renderFinal() // no lock needed — consumer goroutine is done
+			d.renderFinal()
 			return
 		case <-ticker.C:
 			d.mu.Lock()
@@ -179,6 +170,17 @@ func (d *Display) renderFinal() {
 	ids := d.sortedIDs()
 	for _, id := range ids {
 		js := d.jobs[id]
+		if utils.GlobalForAIFlag {
+			switch js.status {
+			case "done":
+				fmt.Printf("[OK] %s: %s\n", id, js.message)
+			case "error":
+				fmt.Printf("[ERROR] %s: %s\n", id, js.err.Error())
+			case "skipped":
+				fmt.Printf("[OK] %s: %s\n", id, js.message)
+			}
+			continue
+		}
 		switch js.status {
 		case "done":
 			lipgloss.Printf("  %s %s %s\n", doneStyle.Render("✓"), id, skipStyle.Render(js.message))

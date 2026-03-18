@@ -61,21 +61,20 @@ func resolveGHToken() {
 }
 
 func setupLogs() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	output := zerolog.ConsoleWriter{
+		Out:        os.Stdout,
+		TimeFormat: time.DateTime,
+		NoColor:    false,
+	}
+	log.Logger = zerolog.New(output).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+
 	if debugFlag {
-		utils.GlobalDebugFlag = true
-		zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		output := zerolog.ConsoleWriter{
-			Out:        os.Stdout,
-			TimeFormat: time.DateTime,
-			NoColor:    false,
-		}
-		log.Logger = zerolog.New(output).With().Timestamp().Logger()
-		log.Debug().Str("package", "cmd").Msg("debug logging enabled")
+		utils.GlobalDebugFlag = true
 	} else if forAIFlag {
+		zerolog.SetGlobalLevel(zerolog.Disabled)
 		utils.GlobalForAIFlag = true
-		zerolog.SetGlobalLevel(zerolog.Disabled)
-	} else {
-		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}
 }

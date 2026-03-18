@@ -40,7 +40,6 @@ func (d *DirectDownloadInstaller) Install(tool *registry.Tool, p platform.Platfo
 		return Result{Tool: tool.Name, Version: version, Skipped: true}
 	}
 
-	// Build download URL
 	versionBare := strings.TrimPrefix(version, "v")
 	url := tool.URL
 	url = strings.ReplaceAll(url, "{version}", version)
@@ -53,13 +52,11 @@ func (d *DirectDownloadInstaller) Install(tool *registry.Tool, p platform.Platfo
 		return Result{Tool: tool.Name, Err: err}
 	}
 
-	// Check if we need archive extraction
 	archiveFormat := tool.Asset.ArchiveFormat
 	if archiveFormat != "" && archiveFormat != "none" {
 		return d.installArchive(tool, url, version, currentVersion, destDir, archiveFormat, st)
 	}
 
-	// Raw binary download
 	resp, err := http.Get(url)
 	if err != nil {
 		return Result{Tool: tool.Name, Err: err}

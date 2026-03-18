@@ -1,6 +1,5 @@
 package highway
 
-// ProgressType distinguishes between sub-status messages and numeric progress.
 type ProgressType int
 
 const (
@@ -8,14 +7,14 @@ const (
 	ProgressTypeProgress
 )
 
-// Progress represents a single status update from a running job.
 type Progress struct {
 	JobID     string
 	Message   string
 	SubStatus string
+	Extra     string
 	Type      ProgressType
-	Current   int
-	Total     int
+	Current   int64
+	Total     int64
 	Done      bool
 	Error     error
 }

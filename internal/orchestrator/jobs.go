@@ -1,4 +1,4 @@
-package cmd
+package orchestrator
 
 import (
 	"context"
@@ -13,7 +13,6 @@ import (
 	"github.com/tanq16/cli-productivity-suite/internal/state"
 )
 
-// InstallJob wraps a registry.Tool as a highway.Job.
 type InstallJob struct {
 	tool registry.Tool
 	p    platform.Platform
@@ -21,7 +20,6 @@ type InstallJob struct {
 	st   *state.State
 }
 
-// NewInstallJob creates an InstallJob for the given tool.
 func NewInstallJob(tool registry.Tool, p platform.Platform, gh *github.Client, st *state.State) *InstallJob {
 	return &InstallJob{tool: tool, p: p, gh: gh, st: st}
 }
@@ -29,14 +27,12 @@ func NewInstallJob(tool registry.Tool, p platform.Platform, gh *github.Client, s
 func (j *InstallJob) ID() string   { return j.tool.Name }
 func (j *InstallJob) Type() string { return j.tool.Kind.String() }
 
-// Marshal serializes the job for state persistence.
 func (j *InstallJob) Marshal() ([]byte, error) {
 	return json.Marshal(struct {
 		ToolName string `json:"tool_name"`
 	}{ToolName: j.tool.Name})
 }
 
-// Run executes the install and sends progress updates.
 func (j *InstallJob) Run(ctx context.Context, progress chan<- highway.Progress) error {
 	progress <- highway.Progress{
 		JobID:     j.tool.Name,

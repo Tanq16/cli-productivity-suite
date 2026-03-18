@@ -74,7 +74,6 @@ func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.
 		utils.RunCmd(xattrCmd) // best-effort
 	}
 
-	// Remove existing installation and extract
 	nvimDir := filepath.Join(p.ShellDir(), "nvim")
 	os.RemoveAll(nvimDir)
 
@@ -82,13 +81,11 @@ func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.
 		return Result{Tool: "neovim", Err: fmt.Errorf("extract failed: %w", err)}
 	}
 
-	// Move extracted directory to ~/shell/nvim
 	extractedDir := filepath.Join(tmpDir, fmt.Sprintf("nvim-%s-%s", osStr, archStr))
 	if err := os.Rename(extractedDir, nvimDir); err != nil {
 		return Result{Tool: "neovim", Err: fmt.Errorf("move to %s failed: %w", nvimDir, err)}
 	}
 
-	// Symlink ~/shell/executables/nvim → ~/shell/nvim/bin/nvim
 	symlinkPath := filepath.Join(p.ShellExecDir(), "nvim")
 	os.Remove(symlinkPath)
 	if err := os.Symlink(filepath.Join(nvimDir, "bin", "nvim"), symlinkPath); err != nil {
@@ -178,13 +175,11 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, st *state.
 
 	uvPath := filepath.Join(p.ShellExecDir(), "uv")
 
-	// Install Python 3.14
 	cmd := exec.Command(uvPath, "python", "install", "3.14")
 	if err := utils.RunCmd(cmd); err != nil {
 		return Result{Tool: "python", Err: fmt.Errorf("uv python install failed: %w", err)}
 	}
 
-	// Create py-default venv
 	venvPath := filepath.Join(p.HomeDir, "shell", "py-default")
 	venvCmd := exec.Command(uvPath, "venv", "--python", "3.14", "--clear", venvPath)
 	if err := utils.RunCmd(venvCmd); err != nil {

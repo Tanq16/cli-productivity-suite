@@ -32,7 +32,6 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 		return Result{Tool: tool.Name, Err: fmt.Errorf("failed to fetch release: %w", err)}
 	}
 
-	// Check if already at latest version
 	currentVersion := st.ToolVersion(tool.Name)
 	if currentVersion == release.TagName {
 		return Result{Tool: tool.Name, Version: release.TagName, Skipped: true}
@@ -43,7 +42,6 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 		return Result{Tool: tool.Name, Err: fmt.Errorf("no matching asset: %w", err)}
 	}
 
-	// Download to temp dir
 	tmpDir, err := os.MkdirTemp("", "cps-"+tool.Name+"-*")
 	if err != nil {
 		return Result{Tool: tool.Name, Err: err}
@@ -68,10 +66,8 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 	var binaryPath string
 
 	if tool.Asset.ArchiveFormat == "none" {
-		// Raw binary — just move it
 		binaryPath = archivePath
 	} else {
-		// Extract archive
 		extractDir := filepath.Join(tmpDir, "extracted")
 		if err := os.MkdirAll(extractDir, 0755); err != nil {
 			return Result{Tool: tool.Name, Err: err}
@@ -93,7 +89,6 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 			return Result{Tool: tool.Name, Err: fmt.Errorf("extract failed: %w", err)}
 		}
 
-		// Find the binary in extracted contents
 		pattern := tool.Asset.BinaryPathInArchive
 		if pattern == "" {
 			pattern = tool.BinaryName
@@ -104,7 +99,6 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 		}
 	}
 
-	// Place binary in destination
 	destPath := filepath.Join(destDir, tool.BinaryName)
 	data, err := os.ReadFile(binaryPath)
 	if err != nil {

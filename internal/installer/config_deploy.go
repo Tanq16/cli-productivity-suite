@@ -111,12 +111,10 @@ func (c *ConfigDeployInstaller) Install(tool *registry.Tool, p platform.Platform
 		return Result{Tool: tool.Name, Skipped: true}
 	}
 
-	// Create parent directory
 	if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
 
-	// Write config file (overwrite)
 	if err := os.WriteFile(destPath, content, 0644); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
