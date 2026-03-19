@@ -1,4 +1,4 @@
-package orchestrator
+package runner
 
 import (
 	"fmt"

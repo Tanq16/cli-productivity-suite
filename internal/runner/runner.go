@@ -1,4 +1,4 @@
-package orchestrator
+package runner
 
 import (
 	"context"
@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tanq16/cli-productivity-suite/internal/display"
+	"golang.org/x/sync/errgroup"
+
 	"github.com/tanq16/cli-productivity-suite/internal/github"
-	"github.com/tanq16/cli-productivity-suite/internal/highway"
 	"github.com/tanq16/cli-productivity-suite/internal/installer"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
 	"github.com/tanq16/cli-productivity-suite/internal/registry"
@@ -35,7 +35,7 @@ type UpdateConfig struct {
 	IncludeConf bool
 }
 
-func RunInit(parentCtx context.Context, ghToken string) {
+func Init(parentCtx context.Context, ghToken string) {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
@@ -74,70 +74,51 @@ func RunInit(parentCtx context.Context, ghToken string) {
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
+		utils.ClearPreviousLine()
 	}
 
-	disp := display.New()
-
-	runPhase(ctx, disp, "Phase 2: System packages", filterPlatformTools(reg.ByKind(registry.SystemPackage), p), 1, p, gh, st)
+	runPhase(ctx, "Phase 2: System packages", filterPlatformTools(reg.ByKind(registry.SystemPackage), p), 1, p, gh, st)
 	st.Save()
 
-	runPhase(ctx, disp, "Phase 3: Cloud CLIs", reg.ByKind(registry.CloudCLI), 1, p, gh, st)
+	runPhase(ctx, "Phase 3: Cloud CLIs", reg.ByKind(registry.CloudCLI), 1, p, gh, st)
 	st.Save()
 
 	goSDK := filterByName(reg.ByKind(registry.LanguageRuntime), "go-sdk")
-	runPhase(ctx, disp, "Phase 4: Go SDK", goSDK, 1, p, gh, st)
+	runPhase(ctx, "Phase 4: Go SDK", goSDK, 1, p, gh, st)
 	st.Save()
 
 	publicGH := filterGitHubPublic(reg.ByKind(registry.GitHubRelease), false)
 	publicGH = filterPlatformTools(publicGH, p)
-	runPhase(ctx, disp, "Phase 5: Public GitHub releases", publicGH, 2, p, gh, st)
+	runPhase(ctx, "Phase 5: Public GitHub releases", publicGH, 2, p, gh, st)
 	st.Save()
 
-	runPhase(ctx, disp, "Phase 6: Direct downloads", reg.ByKind(registry.DirectDownload), 1, p, gh, st)
+	runPhase(ctx, "Phase 6: Direct downloads", reg.ByKind(registry.DirectDownload), 1, p, gh, st)
 	st.Save()
 
 	ownPublic := filterOwnPublic(reg.ByKind(registry.GitHubRelease))
-	runPhase(ctx, disp, "Phase 7: Own public tools", ownPublic, 2, p, gh, st)
+	runPhase(ctx, "Phase 7: Own public tools", ownPublic, 2, p, gh, st)
 	st.Save()
 
 	if ghToken != "" {
 		privateTools := reg.ByCategory(registry.Private)
-		runPhase(ctx, disp, "Phase 8: Private tools", privateTools, 2, p, gh, st)
+		runPhase(ctx, "Phase 8: Private tools", privateTools, 2, p, gh, st)
 	} else {
 		utils.PrintWarn("Phase 8: Skipping private tools (no --gh-token)", nil)
 	}
 	st.Save()
 
 	nonSudoRuntimes := excludeByName(reg.ByKind(registry.LanguageRuntime), "go-sdk")
-	runPhase(ctx, disp, "Phase 9: Language runtimes", nonSudoRuntimes, 1, p, gh, st)
+	runPhase(ctx, "Phase 9: Language runtimes", nonSudoRuntimes, 1, p, gh, st)
 	st.Save()
 
 	disableOMZSlowPaste(p)
-	runPhase(ctx, disp, "Phase 10: Shell plugins", reg.ByKind(registry.ShellPlugin), 1, p, gh, st)
+	runPhase(ctx, "Phase 10: Shell plugins", reg.ByKind(registry.ShellPlugin), 1, p, gh, st)
 	st.Save()
 
-	runPhase(ctx, disp, "Phase 11: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), 1, p, gh, st)
+	runPhase(ctx, "Phase 11: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), 1, p, gh, st)
 	st.Save()
 
-	utils.PrintInfo("Phase 12: Running post-install tasks")
-
-	tpmInstall := filepath.Join(p.HomeDir, ".tmux", "plugins", "tpm", "bin", "install_plugins")
-	if _, err := os.Stat(tpmInstall); err == nil {
-		utils.PrintInfo("running TPM install_plugins")
-		tpmCmd := exec.Command("bash", tpmInstall)
-		tpmCmd.Env = append(os.Environ(), fmt.Sprintf("TMUX_PLUGIN_MANAGER_PATH=%s", filepath.Join(p.HomeDir, ".tmux", "plugins")))
-		if err := utils.RunCmd(tpmCmd); err != nil {
-			utils.PrintWarn("TPM install_plugins failed", err)
-		}
-	}
-
-	if _, err := exec.LookPath("nvim"); err == nil {
-		utils.PrintInfo("running NvChad headless setup")
-		nvimCmd := exec.Command("nvim", "--headless", "+MasonInstallAll", "+Lazy sync", "+qa")
-		if err := utils.RunCmd(nvimCmd); err != nil {
-			utils.PrintWarn("NvChad headless setup failed", err)
-		}
-	}
+	runPostInstall(p)
 
 	st.LastInit = time.Now()
 	if err := st.Save(); err != nil {
@@ -147,7 +128,7 @@ func RunInit(parentCtx context.Context, ghToken string) {
 	utils.PrintSuccess("init complete!")
 }
 
-func RunCheck(ghToken string, appVersion string, cfg CheckConfig) {
+func Check(parentCtx context.Context, ghToken string, appVersion string, cfg CheckConfig) {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
@@ -157,6 +138,9 @@ func RunCheck(ghToken string, appVersion string, cfg CheckConfig) {
 	if err != nil {
 		utils.PrintFatal("failed to load state", err)
 	}
+
+	ctx, cancel := signal.NotifyContext(parentCtx, os.Interrupt)
+	defer cancel()
 
 	gh := github.NewClient(ghToken)
 	reg := registry.New()
@@ -180,44 +164,12 @@ func RunCheck(ghToken string, appVersion string, cfg CheckConfig) {
 		}
 	}
 
-	headers := []string{"Tool", "Current", "Latest", "Status"}
-	var rows [][]string
-
-	for _, tool := range tools {
-		current := st.ToolVersion(tool.Name)
-		if current == "" {
-			continue
-		}
-
-		t := tool
-		inst := installer.Dispatch(t.Kind)
-		if inst == nil {
-			continue
-		}
-
-		cur, lat, err := inst.Check(&t, p, gh, st)
-		if err != nil {
-			rows = append(rows, []string{t.Name, cur, "error", err.Error()})
-			continue
-		}
-
-		status := "up-to-date"
-		switch lat {
-		case "system-managed", "check-manually", "git-managed":
-			status = lat
-		case "not-deployed":
-			status = "not deployed"
-		case "config-differs":
-			status = "config differs"
-		case "skipped":
-			continue
-		default:
-			if cur != lat && lat != "" {
-				status = "update available"
-			}
-		}
-		rows = append(rows, []string{t.Name, cur, lat, status})
+	if len(tools) == 0 {
+		utils.PrintWarn("no tools to check", nil)
+		return
 	}
+
+	results := runCheckPhase(ctx, "Checking tools", tools, 4, p, gh, st)
 
 	cpsRow := []string{"cps", appVersion, "unknown", "up-to-date"}
 	if rel, err := gh.LatestRelease("Tanq16/cli-productivity-suite"); err == nil {
@@ -228,7 +180,12 @@ func RunCheck(ghToken string, appVersion string, cfg CheckConfig) {
 			cpsRow[3] = "update available"
 		}
 	}
-	rows = append([][]string{cpsRow}, rows...)
+
+	headers := []string{"Tool", "Current", "Latest", "Status"}
+	rows := [][]string{cpsRow}
+	for _, r := range results {
+		rows = append(rows, []string{r.name, r.current, r.latest, r.status})
+	}
 
 	if len(rows) == 0 {
 		utils.PrintWarn("no installed tools found in state", nil)
@@ -238,7 +195,7 @@ func RunCheck(ghToken string, appVersion string, cfg CheckConfig) {
 	utils.PrintTable(headers, rows)
 }
 
-func RunUpdate(parentCtx context.Context, ghToken string, cfg UpdateConfig) {
+func Update(parentCtx context.Context, ghToken string, cfg UpdateConfig) {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
@@ -302,17 +259,15 @@ func RunUpdate(parentCtx context.Context, ghToken string, cfg UpdateConfig) {
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
+		utils.ClearPreviousLine()
 	}
-
-	utils.PrintInfo(fmt.Sprintf("updating %d tools", len(updatable)))
 
 	workers := 2
 	if needsSudo {
 		workers = 1
 	}
 
-	disp := display.New()
-	runPhase(ctx, disp, "Updating tools", updatable, workers, p, gh, st)
+	runPhase(ctx, "Updating tools", updatable, workers, p, gh, st)
 
 	if err := st.Save(); err != nil {
 		utils.PrintError("failed to save state", err)
@@ -321,7 +276,7 @@ func RunUpdate(parentCtx context.Context, ghToken string, cfg UpdateConfig) {
 	utils.PrintSuccess("update complete!")
 }
 
-func RunInstall(toolName string, ghToken string) {
+func Install(parentCtx context.Context, toolName string, ghToken string) {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
@@ -331,6 +286,9 @@ func RunInstall(toolName string, ghToken string) {
 	if err != nil {
 		utils.PrintFatal("failed to load state", err)
 	}
+
+	ctx, cancel := signal.NotifyContext(parentCtx, os.Interrupt)
+	defer cancel()
 
 	gh := github.NewClient(ghToken)
 	reg := registry.New()
@@ -344,31 +302,28 @@ func RunInstall(toolName string, ghToken string) {
 		utils.PrintFatal(fmt.Sprintf("tool %s is private — provide --gh-token or set CPS_GITHUB_PAT", toolName), nil)
 	}
 
-	inst := installer.Dispatch(tool.Kind)
-	if inst == nil {
-		utils.PrintFatal(fmt.Sprintf("no installer for tool kind: %s", tool.Kind), nil)
-	}
-
 	if ToolNeedsSudo(*tool, p) {
 		utils.PrintInfo("this tool requires sudo — authenticating")
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
+		utils.ClearPreviousLine()
 	}
 
-	result := inst.Install(tool, p, gh, st)
-	printResult(result)
-
-	if result.Err != nil {
-		utils.PrintFatal(fmt.Sprintf("install failed for %s", toolName), nil)
-	}
+	hasErrors := runPhase(ctx, fmt.Sprintf("Installing %s", toolName), []registry.Tool{*tool}, 1, p, gh, st)
 
 	if err := st.Save(); err != nil {
 		utils.PrintError("failed to save state", err)
 	}
+
+	if hasErrors {
+		utils.PrintFatal(fmt.Sprintf("install failed for %s", toolName), nil)
+	}
+
+	utils.PrintSuccess(fmt.Sprintf("%s installed", toolName))
 }
 
-func RunClean() {
+func Clean() {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
@@ -413,35 +368,160 @@ func RunClean() {
 	utils.PrintSuccess("clean complete")
 }
 
-func runPhase(ctx context.Context, disp *display.Display, phaseName string, tools []registry.Tool, workers int, p platform.Platform, gh *github.Client, st *state.State) {
+// runPhase prints a phase header, runs tools concurrently, prints results as
+// they complete, then clears all result lines (keeping only errors).
+func runPhase(ctx context.Context, phaseName string, tools []registry.Tool, workers int, p platform.Platform, gh *github.Client, st *state.State) bool {
 	if len(tools) == 0 {
-		return
+		return false
 	}
-	hw := highway.New(workers)
-	jobs := make([]highway.Job, len(tools))
-	for i, t := range tools {
-		jobs[i] = NewInstallJob(t, p, gh, st)
+	utils.PrintInfo(phaseName)
+
+	resultsCh := make(chan jobResult, len(tools))
+	g, gCtx := errgroup.WithContext(ctx)
+	g.SetLimit(workers)
+
+	for _, t := range tools {
+		tool := t
+		g.Go(func() error {
+			if gCtx.Err() != nil {
+				resultsCh <- jobResult{name: tool.Name, err: gCtx.Err()}
+				return nil
+			}
+			inst := installer.Dispatch(tool.Kind)
+			if inst == nil {
+				resultsCh <- jobResult{name: tool.Name, err: fmt.Errorf("no installer for kind: %s", tool.Kind)}
+				return nil
+			}
+			result := inst.Install(&tool, p, gh, st)
+			if result.Err != nil {
+				resultsCh <- jobResult{name: tool.Name, err: result.Err}
+			} else if result.Skipped {
+				resultsCh <- jobResult{name: tool.Name, message: fmt.Sprintf("already at %s", result.Version)}
+			} else if result.WasUpdated {
+				resultsCh <- jobResult{name: tool.Name, message: fmt.Sprintf("updated to %s", result.Version)}
+			} else {
+				resultsCh <- jobResult{name: tool.Name, message: fmt.Sprintf("installed %s", result.Version)}
+			}
+			return nil
+		})
 	}
-	hw.Submit(jobs...)
-	errCh := make(chan error, 1)
-	go func() {
-		errCh <- hw.Run(ctx)
-	}()
-	disp.StartPhase(phaseName, hw.Progress())
-	if err := <-errCh; err != nil {
-		utils.PrintWarn("phase interrupted", err)
+
+	go func() { g.Wait(); close(resultsCh) }()
+
+	var all []jobResult
+	for r := range resultsCh {
+		all = append(all, r)
+		if r.err != nil {
+			utils.PrintError(r.name, r.err)
+		} else {
+			utils.PrintSuccess(fmt.Sprintf("%s: %s", r.name, r.message))
+		}
 	}
+
+	utils.ClearLines(len(all))
+
+	hasErrors := false
+	for _, r := range all {
+		if r.err != nil {
+			utils.PrintError(r.name, r.err)
+			hasErrors = true
+		}
+	}
+
+	return hasErrors
 }
 
-func printResult(r installer.Result) {
-	if r.Err != nil {
-		utils.PrintError(r.Tool, r.Err)
-	} else if r.Skipped {
-		utils.PrintInfo(fmt.Sprintf("%s: already at %s", r.Tool, r.Version))
-	} else if r.WasUpdated {
-		utils.PrintSuccess(fmt.Sprintf("%s: updated to %s", r.Tool, r.Version))
-	} else {
-		utils.PrintSuccess(fmt.Sprintf("%s: installed %s", r.Tool, r.Version))
+// runCheckPhase runs version checks concurrently, prints progress, clears
+// result lines, and returns the collected check results for the table.
+func runCheckPhase(ctx context.Context, phaseName string, tools []registry.Tool, workers int, p platform.Platform, gh *github.Client, st *state.State) []checkResult {
+	utils.PrintInfo(phaseName)
+
+	resultsCh := make(chan checkResult, len(tools))
+	g, gCtx := errgroup.WithContext(ctx)
+	g.SetLimit(workers)
+
+	for _, t := range tools {
+		tool := t
+		g.Go(func() error {
+			if gCtx.Err() != nil {
+				return nil
+			}
+			current := st.ToolVersion(tool.Name)
+			if current == "" {
+				return nil
+			}
+			inst := installer.Dispatch(tool.Kind)
+			if inst == nil {
+				return nil
+			}
+			cur, lat, err := inst.Check(&tool, p, gh, st)
+			if err != nil {
+				resultsCh <- checkResult{name: tool.Name, current: cur, latest: "error", status: err.Error()}
+				return nil
+			}
+			status := "up-to-date"
+			switch lat {
+			case "system-managed", "check-manually", "git-managed":
+				status = lat
+			case "not-deployed":
+				status = "not deployed"
+			case "config-differs":
+				status = "config differs"
+			case "skipped":
+				return nil
+			default:
+				if cur != lat && lat != "" {
+					status = "update available"
+				}
+			}
+			resultsCh <- checkResult{name: tool.Name, current: cur, latest: lat, status: status}
+			return nil
+		})
+	}
+
+	go func() { g.Wait(); close(resultsCh) }()
+
+	var all []checkResult
+	var lineCount int
+	for r := range resultsCh {
+		all = append(all, r)
+		utils.PrintInfo(fmt.Sprintf("%s: %s", r.name, r.status))
+		lineCount++
+	}
+
+	utils.ClearLines(lineCount)
+
+	return all
+}
+
+func runPostInstall(p platform.Platform) {
+	utils.PrintInfo("Phase 12: Post-install tasks")
+	var lineCount int
+	var errors []jobResult
+
+	tpmInstall := filepath.Join(p.HomeDir, ".tmux", "plugins", "tpm", "bin", "install_plugins")
+	if _, err := os.Stat(tpmInstall); err == nil {
+		utils.PrintSuccess("tpm-install: running")
+		lineCount++
+		tpmCmd := exec.Command("bash", tpmInstall)
+		tpmCmd.Env = append(os.Environ(), fmt.Sprintf("TMUX_PLUGIN_MANAGER_PATH=%s", filepath.Join(p.HomeDir, ".tmux", "plugins")))
+		if err := utils.RunCmd(tpmCmd); err != nil {
+			errors = append(errors, jobResult{name: "tpm-install", err: err})
+		}
+	}
+
+	if _, err := exec.LookPath("nvim"); err == nil {
+		utils.PrintSuccess("nvchad-setup: running")
+		lineCount++
+		nvimCmd := exec.Command("nvim", "--headless", "+MasonInstallAll", "+Lazy sync", "+qa")
+		if err := utils.RunCmd(nvimCmd); err != nil {
+			errors = append(errors, jobResult{name: "nvchad-setup", err: err})
+		}
+	}
+
+	utils.ClearLines(lineCount)
+	for _, e := range errors {
+		utils.PrintError(e.name, e.err)
 	}
 }
 

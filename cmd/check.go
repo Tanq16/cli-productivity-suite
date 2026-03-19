@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/tanq16/cli-productivity-suite/internal/orchestrator"
+	"github.com/tanq16/cli-productivity-suite/internal/runner"
 )
 
 var checkFlags struct {
@@ -17,13 +17,13 @@ var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Check for available updates",
 	Run: func(cmd *cobra.Command, args []string) {
-		cfg := orchestrator.CheckConfig{
+		cfg := runner.CheckConfig{
 			Public:  checkFlags.Public,
 			Private: checkFlags.Private,
 			System:  checkFlags.System,
 			All:     checkFlags.All,
 		}
-		orchestrator.RunCheck(ghToken, AppVersion, cfg)
+		runner.Check(cmd.Context(), ghToken, AppVersion, cfg)
 	},
 }
 

@@ -81,3 +81,19 @@ func PrintWarn(msg string, err error) {
 func PrintGeneric(msg string) {
 	fmt.Println(msg)
 }
+
+func ClearLines(n int) {
+	if GlobalDebugFlag || GlobalForAIFlag {
+		return
+	}
+	for range n {
+		fmt.Print("\033[A\033[2K")
+	}
+}
+
+func ClearPreviousLine() {
+	if GlobalDebugFlag || GlobalForAIFlag {
+		return
+	}
+	fmt.Print("\033[A\033[2K")
+}

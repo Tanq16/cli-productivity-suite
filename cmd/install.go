@@ -3,8 +3,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/tanq16/cli-productivity-suite/internal/orchestrator"
 	"github.com/tanq16/cli-productivity-suite/internal/registry"
+	"github.com/tanq16/cli-productivity-suite/internal/runner"
 )
 
 var installCmd = &cobra.Command{
@@ -13,7 +13,7 @@ var installCmd = &cobra.Command{
 	Args:              cobra.ExactArgs(1),
 	ValidArgsFunction: completeToolNames,
 	Run: func(cmd *cobra.Command, args []string) {
-		orchestrator.RunInstall(args[0], ghToken)
+		runner.Install(cmd.Context(), args[0], ghToken)
 	},
 }
 
