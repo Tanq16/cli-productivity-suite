@@ -334,10 +334,27 @@ var AllTools = []Tool{
 
 	// ========== System Packages ==========
 	{
-		Name: "system-packages", Kind: SystemPackage, Category: System,
-		Description: "Core system packages",
-		AptPkgs:     []string{"tmux", "git", "tree", "wget", "curl", "zsh", "openssl", "nmap", "ncat", "cmake", "gcc", "make", "ninja-build", "gettext", "zip", "unzip", "file", "ffmpeg"},
-		BrewPkgs:    []string{"tmux", "git", "tree", "wget", "curl", "openssl", "nmap", "ffmpeg"},
+		Name: "core-utils", Kind: SystemPackage, Category: System,
+		Description: "Core system utilities",
+		AptPkgs:  []string{"git", "tree", "wget", "curl", "zip", "unzip", "file"},
+		BrewPkgs: []string{"git", "tree", "wget", "curl"},
+	},
+	{
+		Name: "dev-tools", Kind: SystemPackage, Category: System,
+		Description: "Development build tools",
+		AptPkgs: []string{"cmake", "gcc", "make", "ninja-build", "gettext"},
+	},
+	{
+		Name: "network-tools", Kind: SystemPackage, Category: System,
+		Description: "Network utilities",
+		AptPkgs:  []string{"nmap", "ncat", "openssl"},
+		BrewPkgs: []string{"openssl", "nmap"},
+	},
+	{
+		Name: "other-tools", Kind: SystemPackage, Category: System,
+		Description: "Shell, terminal, and media tools",
+		AptPkgs:  []string{"tmux", "zsh", "ffmpeg"},
+		BrewPkgs: []string{"tmux", "ffmpeg"},
 	},
 	{
 		Name: "aerospace", Kind: SystemPackage, Category: System,

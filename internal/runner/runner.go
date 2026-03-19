@@ -66,6 +66,11 @@ func Init(ghToken string) {
 
 	var hadErrors bool
 
+	if p.OS == platform.Linux {
+		cmd := exec.Command("sudo", "apt-get", "update", "-qq")
+		utils.RunCmd(cmd)
+	}
+
 	if runPhase("Phase 2: System packages", filterPlatformTools(reg.ByKind(registry.SystemPackage), p), p, gh, st) {
 		hadErrors = true
 	}
