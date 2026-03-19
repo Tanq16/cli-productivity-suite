@@ -106,7 +106,7 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 		} `json:"files"`
 	}
 
-	resp, err := http.Get("https://go.dev/dl/?mode=json")
+	resp, err := httpGet("https://go.dev/dl/?mode=json")
 	if err != nil {
 		return Result{Tool: "go-sdk", Err: err}
 	}

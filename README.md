@@ -10,18 +10,18 @@
 
 A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driven development environment on Linux and macOS. It installs and tracks ~50 tools across these categories:
 
-- **CLI utilities** — bat, fd, ripgrep, lsd, jq, yq, fzf, gron, sq, and more
-- **Security tools** — nuclei, naabu, katana, subfinder, ffuf, gobuster, trufflehog, proxify
-- **Cloud & infra** — AWS CLI, Azure CLI, gcloud CLI, terraform, kubectl, kubelogin
-- **Language runtimes** — Go SDK, Python 3.14 (via uv), Node.js LTS (via nvm)
-- **Editor & shell** — Neovim (0.11+) with NvChad, spaceship-prompt, zsh plugins, tmux with TPM
-- **Config files** — complete `.zshrc`, tmux.conf, kitty.conf, aerospace.toml (macOS)
+- **CLI utilities** - bat, fd, ripgrep, lsd, jq, yq, fzf, gron, sq, and more
+- **Security tools** - nuclei, naabu, katana, subfinder, ffuf, gobuster, trufflehog, proxify
+- **Cloud & infra** - AWS CLI, Azure CLI, gcloud CLI, terraform, kubectl, kubelogin
+- **Language runtimes** - Go SDK, Python 3.14 (via uv), Node.js LTS (via nvm)
+- **Editor & shell** - Neovim (0.11+) with NvChad, spaceship-prompt, zsh plugins, tmux with TPM
+- **Config files** - complete `.zshrc`, tmux.conf, kitty.conf, aerospace.toml (macOS)
 
 ## Capabilities
 
 | Category | Commands | Description |
 |----------|----------|-------------|
-| Setup | `cps init` | Full environment setup — system packages, ~50 tools, cloud CLIs, language runtimes, shell plugins, and config files |
+| Setup | `cps init` | Full environment setup - system packages, ~50 tools, cloud CLIs, language runtimes, shell plugins, and config files |
 | Monitoring | `cps check` | Compare installed versions against latest releases |
 | Updates | `cps update`, `cps install <tool>` | Update all installed tools or install a single tool by name |
 | Maintenance | `cps clean` | Remove all CPS-managed files and directories |
@@ -52,7 +52,7 @@ make build
 
 - [Oh My Zsh](https://ohmyz.sh/) must be installed before running `cps init`
 - Git must be available in PATH
-- Install a nerd font for your terminal emulator — recommended: [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip)
+- Install a nerd font for your terminal emulator - recommended: [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip)
 
 ## Usage
 
@@ -116,26 +116,22 @@ cps clean
 
 ## Tips and Notes
 
-- All binary tools are installed to `~/shell/executables/` — add this to your PATH (the deployed `.zshrc` handles this automatically)
+- All binary tools are installed to `~/shell/executables/` - automatically added to your PATH in `.zshrc`
 - Neovim is installed from GitHub releases (0.11+) on both Linux and macOS to meet NvChad requirements
-- State is tracked in `~/.config/cps/state.json` — this file records installed versions for `check` and `update` commands
-- If the `gh` CLI is authenticated (`gh auth login`), CPS automatically uses its token — no need to pass `--gh-token`
-- Running `cps init` is idempotent — it skips tools that are already at the latest version
+- State is tracked in `~/.config/cps/state.json` - this file records installed versions for `check` and `update` commands
+- If the `gh` CLI is authenticated (`gh auth login`), CPS automatically uses its token - no need to pass `--gh-token`
+- Running `cps init` is idempotent - it skips tools that are already at the latest version
 - Cloud CLIs (AWS, Azure, gcloud) require sudo on Linux for system-level installation
-- The `.zshrc` deployed by `cps init` is a complete replacement — it includes Oh My Zsh config, all tool integrations, aliases, and functions
-- `cps clean` removes `~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.nvm`, `~/nuclei-templates`, `~/google-cloud-sdk`, and `~/.config/cps` — it does not touch Oh My Zsh, deployed config files, or system packages
+- The `.zshrc` deployed by `cps init` is a complete replacement - it includes Oh My Zsh config, tool integrations and aliases
+- `cps clean` removes `~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.nvm`, `~/nuclei-templates`, `~/google-cloud-sdk`, and `~/.config/cps` - it does not touch Oh My Zsh, deployed config files, or system packages
 
 ## Deep Removal
 
 The `cps clean` command performs a superficial cleanup of CPS-managed directories. For a full removal of everything CPS installs, follow these steps:
 
-**Step 1** — Run `cps clean` to remove the primary managed directories (`~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.nvm`, `~/nuclei-templates`, `~/google-cloud-sdk`, `~/.config/cps`):
+**Step 1** - Run `cps clean` to remove the primary managed directories (`~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.nvm`, `~/nuclei-templates`, `~/google-cloud-sdk`, `~/.config/cps`):
 
-```bash
-cps clean
-```
-
-**Step 2** — Remove remaining configs, data directories, Oh My Zsh, and system-level installs:
+**Step 2** - Remove remaining configs, data directories, Oh My Zsh, and system-level installs:
 
 ```bash
 rm -rf \
@@ -148,7 +144,7 @@ rm -rf \
   && sudo rm -rf /usr/local/go /usr/local/aws-cli /usr/local/bin/cps
 ```
 
-**Step 3** — Remove system packages installed by CPS:
+**Step 3** - Remove system packages installed by CPS:
 
 Linux (apt):
 

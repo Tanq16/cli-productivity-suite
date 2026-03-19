@@ -2,8 +2,6 @@ package installer
 
 import (
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -130,25 +128,3 @@ func (c *CloudCLIInstaller) installGcloudCLI(p platform.Platform, st *state.Stat
 	return Result{Tool: "gcloud-cli", Version: "latest"}
 }
 
-func downloadToFile(url, destPath string) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("download failed: HTTP %d from %s", resp.StatusCode, url)
-	}
-
-	f, err := os.Create(destPath)
-	if err != nil {
-		return err
-	}
-
-	if _, err := io.Copy(f, resp.Body); err != nil {
-		f.Close()
-		return err
-	}
-	return f.Close()
-}

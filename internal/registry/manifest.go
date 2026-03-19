@@ -296,7 +296,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "box-cli", BinaryName: "box-cli", Kind: GitHubRelease, Category: Private,
+		Name: "box", BinaryName: "box", Kind: GitHubRelease, Category: Private,
 		Repo: "Tanq16/box-cli", Description: "Private box CLI", IsPrivate: true,
 		Asset: AssetPattern{
 			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},

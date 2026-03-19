@@ -57,7 +57,7 @@ func (d *DirectDownloadInstaller) Install(tool *registry.Tool, p platform.Platfo
 		return d.installArchive(tool, url, version, currentVersion, destDir, archiveFormat, st)
 	}
 
-	resp, err := http.Get(url)
+	resp, err := httpGet(url)
 	if err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
@@ -89,7 +89,7 @@ func (d *DirectDownloadInstaller) Install(tool *registry.Tool, p platform.Platfo
 
 func (d *DirectDownloadInstaller) fetchVersion(tool *registry.Tool, gh *github.Client) (string, error) {
 	if tool.StableURL != "" {
-		resp, err := http.Get(tool.StableURL)
+		resp, err := httpGet(tool.StableURL)
 		if err != nil {
 			return "", err
 		}

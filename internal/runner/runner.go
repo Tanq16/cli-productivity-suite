@@ -60,55 +60,81 @@ func Init(ghToken string) {
 	if err := os.MkdirAll(p.ShellExecDir(), 0755); err != nil {
 		utils.PrintFatal(fmt.Sprintf("failed to create %s", p.ShellExecDir()), err)
 	}
+	var phase1Lines int
 	utils.PrintSuccess("prerequisites OK")
+	phase1Lines++
 
 	if PhaseNeedsSudo(p, registry.SystemPackage, registry.CloudCLI, registry.LanguageRuntime) {
-		utils.PrintInfo("some phases require sudo — authenticating")
+		utils.PrintInfo("authenticating sudo")
+		phase1Lines++
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
-		utils.ClearPreviousLine()
+		phase1Lines++
 	}
+	utils.ClearLines(phase1Lines)
 
-	runPhase("Phase 2: System packages", filterPlatformTools(reg.ByKind(registry.SystemPackage), p), p, gh, st)
+	var hadErrors bool
+
+	if runPhase("Phase 2: System packages", filterPlatformTools(reg.ByKind(registry.SystemPackage), p), p, gh, st) {
+		hadErrors = true
+	}
 	st.Save()
 
-	runPhase("Phase 3: Cloud CLIs", reg.ByKind(registry.CloudCLI), p, gh, st)
+	if runPhase("Phase 3: Cloud CLIs", reg.ByKind(registry.CloudCLI), p, gh, st) {
+		hadErrors = true
+	}
 	st.Save()
 
 	goSDK := filterByName(reg.ByKind(registry.LanguageRuntime), "go-sdk")
-	runPhase("Phase 4: Go SDK", goSDK, p, gh, st)
+	if runPhase("Phase 4: Go SDK", goSDK, p, gh, st) {
+		hadErrors = true
+	}
 	st.Save()
 
 	publicGH := filterGitHubPublic(reg.ByKind(registry.GitHubRelease), false)
 	publicGH = filterPlatformTools(publicGH, p)
-	runPhase("Phase 5: Public GitHub releases", publicGH, p, gh, st)
+	if runPhase("Phase 5: Public GitHub releases", publicGH, p, gh, st) {
+		hadErrors = true
+	}
 	st.Save()
 
-	runPhase("Phase 6: Direct downloads", reg.ByKind(registry.DirectDownload), p, gh, st)
+	if runPhase("Phase 6: Direct downloads", reg.ByKind(registry.DirectDownload), p, gh, st) {
+		hadErrors = true
+	}
 	st.Save()
 
 	ownPublic := filterOwnPublic(reg.ByKind(registry.GitHubRelease))
-	runPhase("Phase 7: Own public tools", ownPublic, p, gh, st)
+	if runPhase("Phase 7: Own public tools", ownPublic, p, gh, st) {
+		hadErrors = true
+	}
 	st.Save()
 
 	if ghToken != "" {
 		privateTools := reg.ByCategory(registry.Private)
-		runPhase("Phase 8: Private tools", privateTools, p, gh, st)
+		if runPhase("Phase 8: Private tools", privateTools, p, gh, st) {
+			hadErrors = true
+		}
 	} else {
 		utils.PrintWarn("Phase 8: Skipping private tools (no --gh-token)", nil)
 	}
 	st.Save()
 
 	nonSudoRuntimes := excludeByName(reg.ByKind(registry.LanguageRuntime), "go-sdk")
-	runPhase("Phase 9: Language runtimes", nonSudoRuntimes, p, gh, st)
+	if runPhase("Phase 9: Language runtimes", nonSudoRuntimes, p, gh, st) {
+		hadErrors = true
+	}
 	st.Save()
 
 	disableOMZSlowPaste(p)
-	runPhase("Phase 10: Shell plugins", reg.ByKind(registry.ShellPlugin), p, gh, st)
+	if runPhase("Phase 10: Shell plugins", reg.ByKind(registry.ShellPlugin), p, gh, st) {
+		hadErrors = true
+	}
 	st.Save()
 
-	runPhase("Phase 11: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st)
+	if runPhase("Phase 11: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
+		hadErrors = true
+	}
 	st.Save()
 
 	runPostInstall(p)
@@ -118,7 +144,11 @@ func Init(ghToken string) {
 		utils.PrintError("failed to save state", err)
 	}
 
-	utils.PrintSuccess("init complete!")
+	if hadErrors {
+		utils.PrintWarn("init finished with errors", nil)
+	} else {
+		utils.PrintSuccess("init complete!")
+	}
 }
 
 func Check(ghToken string, appVersion string, cfg CheckConfig) {
@@ -159,7 +189,8 @@ func Check(ghToken string, appVersion string, cfg CheckConfig) {
 		return
 	}
 
-	results := runCheckPhase("Checking tools", tools, p, gh, st)
+	headers := []string{"Tool", "Current", "Latest", "Status"}
+	var rows [][]string
 
 	cpsRow := []string{"cps", appVersion, "unknown", "up-to-date"}
 	if rel, err := gh.LatestRelease("Tanq16/cli-productivity-suite"); err == nil {
@@ -170,15 +201,40 @@ func Check(ghToken string, appVersion string, cfg CheckConfig) {
 			cpsRow[3] = "update available"
 		}
 	}
+	if cpsRow[3] != "up-to-date" {
+		rows = append(rows, cpsRow)
+	}
 
-	headers := []string{"Tool", "Current", "Latest", "Status"}
-	rows := [][]string{cpsRow}
-	for _, r := range results {
-		rows = append(rows, []string{r.name, r.current, r.latest, r.status})
+	for _, t := range tools {
+		current := st.ToolVersion(t.Name)
+		if current == "" {
+			continue
+		}
+		inst := installer.Dispatch(t.Kind)
+		if inst == nil {
+			continue
+		}
+		cur, lat, err := inst.Check(&t, p, gh, st)
+		if err != nil {
+			rows = append(rows, []string{t.Name, cur, "error", err.Error()})
+			continue
+		}
+		switch lat {
+		case "skipped", "system-managed", "check-manually", "git-managed":
+			continue
+		case "not-deployed":
+			rows = append(rows, []string{t.Name, cur, lat, "not deployed"})
+		case "config-differs":
+			rows = append(rows, []string{t.Name, cur, lat, "config differs"})
+		default:
+			if cur != lat && lat != "" {
+				rows = append(rows, []string{t.Name, cur, lat, "update available"})
+			}
+		}
 	}
 
 	if len(rows) == 0 {
-		utils.PrintWarn("no installed tools found in state", nil)
+		utils.PrintSuccess("everything is up to date")
 		return
 	}
 
@@ -226,11 +282,25 @@ func Update(ghToken string, cfg UpdateConfig) {
 		if t.Kind == registry.ConfigFile && !cfg.IncludeConf {
 			continue
 		}
-		updatable = append(updatable, t)
+		switch t.Kind {
+		case registry.SystemPackage, registry.CloudCLI, registry.LanguageRuntime:
+			continue
+		case registry.ConfigFile:
+			inst := installer.Dispatch(t.Kind)
+			if inst == nil {
+				continue
+			}
+			_, lat, _ := inst.Check(&t, p, gh, st)
+			if lat == "config-differs" || lat == "not-deployed" {
+				updatable = append(updatable, t)
+			}
+		default:
+			updatable = append(updatable, t)
+		}
 	}
 
 	if len(updatable) == 0 {
-		utils.PrintWarn("no updatable tools found", nil)
+		utils.PrintSuccess("everything is up to date")
 		return
 	}
 
@@ -242,20 +312,24 @@ func Update(ghToken string, cfg UpdateConfig) {
 		}
 	}
 	if needsSudo {
-		utils.PrintInfo("some tools require sudo — authenticating")
+		utils.PrintInfo("authenticating sudo")
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
-		utils.ClearPreviousLine()
+		utils.ClearLines(2)
 	}
 
-	runPhase("Updating tools", updatable, p, gh, st)
+	hasErrors := runPhase("Updating tools", updatable, p, gh, st)
 
 	if err := st.Save(); err != nil {
 		utils.PrintError("failed to save state", err)
 	}
 
-	utils.PrintSuccess("update complete!")
+	if hasErrors {
+		utils.PrintWarn("update finished with errors", nil)
+	} else {
+		utils.PrintSuccess("update complete!")
+	}
 }
 
 func Install(toolName string, ghToken string) {
@@ -282,24 +356,29 @@ func Install(toolName string, ghToken string) {
 	}
 
 	if ToolNeedsSudo(*tool, p) {
-		utils.PrintInfo("this tool requires sudo — authenticating")
+		utils.PrintInfo("authenticating sudo")
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
-		utils.ClearPreviousLine()
+		utils.ClearLines(2)
 	}
 
-	hasErrors := runPhase(fmt.Sprintf("Installing %s", toolName), []registry.Tool{*tool}, p, gh, st)
+	inst := installer.Dispatch(tool.Kind)
+	if inst == nil {
+		utils.PrintFatal(fmt.Sprintf("no installer for kind: %s", tool.Kind), nil)
+	}
+
+	st.Remove(tool.Name)
+	result := inst.Install(tool, p, gh, st)
+	if result.Err != nil {
+		utils.PrintFatal(fmt.Sprintf("install failed for %s", toolName), result.Err)
+	}
 
 	if err := st.Save(); err != nil {
 		utils.PrintError("failed to save state", err)
 	}
 
-	if hasErrors {
-		utils.PrintFatal(fmt.Sprintf("install failed for %s", toolName), nil)
-	}
-
-	utils.PrintSuccess(fmt.Sprintf("%s installed", toolName))
+	utils.PrintSuccess(fmt.Sprintf("%s: installed %s", toolName, result.Version))
 }
 
 func Clean() {
@@ -320,7 +399,7 @@ func Clean() {
 
 	utils.PrintWarn("this will remove the following directories:", nil)
 	for _, d := range dirs {
-		utils.PrintGeneric("  " + d)
+		utils.PrintInfo("  " + d)
 	}
 	answer, err := utils.PromptInput("\nare you sure? (yes/no):", "yes/no")
 	if err != nil {
@@ -386,53 +465,6 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 	return len(errors) > 0
 }
 
-func runCheckPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *github.Client, st *state.State) []checkResult {
-	utils.PrintInfo(phaseName)
-
-	var all []checkResult
-	var lineCount int
-
-	for _, t := range tools {
-		current := st.ToolVersion(t.Name)
-		if current == "" {
-			continue
-		}
-		inst := installer.Dispatch(t.Kind)
-		if inst == nil {
-			continue
-		}
-		cur, lat, err := inst.Check(&t, p, gh, st)
-		if err != nil {
-			all = append(all, checkResult{name: t.Name, current: cur, latest: "error", status: err.Error()})
-			utils.PrintInfo(fmt.Sprintf("%s: error", t.Name))
-			lineCount++
-			continue
-		}
-		status := "up-to-date"
-		switch lat {
-		case "system-managed", "check-manually", "git-managed":
-			status = lat
-		case "not-deployed":
-			status = "not deployed"
-		case "config-differs":
-			status = "config differs"
-		case "skipped":
-			continue
-		default:
-			if cur != lat && lat != "" {
-				status = "update available"
-			}
-		}
-		all = append(all, checkResult{name: t.Name, current: cur, latest: lat, status: status})
-		utils.PrintInfo(fmt.Sprintf("%s: %s", t.Name, status))
-		lineCount++
-	}
-
-	utils.ClearLines(lineCount)
-
-	return all
-}
-
 func runPostInstall(p platform.Platform) {
 	utils.PrintInfo("Phase 12: Post-install tasks")
 	var lineCount int
@@ -440,7 +472,7 @@ func runPostInstall(p platform.Platform) {
 
 	tpmInstall := filepath.Join(p.HomeDir, ".tmux", "plugins", "tpm", "bin", "install_plugins")
 	if _, err := os.Stat(tpmInstall); err == nil {
-		utils.PrintSuccess("tpm-install: running")
+		utils.PrintInfo("tpm-install: running")
 		lineCount++
 		tpmCmd := exec.Command("bash", tpmInstall)
 		tpmCmd.Env = append(os.Environ(), fmt.Sprintf("TMUX_PLUGIN_MANAGER_PATH=%s", filepath.Join(p.HomeDir, ".tmux", "plugins")))
@@ -450,7 +482,7 @@ func runPostInstall(p platform.Platform) {
 	}
 
 	if _, err := exec.LookPath("nvim"); err == nil {
-		utils.PrintSuccess("nvchad-setup: running")
+		utils.PrintInfo("nvchad-setup: running")
 		lineCount++
 		nvimCmd := exec.Command("nvim", "--headless", "+MasonInstallAll", "+Lazy sync", "+qa")
 		if err := utils.RunCmd(nvimCmd); err != nil {
