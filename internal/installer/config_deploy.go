@@ -58,13 +58,15 @@ func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Pl
 // with the same lines as the embedded content. Extra user lines appended after
 // the embedded portion are allowed.
 func configLinesMatch(embedded, deployed []byte) bool {
-	embeddedLines := strings.Split(string(embedded), "\n")
-	deployedLines := strings.Split(string(deployed), "\n")
-	if len(deployedLines) < len(embeddedLines) {
+	embStr := strings.ReplaceAll(string(embedded), "\r\n", "\n")
+	depStr := strings.ReplaceAll(string(deployed), "\r\n", "\n")
+	embLines := strings.Split(embStr, "\n")
+	depLines := strings.Split(depStr, "\n")
+	if len(depLines) < len(embLines) {
 		return false
 	}
-	for i := range embeddedLines {
-		if embeddedLines[i] != deployedLines[i] {
+	for i := range embLines {
+		if strings.TrimRight(embLines[i], " \t") != strings.TrimRight(depLines[i], " \t") {
 			return false
 		}
 	}

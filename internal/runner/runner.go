@@ -30,7 +30,7 @@ func Init(ghToken string) {
 	gh := github.NewClient(ghToken)
 	reg := registry.New()
 
-	utils.PrintInfo("Phase 1: Checking prerequisites")
+	utils.PrintRunning("(Running) Phase 1: Checking prerequisites")
 	omzDir := filepath.Join(p.HomeDir, ".oh-my-zsh")
 	if _, err := os.Stat(omzDir); os.IsNotExist(err) {
 		msg := fmt.Sprintf("Oh My Zsh not found at %s\nInstall it first: sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\"", omzDir)
@@ -46,17 +46,18 @@ func Init(ghToken string) {
 		utils.PrintFatal(fmt.Sprintf("failed to create %s", p.ShellExecDir()), err)
 	}
 	var phase1Lines int
-	utils.PrintSuccess("prerequisites OK")
+	utils.PrintIndentedSuccess("prerequisites OK")
 	phase1Lines++
 
 	if PhaseNeedsSudo(p, registry.SystemPackage, registry.CloudCLI, registry.LanguageRuntime) {
-		utils.PrintInfo("authenticating sudo")
+		utils.PrintIndentedRunning("authenticating sudo")
 		phase1Lines++
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
 	}
-	utils.ClearLines(phase1Lines)
+	utils.ClearLines(phase1Lines + 1) // sub-lines + running header
+	utils.PrintInfo("Phase 1: Checking prerequisites")
 
 	var hadErrors bool
 
@@ -149,59 +150,55 @@ func Check(ghToken string, appVersion string) {
 	gh := github.NewClient(ghToken)
 	tools := registry.New().ForPlatform(p.OS.String())
 
-	headers := []string{"Tool", "Current", "Latest", "Status"}
-	var rows [][]string
-
-	cpsRow := []string{"cps", appVersion, "unknown", "up-to-date"}
-	if rel, err := gh.LatestRelease("Tanq16/cli-productivity-suite"); err == nil {
-		cpsRow[2] = rel.TagName
-		if appVersion == "dev-build" {
-			cpsRow[3] = "dev build"
-		} else if appVersion != rel.TagName {
-			cpsRow[3] = "update available"
-		}
-	}
-	if cpsRow[3] != "up-to-date" {
-		rows = append(rows, cpsRow)
-	}
-
+	var checkable []registry.Tool
 	for _, t := range tools {
 		if t.IsPrivate && ghToken == "" {
 			continue
 		}
-		current := st.ToolVersion(t.Name)
-		if current == "" {
-			continue
-		}
-		inst := installer.Dispatch(t.Kind)
-		if inst == nil {
-			continue
-		}
-		cur, lat, err := inst.Check(&t, p, gh, st)
-		if err != nil {
-			rows = append(rows, []string{t.Name, cur, "error", err.Error()})
-			continue
-		}
-		switch lat {
-		case "skipped", "system-managed", "check-manually", "git-managed":
-			continue
-		case "not-deployed":
-			rows = append(rows, []string{t.Name, cur, lat, "not deployed"})
-		case "config-differs":
-			rows = append(rows, []string{t.Name, cur, lat, "config differs"})
-		default:
-			if cur != lat && lat != "" {
-				rows = append(rows, []string{t.Name, cur, lat, "update available"})
-			}
+		checkable = append(checkable, t)
+	}
+
+	utils.PrintRunning("Checking tools")
+
+	// Check CPS version inline
+	var cpsResult *CheckResult
+	if rel, err := gh.LatestRelease("Tanq16/cli-productivity-suite"); err == nil {
+		if appVersion == "dev-build" {
+			cpsResult = &CheckResult{Current: appVersion, Latest: rel.TagName, Status: "update"}
+		} else if appVersion != rel.TagName {
+			cpsResult = &CheckResult{Current: appVersion, Latest: rel.TagName, Status: "update"}
 		}
 	}
 
-	if len(rows) == 0 {
+	results := checkTools(checkable, p, gh, st)
+	utils.ClearLines(1)
+
+	hasResults := len(results) > 0 || cpsResult != nil
+	if !hasResults {
 		utils.PrintSuccess("everything is up to date")
 		return
 	}
 
-	utils.PrintTable(headers, rows)
+	utils.PrintInfo("Check complete")
+	if cpsResult != nil {
+		if appVersion == "dev-build" {
+			utils.PrintIndentedWarn(fmt.Sprintf("cps: dev build (latest: %s)", cpsResult.Latest), nil)
+		} else {
+			utils.PrintIndentedWarn(fmt.Sprintf("cps: update available (%s → %s)", cpsResult.Current, cpsResult.Latest), nil)
+		}
+	}
+	for _, r := range results {
+		switch r.Status {
+		case "update":
+			utils.PrintIndentedWarn(fmt.Sprintf("%s: update available (%s → %s)", r.Tool.Name, r.Current, r.Latest), nil)
+		case "error":
+			utils.PrintIndentedError(fmt.Sprintf("%s: check failed: %s", r.Tool.Name, r.Err), nil)
+		case "config-differs":
+			utils.PrintIndentedWarn(fmt.Sprintf("%s: config differs", r.Tool.Name), nil)
+		case "not-deployed":
+			utils.PrintIndentedWarn(fmt.Sprintf("%s: not deployed", r.Tool.Name), nil)
+		}
+	}
 }
 
 func Update(ghToken string, includeConf bool) {
@@ -218,7 +215,8 @@ func Update(ghToken string, includeConf bool) {
 	gh := github.NewClient(ghToken)
 	tools := registry.New().ForPlatform(p.OS.String())
 
-	var updatable []registry.Tool
+	// Pre-filter: skip private without token, skip system/cloud/runtime, skip config unless --include-conf
+	var checkable []registry.Tool
 	for _, t := range tools {
 		if t.IsPrivate && ghToken == "" {
 			continue
@@ -226,23 +224,27 @@ func Update(ghToken string, includeConf bool) {
 		if st.ToolVersion(t.Name) == "" {
 			continue
 		}
-		if t.Kind == registry.ConfigFile && !includeConf {
-			continue
-		}
 		switch t.Kind {
 		case registry.SystemPackage, registry.CloudCLI, registry.LanguageRuntime:
 			continue
 		case registry.ConfigFile:
-			inst := installer.Dispatch(t.Kind)
-			if inst == nil {
+			if !includeConf {
 				continue
 			}
-			_, lat, _ := inst.Check(&t, p, gh, st)
-			if lat == "config-differs" || lat == "not-deployed" {
-				updatable = append(updatable, t)
-			}
-		default:
-			updatable = append(updatable, t)
+		}
+		checkable = append(checkable, t)
+	}
+
+	utils.PrintRunning("Checking tools")
+	results := checkTools(checkable, p, gh, st)
+	utils.ClearLines(1)
+
+	// Extract tools where status is actionable
+	var updatable []registry.Tool
+	for _, r := range results {
+		switch r.Status {
+		case "update", "config-differs", "not-deployed":
+			updatable = append(updatable, r.Tool)
 		}
 	}
 
@@ -288,7 +290,7 @@ func Install(toolName string, ghToken string) {
 	}
 
 	if ToolNeedsSudo(*tool, p) {
-		utils.PrintInfo("authenticating sudo")
+		utils.PrintRunning("authenticating sudo")
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
@@ -300,10 +302,13 @@ func Install(toolName string, ghToken string) {
 		utils.PrintFatal(fmt.Sprintf("no installer for kind: %s", tool.Kind), nil)
 	}
 
+	utils.PrintRunning("installing " + toolName)
 	st.Remove(tool.Name)
 	result := inst.Install(tool, p, gh, st)
+	utils.ClearLines(1)
+
 	if result.Err != nil {
-		utils.PrintFatal(fmt.Sprintf("install failed for %s", toolName), result.Err)
+		utils.PrintFatal(fmt.Sprintf("%s: install failed", toolName), result.Err)
 	}
 
 	if err := st.Save(); err != nil {
@@ -320,10 +325,13 @@ func SelfUpdate(appVersion string) {
 	}
 
 	gh := github.NewClient("")
+
+	utils.PrintRunning("checking latest version")
 	release, err := gh.LatestRelease("Tanq16/cli-productivity-suite")
 	if err != nil {
 		utils.PrintFatal("failed to check latest version", err)
 	}
+	utils.ClearLines(1)
 
 	if appVersion == release.TagName {
 		utils.PrintSuccess(fmt.Sprintf("already at latest version %s", appVersion))
@@ -342,12 +350,13 @@ func SelfUpdate(appVersion string) {
 		utils.PrintFatal(fmt.Sprintf("no release asset found for %s", assetName), nil)
 	}
 
-	utils.PrintInfo("authenticating sudo")
+	utils.PrintRunning("authenticating sudo")
 	if err := EnsureSudo(); err != nil {
 		utils.PrintFatal("sudo authentication failed", err)
 	}
 	utils.ClearLines(1)
 
+	utils.PrintRunning(fmt.Sprintf("downloading %s", release.TagName))
 	tmpDir, err := os.MkdirTemp("", "cps-self-update-*")
 	if err != nil {
 		utils.PrintFatal("failed to create temp dir", err)
@@ -367,8 +376,9 @@ func SelfUpdate(appVersion string) {
 	if err := cmd.Run(); err != nil {
 		utils.PrintFatal("failed to replace binary", err)
 	}
+	utils.ClearLines(1)
 
-	utils.PrintSuccess(fmt.Sprintf("updated cps: %s -> %s", appVersion, release.TagName))
+	utils.PrintSuccess(fmt.Sprintf("updated cps: %s → %s", appVersion, release.TagName))
 }
 
 func Clean() {
@@ -416,11 +426,42 @@ func Clean() {
 	utils.PrintSuccess("clean complete")
 }
 
+func checkTools(tools []registry.Tool, p platform.Platform, gh *github.Client, st *state.State) []CheckResult {
+	var results []CheckResult
+	for _, t := range tools {
+		if st.ToolVersion(t.Name) == "" {
+			continue
+		}
+		inst := installer.Dispatch(t.Kind)
+		if inst == nil {
+			continue
+		}
+		cur, lat, err := inst.Check(&t, p, gh, st)
+		if err != nil {
+			results = append(results, CheckResult{Tool: t, Current: cur, Latest: "", Status: "error", Err: err})
+			continue
+		}
+		switch lat {
+		case "skipped", "system-managed", "check-manually", "git-managed", "up-to-date":
+			continue
+		case "not-deployed":
+			results = append(results, CheckResult{Tool: t, Current: cur, Latest: lat, Status: "not-deployed"})
+		case "config-differs":
+			results = append(results, CheckResult{Tool: t, Current: cur, Latest: lat, Status: "config-differs"})
+		default:
+			if cur != lat && lat != "" {
+				results = append(results, CheckResult{Tool: t, Current: cur, Latest: lat, Status: "update"})
+			}
+		}
+	}
+	return results
+}
+
 func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *github.Client, st *state.State) bool {
 	if len(tools) == 0 {
 		return false
 	}
-	utils.PrintInfo(phaseName)
+	utils.PrintRunning("(Running) " + phaseName)
 
 	var lineCount int
 	var errors []jobResult
@@ -428,41 +469,46 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 	for _, t := range tools {
 		inst := installer.Dispatch(t.Kind)
 		if inst == nil {
-			utils.PrintError(t.Name, fmt.Errorf("no installer for kind: %s", t.Kind))
+			utils.PrintIndentedError(t.Name+": no installer for kind: "+t.Kind.String(), nil)
 			errors = append(errors, jobResult{name: t.Name, err: fmt.Errorf("no installer for kind: %s", t.Kind)})
 			lineCount++
 			continue
 		}
 		result := inst.Install(&t, p, gh, st)
 		if result.Err != nil {
-			utils.PrintError(t.Name, result.Err)
+			utils.PrintIndentedError(fmt.Sprintf("%s: %s", t.Name, result.Err), nil)
 			errors = append(errors, jobResult{name: t.Name, err: result.Err})
 		} else if result.Skipped {
-			utils.PrintSuccess(fmt.Sprintf("%s: already at %s", t.Name, result.Version))
+			utils.PrintIndentedSuccess(fmt.Sprintf("%s: already at %s", t.Name, result.Version))
 		} else if result.WasUpdated {
-			utils.PrintSuccess(fmt.Sprintf("%s: updated to %s", t.Name, result.Version))
+			utils.PrintIndentedSuccess(fmt.Sprintf("%s: updated to %s", t.Name, result.Version))
 		} else {
-			utils.PrintSuccess(fmt.Sprintf("%s: installed %s", t.Name, result.Version))
+			utils.PrintIndentedSuccess(fmt.Sprintf("%s: installed %s", t.Name, result.Version))
 		}
 		lineCount++
 	}
 
-	utils.ClearLines(lineCount)
-	for _, e := range errors {
-		utils.PrintError(e.name, e.err)
+	utils.ClearLines(lineCount + 1) // tool lines + running header
+	if len(errors) > 0 {
+		utils.PrintError(phaseName+": partially completed with errors", nil)
+		for _, e := range errors {
+			utils.PrintIndentedError(fmt.Sprintf("%s: %s", e.name, e.err), nil)
+		}
+	} else {
+		utils.PrintInfo(phaseName)
 	}
 
 	return len(errors) > 0
 }
 
 func runPostInstall(p platform.Platform) {
-	utils.PrintInfo("Phase 12: Post-install tasks")
+	utils.PrintRunning("(Running) Phase 12: Post-install tasks")
 	var lineCount int
 	var errors []jobResult
 
 	tpmInstall := filepath.Join(p.HomeDir, ".tmux", "plugins", "tpm", "bin", "install_plugins")
 	if _, err := os.Stat(tpmInstall); err == nil {
-		utils.PrintInfo("tpm-install: running")
+		utils.PrintIndentedRunning("tpm-install: running")
 		lineCount++
 		tpmCmd := exec.Command("bash", tpmInstall)
 		tpmCmd.Env = append(os.Environ(), fmt.Sprintf("TMUX_PLUGIN_MANAGER_PATH=%s", filepath.Join(p.HomeDir, ".tmux", "plugins")))
@@ -472,7 +518,7 @@ func runPostInstall(p platform.Platform) {
 	}
 
 	if _, err := exec.LookPath("nvim"); err == nil {
-		utils.PrintInfo("nvchad-setup: running")
+		utils.PrintIndentedRunning("nvchad-setup: running")
 		lineCount++
 		nvimCmd := exec.Command("nvim", "--headless", "+MasonInstallAll", "+Lazy sync", "+qa")
 		if err := utils.RunCmd(nvimCmd); err != nil {
@@ -480,9 +526,14 @@ func runPostInstall(p platform.Platform) {
 		}
 	}
 
-	utils.ClearLines(lineCount)
-	for _, e := range errors {
-		utils.PrintError(e.name, e.err)
+	utils.ClearLines(lineCount + 1) // sub-lines + running header
+	if len(errors) > 0 {
+		utils.PrintError("Phase 12: partially completed with errors", nil)
+		for _, e := range errors {
+			utils.PrintIndentedError(fmt.Sprintf("%s: %s", e.name, e.err), nil)
+		}
+	} else {
+		utils.PrintInfo("Phase 12: Post-install tasks")
 	}
 }
 
