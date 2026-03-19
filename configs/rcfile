@@ -58,6 +58,7 @@ alias gitn='git --no-pager'
 alias awsn='aws --no-cli-pager'
 alias tt='tmux -u new -s default'
 alias t='tmux -u a -t default'
+alias a=anbu
 alias ts='tmux -u new -s'
 alias ta='tmux -u a -t'
 alias tls='tmux list-sessions'
