@@ -45,18 +45,23 @@ func Init(ghToken string) {
 	if err := os.MkdirAll(p.ShellExecDir(), 0755); err != nil {
 		utils.PrintFatal(fmt.Sprintf("failed to create %s", p.ShellExecDir()), err)
 	}
-	var phase1Lines int
 	utils.PrintIndentedSuccess("prerequisites OK")
-	phase1Lines++
 
 	if PhaseNeedsSudo(p, registry.SystemPackage, registry.CloudCLI, registry.LanguageRuntime) {
-		utils.PrintIndentedRunning("authenticating sudo")
-		phase1Lines++
+		cached := exec.Command("sudo", "-n", "-v").Run() == nil
+		utils.ClearLines(2)
+		utils.PrintRunning("(Running) Phase 1: Authenticating sudo")
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
+		if cached {
+			utils.ClearLines(1)
+		} else {
+			utils.ClearLines(2)
+		}
+	} else {
+		utils.ClearLines(2)
 	}
-	utils.ClearLines(phase1Lines + 1) // sub-lines + running header
 	utils.PrintInfo("Phase 1: Checking prerequisites")
 
 	var hadErrors bool
