@@ -37,7 +37,7 @@ func Init(ghToken string) {
 		utils.PrintFatal(msg, nil)
 	}
 	if _, err := exec.LookPath("git"); err != nil {
-		utils.PrintFatal("git not found in PATH", nil)
+		utils.PrintFatal("git not found in PATH", err)
 	}
 	if err := os.MkdirAll(p.ShellDir(), 0755); err != nil {
 		utils.PrintFatal(fmt.Sprintf("failed to create %s", p.ShellDir()), err)
@@ -192,7 +192,7 @@ func Check(ghToken string, appVersion string) {
 		case "update":
 			utils.PrintIndentedWarn(fmt.Sprintf("%s: update available (%s → %s)", r.Tool.Name, r.Current, r.Latest), nil)
 		case "error":
-			utils.PrintIndentedError(fmt.Sprintf("%s: check failed: %s", r.Tool.Name, r.Err), nil)
+			utils.PrintIndentedError(fmt.Sprintf("%s: check failed", r.Tool.Name), r.Err)
 		case "config-differs":
 			utils.PrintIndentedWarn(fmt.Sprintf("%s: config differs", r.Tool.Name), nil)
 		case "not-deployed":
@@ -371,10 +371,23 @@ func SelfUpdate(appVersion string) {
 		utils.PrintFatal("chmod failed", err)
 	}
 
-	destPath := "/usr/local/bin/cps"
-	cmd := exec.Command("sudo", "cp", tmpBinary, destPath)
-	if err := cmd.Run(); err != nil {
-		utils.PrintFatal("failed to replace binary", err)
+	destPath, err := exec.LookPath("cps")
+	if err != nil {
+		destPath = "/usr/local/bin/cps"
+	}
+	rmCmd := exec.Command("sudo", "rm", "-f", destPath)
+	if err := rmCmd.Run(); err != nil {
+		utils.PrintFatal(fmt.Sprintf("failed to remove old binary at %s", destPath), err)
+	}
+	cpCmd := exec.Command("sudo", "cp", tmpBinary, destPath)
+	var stderr strings.Builder
+	cpCmd.Stderr = &stderr
+	if err := cpCmd.Run(); err != nil {
+		detail := strings.TrimSpace(stderr.String())
+		if detail != "" {
+			err = fmt.Errorf("%s: %w", detail, err)
+		}
+		utils.PrintFatal(fmt.Sprintf("failed to install binary at %s", destPath), err)
 	}
 	utils.ClearLines(1)
 
@@ -476,7 +489,7 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 		}
 		result := inst.Install(&t, p, gh, st)
 		if result.Err != nil {
-			utils.PrintIndentedError(fmt.Sprintf("%s: %s", t.Name, result.Err), nil)
+			utils.PrintIndentedError(t.Name, result.Err)
 			errors = append(errors, jobResult{name: t.Name, err: result.Err})
 		} else if result.Skipped {
 			utils.PrintIndentedSuccess(fmt.Sprintf("%s: already at %s", t.Name, result.Version))
@@ -492,7 +505,7 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 	if len(errors) > 0 {
 		utils.PrintError(phaseName+": partially completed with errors", nil)
 		for _, e := range errors {
-			utils.PrintIndentedError(fmt.Sprintf("%s: %s", e.name, e.err), nil)
+			utils.PrintIndentedError(e.name, e.err)
 		}
 	} else {
 		utils.PrintInfo(phaseName)
@@ -530,7 +543,7 @@ func runPostInstall(p platform.Platform) {
 	if len(errors) > 0 {
 		utils.PrintError("Phase 12: partially completed with errors", nil)
 		for _, e := range errors {
-			utils.PrintIndentedError(fmt.Sprintf("%s: %s", e.name, e.err), nil)
+			utils.PrintIndentedError(e.name, e.err)
 		}
 	} else {
 		utils.PrintInfo("Phase 12: Post-install tasks")
