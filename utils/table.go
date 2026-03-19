@@ -11,10 +11,12 @@ import (
 var (
 	headerStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.ANSIColor(5))
+			Foreground(lipgloss.ANSIColor(15)).
+			Padding(0, 1)
 
-	evenRowStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.ANSIColor(8))
+	cellStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.ANSIColor(7)).
+			Padding(0, 1)
 
 	borderStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.ANSIColor(8))
@@ -35,10 +37,7 @@ func PrintTable(headers []string, rows [][]string) {
 			if row == table.HeaderRow {
 				return headerStyle
 			}
-			if row%2 == 0 {
-				return evenRowStyle
-			}
-			return lipgloss.NewStyle()
+			return cellStyle
 		})
 
 	PrintGeneric(t.Render())

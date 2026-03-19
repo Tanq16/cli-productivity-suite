@@ -23,6 +23,9 @@ var rootCmd = &cobra.Command{
 	Short:             "CLI Productivity Suite — manage your dev environment",
 	Version:           AppVersion,
 	CompletionOptions: cobra.CompletionOptions{HiddenDefaultCmd: true},
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		resolveGHToken()
+	},
 }
 
 func Execute() {
@@ -46,7 +49,7 @@ func init() {
 	rootCmd.AddCommand(installCmd)
 	rootCmd.AddCommand(updateCmd)
 
-	cobra.OnInitialize(setupLogs, resolveGHToken)
+	cobra.OnInitialize(setupLogs)
 }
 
 func resolveGHToken() {

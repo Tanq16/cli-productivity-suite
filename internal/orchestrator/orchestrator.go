@@ -417,7 +417,7 @@ func runPhase(ctx context.Context, disp *display.Display, phaseName string, tool
 	if len(tools) == 0 {
 		return
 	}
-	hw := highway.New(workers, "")
+	hw := highway.New(workers)
 	jobs := make([]highway.Job, len(tools))
 	for i, t := range tools {
 		jobs[i] = NewInstallJob(t, p, gh, st)

@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	infoStyle    = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(4))
-	successStyle = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(2))
-	errorStyle   = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(1))
-	warnStyle    = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(3))
+	infoStyle    = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(12))
+	successStyle = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(10))
+	errorStyle   = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(9))
+	warnStyle    = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(11))
 )
 
 func PrintInfo(msg string) {

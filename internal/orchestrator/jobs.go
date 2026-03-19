@@ -2,7 +2,6 @@ package orchestrator
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/tanq16/cli-productivity-suite/internal/github"
@@ -24,20 +23,17 @@ func NewInstallJob(tool registry.Tool, p platform.Platform, gh *github.Client, s
 	return &InstallJob{tool: tool, p: p, gh: gh, st: st}
 }
 
-func (j *InstallJob) ID() string   { return j.tool.Name }
-func (j *InstallJob) Type() string { return j.tool.Kind.String() }
-
-func (j *InstallJob) Marshal() ([]byte, error) {
-	return json.Marshal(struct {
-		ToolName string `json:"tool_name"`
-	}{ToolName: j.tool.Name})
-}
+func (j *InstallJob) ID() string { return j.tool.Name }
 
 func (j *InstallJob) Run(ctx context.Context, progress chan<- highway.Progress) error {
 	progress <- highway.Progress{
 		JobID:     j.tool.Name,
 		SubStatus: "installing",
 		Type:      highway.ProgressTypeSubStatus,
+	}
+
+	if ctx.Err() != nil {
+		return ctx.Err()
 	}
 
 	inst := installer.Dispatch(j.tool.Kind)

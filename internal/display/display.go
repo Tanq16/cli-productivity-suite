@@ -15,11 +15,11 @@ import (
 )
 
 var (
-	phaseStyle   = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(5)).Bold(true)
-	runningStyle = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(4))
-	doneStyle    = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(2))
-	errStyle     = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(1))
-	skipStyle    = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(8))
+	phaseStyle   = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(12)).Bold(true)
+	runningStyle = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(10))
+	doneStyle    = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(10))
+	errStyle     = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(9))
+	skipStyle    = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(7))
 )
 
 type jobState struct {

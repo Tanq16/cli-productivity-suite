@@ -2,7 +2,6 @@ package highway
 
 import (
 	"context"
-	"encoding/json"
 	"sync"
 
 	"golang.org/x/sync/errgroup"
@@ -10,17 +9,11 @@ import (
 
 type Job interface {
 	ID() string
-	Type() string
 	Run(ctx context.Context, progress chan<- Progress) error
-	Marshal() ([]byte, error)
 }
 
-type JobUnmarshaler func(data []byte) (Job, error)
-
 type Highway struct {
-	workers      int
-	statePath    string
-	unmarshalers map[string]JobUnmarshaler
+	workers int
 
 	mu        sync.Mutex
 	pending   []Job
@@ -28,21 +21,15 @@ type Highway struct {
 	progress  chan Progress
 }
 
-func New(workers int, statePath string) *Highway {
+func New(workers int) *Highway {
 	if workers < 1 {
 		workers = 1
 	}
 	return &Highway{
-		workers:      workers,
-		statePath:    statePath,
-		unmarshalers: make(map[string]JobUnmarshaler),
-		completed:    make(map[string]bool),
-		progress:     make(chan Progress, 100),
+		workers:   workers,
+		completed: make(map[string]bool),
+		progress:  make(chan Progress, 100),
 	}
-}
-
-func (h *Highway) RegisterType(jobType string, unmarshal JobUnmarshaler) {
-	h.unmarshalers[jobType] = unmarshal
 }
 
 func (h *Highway) Submit(jobs ...Job) {
@@ -75,12 +62,6 @@ func (h *Highway) Run(ctx context.Context) error {
 
 	err := g.Wait()
 	close(h.progress)
-
-	if ctx.Err() != nil {
-		h.saveState()
-		return ctx.Err()
-	}
-	h.deleteState()
 	return err
 }
 
@@ -129,27 +110,4 @@ func (h *Highway) markFailed(id string) {
 
 func (h *Highway) JobCount() int {
 	return len(h.pending)
-}
-
-// LoadState is a no-op; state persistence is not used in this project
-func (h *Highway) LoadState() error {
-	return nil
-}
-
-func (h *Highway) saveState() error {
-	return nil
-}
-
-func (h *Highway) deleteState() {
-}
-
-type persistedState struct {
-	Completed []string       `json:"completed"`
-	Pending   []persistedJob `json:"pending"`
-}
-
-type persistedJob struct {
-	ID   string          `json:"id"`
-	Type string          `json:"type"`
-	Data json.RawMessage `json:"data"`
 }
