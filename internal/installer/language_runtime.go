@@ -62,7 +62,7 @@ func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.
 	defer os.RemoveAll(tmpDir)
 
 	tarPath := filepath.Join(tmpDir, "nvim.tar.gz")
-	if err := downloadToFile(url, tarPath); err != nil {
+	if err := DownloadToFile(url, tarPath); err != nil {
 		return Result{Tool: "neovim", Err: fmt.Errorf("download failed: %w", err)}
 	}
 
@@ -154,7 +154,7 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 	defer os.RemoveAll(tmpDir)
 
 	tarPath := filepath.Join(tmpDir, "go.tar.gz")
-	if err := downloadToFile(downloadURL, tarPath); err != nil {
+	if err := DownloadToFile(downloadURL, tarPath); err != nil {
 		return Result{Tool: "go-sdk", Err: err}
 	}
 

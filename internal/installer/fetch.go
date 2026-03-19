@@ -14,7 +14,7 @@ func httpGet(url string) (*http.Response, error) {
 	return httpClient.Get(url)
 }
 
-func downloadToFile(url, destPath string) error {
+func DownloadToFile(url, destPath string) error {
 	resp, err := httpGet(url)
 	if err != nil {
 		return err

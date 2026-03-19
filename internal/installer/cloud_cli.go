@@ -55,7 +55,7 @@ func (c *CloudCLIInstaller) installAWSCLI(p platform.Platform, st *state.State) 
 		defer os.RemoveAll(tmpDir)
 
 		zipPath := filepath.Join(tmpDir, "awscliv2.zip")
-		if err := downloadToFile(url, zipPath); err != nil {
+		if err := DownloadToFile(url, zipPath); err != nil {
 			return Result{Tool: "aws-cli", Err: err}
 		}
 		if err := ExtractZip(zipPath, tmpDir); err != nil {
@@ -107,7 +107,7 @@ func (c *CloudCLIInstaller) installGcloudCLI(p platform.Platform, st *state.Stat
 	url := fmt.Sprintf("https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-%s-%s.tar.gz", p.OS.String(), archStr)
 
 	tarPath := filepath.Join(tmpDir, "gcloud.tar.gz")
-	if err := downloadToFile(url, tarPath); err != nil {
+	if err := DownloadToFile(url, tarPath); err != nil {
 		return Result{Tool: "gcloud-cli", Err: err}
 	}
 

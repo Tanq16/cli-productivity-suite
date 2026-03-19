@@ -24,6 +24,7 @@ A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driv
 | Setup | `cps init` | Full environment setup - system packages, ~50 tools, cloud CLIs, language runtimes, shell plugins, and config files |
 | Monitoring | `cps check` | Compare installed versions against latest releases |
 | Updates | `cps update`, `cps install <tool>` | Update all installed tools or install a single tool by name |
+| Self-update | `cps self-update` | Update cps itself to the latest release |
 | Maintenance | `cps clean` | Remove all CPS-managed files and directories |
 
 ## Installation
@@ -70,27 +71,32 @@ cps init --gh-token YOUR_GITHUB_PAT
 
 ### `check`
 
-Compare installed tool versions against latest releases.
+Compare installed tool versions against latest releases. Only shows actionable items (tools needing update, config diffs, errors). Private tools are automatically included when a GitHub token is available.
 
 ```bash
-cps check              # All installed tools
-cps check --public     # Public tools only
-cps check --private    # Private tools only
-cps check --system     # System packages only
+cps check
 ```
 
 ### `update`
 
-Update installed tools to their latest versions.
+Update installed tools to their latest versions. Skips system packages, cloud CLIs, and language runtimes (use `cps init` for those).
 
 ```bash
-cps update             # Update all
-cps update --public    # Public tools only
+cps update                  # Update all
+cps update --include-conf   # Also overwrite deployed config files
+```
+
+### `self-update`
+
+Update cps itself to the latest release (requires sudo).
+
+```bash
+cps self-update
 ```
 
 ### `install`
 
-Install or update a single tool by name.
+Force install a single tool by name (reinstalls regardless of current version).
 
 ```bash
 cps install bat
@@ -130,6 +136,10 @@ cps clean
 The `cps clean` command performs a superficial cleanup of CPS-managed directories. For a full removal of everything CPS installs, follow these steps:
 
 **Step 1** - Run `cps clean` to remove the primary managed directories (`~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.nvm`, `~/nuclei-templates`, `~/google-cloud-sdk`, `~/.config/cps`):
+
+```bash
+cps clean
+```
 
 **Step 2** - Remove remaining configs, data directories, Oh My Zsh, and system-level installs:
 

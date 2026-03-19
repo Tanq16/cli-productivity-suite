@@ -16,21 +16,6 @@ import (
 	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
-type CheckConfig struct {
-	Public  bool
-	Private bool
-	System  bool
-	All     bool
-}
-
-type UpdateConfig struct {
-	Public      bool
-	Private     bool
-	System      bool
-	All         bool
-	IncludeConf bool
-}
-
 func Init(ghToken string) {
 	p, err := platform.Detect()
 	if err != nil {
@@ -70,7 +55,6 @@ func Init(ghToken string) {
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
-		phase1Lines++
 	}
 	utils.ClearLines(phase1Lines)
 
@@ -151,7 +135,7 @@ func Init(ghToken string) {
 	}
 }
 
-func Check(ghToken string, appVersion string, cfg CheckConfig) {
+func Check(ghToken string, appVersion string) {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
@@ -163,31 +147,7 @@ func Check(ghToken string, appVersion string, cfg CheckConfig) {
 	}
 
 	gh := github.NewClient(ghToken)
-	reg := registry.New()
-
-	if !cfg.Public && !cfg.Private && !cfg.System {
-		cfg.All = true
-	}
-
-	var tools []registry.Tool
-	if cfg.All {
-		tools = reg.ForPlatform(p.OS.String())
-	} else {
-		if cfg.Public {
-			tools = append(tools, reg.ByCategory(registry.Public)...)
-		}
-		if cfg.Private {
-			tools = append(tools, reg.ByCategory(registry.Private)...)
-		}
-		if cfg.System {
-			tools = append(tools, reg.ByCategory(registry.System)...)
-		}
-	}
-
-	if len(tools) == 0 {
-		utils.PrintWarn("no tools to check", nil)
-		return
-	}
+	tools := registry.New().ForPlatform(p.OS.String())
 
 	headers := []string{"Tool", "Current", "Latest", "Status"}
 	var rows [][]string
@@ -206,6 +166,9 @@ func Check(ghToken string, appVersion string, cfg CheckConfig) {
 	}
 
 	for _, t := range tools {
+		if t.IsPrivate && ghToken == "" {
+			continue
+		}
 		current := st.ToolVersion(t.Name)
 		if current == "" {
 			continue
@@ -241,7 +204,7 @@ func Check(ghToken string, appVersion string, cfg CheckConfig) {
 	utils.PrintTable(headers, rows)
 }
 
-func Update(ghToken string, cfg UpdateConfig) {
+func Update(ghToken string, includeConf bool) {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
@@ -253,33 +216,17 @@ func Update(ghToken string, cfg UpdateConfig) {
 	}
 
 	gh := github.NewClient(ghToken)
-	reg := registry.New()
-
-	if !cfg.Public && !cfg.Private && !cfg.System {
-		cfg.All = true
-	}
-
-	var tools []registry.Tool
-	if cfg.All {
-		tools = reg.ForPlatform(p.OS.String())
-	} else {
-		if cfg.Public {
-			tools = append(tools, reg.ByCategory(registry.Public)...)
-		}
-		if cfg.Private {
-			tools = append(tools, reg.ByCategory(registry.Private)...)
-		}
-		if cfg.System {
-			tools = append(tools, reg.ByCategory(registry.System)...)
-		}
-	}
+	tools := registry.New().ForPlatform(p.OS.String())
 
 	var updatable []registry.Tool
 	for _, t := range tools {
+		if t.IsPrivate && ghToken == "" {
+			continue
+		}
 		if st.ToolVersion(t.Name) == "" {
 			continue
 		}
-		if t.Kind == registry.ConfigFile && !cfg.IncludeConf {
+		if t.Kind == registry.ConfigFile && !includeConf {
 			continue
 		}
 		switch t.Kind {
@@ -302,21 +249,6 @@ func Update(ghToken string, cfg UpdateConfig) {
 	if len(updatable) == 0 {
 		utils.PrintSuccess("everything is up to date")
 		return
-	}
-
-	needsSudo := false
-	for _, t := range updatable {
-		if ToolNeedsSudo(t, p) {
-			needsSudo = true
-			break
-		}
-	}
-	if needsSudo {
-		utils.PrintInfo("authenticating sudo")
-		if err := EnsureSudo(); err != nil {
-			utils.PrintFatal("sudo authentication failed", err)
-		}
-		utils.ClearLines(2)
 	}
 
 	hasErrors := runPhase("Updating tools", updatable, p, gh, st)
@@ -360,7 +292,7 @@ func Install(toolName string, ghToken string) {
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
-		utils.ClearLines(2)
+		utils.ClearLines(1)
 	}
 
 	inst := installer.Dispatch(tool.Kind)
@@ -379,6 +311,64 @@ func Install(toolName string, ghToken string) {
 	}
 
 	utils.PrintSuccess(fmt.Sprintf("%s: installed %s", toolName, result.Version))
+}
+
+func SelfUpdate(appVersion string) {
+	p, err := platform.Detect()
+	if err != nil {
+		utils.PrintFatal("platform detection failed", err)
+	}
+
+	gh := github.NewClient("")
+	release, err := gh.LatestRelease("Tanq16/cli-productivity-suite")
+	if err != nil {
+		utils.PrintFatal("failed to check latest version", err)
+	}
+
+	if appVersion == release.TagName {
+		utils.PrintSuccess(fmt.Sprintf("already at latest version %s", appVersion))
+		return
+	}
+
+	assetName := fmt.Sprintf("cps-%s-%s", p.OS.String(), p.Arch.String())
+	var downloadURL string
+	for _, a := range release.Assets {
+		if a.Name == assetName {
+			downloadURL = a.BrowserDownloadURL
+			break
+		}
+	}
+	if downloadURL == "" {
+		utils.PrintFatal(fmt.Sprintf("no release asset found for %s", assetName), nil)
+	}
+
+	utils.PrintInfo("authenticating sudo")
+	if err := EnsureSudo(); err != nil {
+		utils.PrintFatal("sudo authentication failed", err)
+	}
+	utils.ClearLines(1)
+
+	tmpDir, err := os.MkdirTemp("", "cps-self-update-*")
+	if err != nil {
+		utils.PrintFatal("failed to create temp dir", err)
+	}
+	defer os.RemoveAll(tmpDir)
+
+	tmpBinary := filepath.Join(tmpDir, "cps")
+	if err := installer.DownloadToFile(downloadURL, tmpBinary); err != nil {
+		utils.PrintFatal("download failed", err)
+	}
+	if err := os.Chmod(tmpBinary, 0755); err != nil {
+		utils.PrintFatal("chmod failed", err)
+	}
+
+	destPath := "/usr/local/bin/cps"
+	cmd := exec.Command("sudo", "cp", tmpBinary, destPath)
+	if err := cmd.Run(); err != nil {
+		utils.PrintFatal("failed to replace binary", err)
+	}
+
+	utils.PrintSuccess(fmt.Sprintf("updated cps: %s -> %s", appVersion, release.TagName))
 }
 
 func Clean() {

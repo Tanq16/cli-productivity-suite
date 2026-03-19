@@ -6,10 +6,10 @@ import (
 	"github.com/tanq16/cli-productivity-suite/internal/runner"
 )
 
-var checkCmd = &cobra.Command{
-	Use:   "check",
-	Short: "Check for available updates",
+var selfUpdateCmd = &cobra.Command{
+	Use:   "self-update",
+	Short: "Update cps itself to the latest release",
 	Run: func(cmd *cobra.Command, args []string) {
-		runner.Check(ghToken, AppVersion)
+		runner.SelfUpdate(AppVersion)
 	},
 }
