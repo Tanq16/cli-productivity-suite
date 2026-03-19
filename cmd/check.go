@@ -23,7 +23,7 @@ var checkCmd = &cobra.Command{
 			System:  checkFlags.System,
 			All:     checkFlags.All,
 		}
-		runner.Check(cmd.Context(), ghToken, AppVersion, cfg)
+		runner.Check(ghToken, AppVersion, cfg)
 	},
 }
 

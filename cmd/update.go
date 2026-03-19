@@ -25,7 +25,7 @@ var updateCmd = &cobra.Command{
 			All:         updateFlags.All,
 			IncludeConf: updateFlags.IncludeConf,
 		}
-		runner.Update(cmd.Context(), ghToken, cfg)
+		runner.Update(ghToken, cfg)
 	},
 }
 

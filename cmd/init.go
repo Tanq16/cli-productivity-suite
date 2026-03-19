@@ -10,6 +10,6 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize full dev environment setup",
 	Run: func(cmd *cobra.Command, args []string) {
-		runner.Init(cmd.Context(), ghToken)
+		runner.Init(ghToken)
 	},
 }
