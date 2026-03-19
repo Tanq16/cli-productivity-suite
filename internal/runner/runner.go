@@ -300,11 +300,16 @@ func Install(toolName string, ghToken string) {
 	}
 
 	if ToolNeedsSudo(*tool, p) {
+		cached := exec.Command("sudo", "-n", "-v").Run() == nil
 		utils.PrintRunning("authenticating sudo")
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
-		utils.ClearLines(1)
+		if cached {
+			utils.ClearLines(1)
+		} else {
+			utils.ClearLines(2)
+		}
 	}
 
 	inst := installer.Dispatch(tool.Kind)
@@ -360,11 +365,16 @@ func SelfUpdate(appVersion string) {
 		utils.PrintFatal(fmt.Sprintf("no release asset found for %s", assetName), nil)
 	}
 
+	cached := exec.Command("sudo", "-n", "-v").Run() == nil
 	utils.PrintRunning("authenticating sudo")
 	if err := EnsureSudo(); err != nil {
 		utils.PrintFatal("sudo authentication failed", err)
 	}
-	utils.ClearLines(1)
+	if cached {
+		utils.ClearLines(1)
+	} else {
+		utils.ClearLines(2)
+	}
 
 	utils.PrintRunning(fmt.Sprintf("downloading %s", release.TagName))
 	tmpDir, err := os.MkdirTemp("", "cps-self-update-*")
