@@ -53,6 +53,7 @@ make build
 
 - [Oh My Zsh](https://ohmyz.sh/) must be installed before running `cps init`
 - Git must be available in PATH
+- **macOS only:** [Homebrew](https://brew.sh/) must be installed for system package installation
 - Install a nerd font for your terminal emulator - recommended: [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip)
 
 ## Usage

@@ -80,7 +80,7 @@ var AllTools = []Tool{
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
 			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "tar.gz",
+			ArchiveFormat:       "zip",
 			BinaryPathInArchive: "*/bin/gh",
 		},
 	},
