@@ -71,8 +71,9 @@ type AssetPattern struct {
 	ArchPatterns        map[string]string // "amd64" -> "x86_64", "arm64" -> "aarch64" etc.
 	RequiredSubstrings  []string
 	ExcludeSubstrings   []string
-	ArchiveFormat       string // "tar.gz", "tar.xz", "zip", "none" (raw binary)
-	BinaryPathInArchive string // glob pattern to find binary in extracted archive, e.g. "*/bat"
+	ArchiveFormat       string            // "tar.gz", "tar.xz", "zip", "none" (raw binary)
+	OSArchiveFormats    map[string]string // per-OS override, e.g. "linux" -> "tar.gz", "darwin" -> "zip"
+	BinaryPathInArchive string            // glob pattern to find binary in extracted archive, e.g. "*/bat"
 }
 
 type Tool struct {

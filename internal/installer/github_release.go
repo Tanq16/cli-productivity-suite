@@ -65,7 +65,11 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 
 	var binaryPath string
 
-	if tool.Asset.ArchiveFormat == "none" {
+	archiveFmt := tool.Asset.ArchiveFormat
+	if f, ok := tool.Asset.OSArchiveFormats[p.OS.String()]; ok {
+		archiveFmt = f
+	}
+	if archiveFmt == "none" {
 		binaryPath = archivePath
 	} else {
 		extractDir := filepath.Join(tmpDir, "extracted")
@@ -73,7 +77,7 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 			return Result{Tool: tool.Name, Err: err}
 		}
 
-		switch tool.Asset.ArchiveFormat {
+		switch archiveFmt {
 		case "tar.gz":
 			err = ExtractTarGz(archivePath, extractDir)
 		case "tgz":
@@ -83,7 +87,7 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 		case "zip":
 			err = ExtractZip(archivePath, extractDir)
 		default:
-			err = fmt.Errorf("unknown archive format: %s", tool.Asset.ArchiveFormat)
+			err = fmt.Errorf("unknown archive format: %s", archiveFmt)
 		}
 		if err != nil {
 			return Result{Tool: tool.Name, Err: fmt.Errorf("extract failed: %w", err)}

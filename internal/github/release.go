@@ -82,9 +82,13 @@ func MatchAsset(release *Release, pattern registry.AssetPattern, osName, archNam
 			continue
 		}
 
-		if pattern.ArchiveFormat != "none" && pattern.ArchiveFormat != "" {
+		archiveFmt := pattern.ArchiveFormat
+		if f, ok := pattern.OSArchiveFormats[osName]; ok {
+			archiveFmt = f
+		}
+		if archiveFmt != "none" && archiveFmt != "" {
 			validFormat := false
-			switch pattern.ArchiveFormat {
+			switch archiveFmt {
 			case "tar.gz":
 				validFormat = strings.HasSuffix(name, ".tar.gz") || strings.HasSuffix(name, ".tgz")
 			case "tgz":
@@ -94,7 +98,7 @@ func MatchAsset(release *Release, pattern registry.AssetPattern, osName, archNam
 			case "zip":
 				validFormat = strings.HasSuffix(name, ".zip")
 			default:
-				validFormat = strings.HasSuffix(name, "."+pattern.ArchiveFormat)
+				validFormat = strings.HasSuffix(name, "."+archiveFmt)
 			}
 			if !validFormat {
 				continue
