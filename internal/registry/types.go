@@ -67,11 +67,11 @@ func (c ToolCategory) String() string {
 }
 
 type AssetPattern struct {
-	OSPatterns         map[string]string // "linux" -> "linux", "darwin" -> "apple" etc.
-	ArchPatterns       map[string]string // "amd64" -> "x86_64", "arm64" -> "aarch64" etc.
-	RequiredSubstrings []string
-	ExcludeSubstrings  []string
-	ArchiveFormat      string // "tar.gz", "tar.xz", "zip", "none" (raw binary)
+	OSPatterns          map[string]string // "linux" -> "linux", "darwin" -> "apple" etc.
+	ArchPatterns        map[string]string // "amd64" -> "x86_64", "arm64" -> "aarch64" etc.
+	RequiredSubstrings  []string
+	ExcludeSubstrings   []string
+	ArchiveFormat       string // "tar.gz", "tar.xz", "zip", "none" (raw binary)
 	BinaryPathInArchive string // glob pattern to find binary in extracted archive, e.g. "*/bat"
 }
 

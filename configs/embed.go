@@ -11,6 +11,9 @@ var linuxKittyConf []byte
 //go:embed macos.kittyconf
 var macosKittyConf []byte
 
+//go:embed mocha.kittyconf
+var mochaKittyConf []byte
+
 //go:embed rcfile
 var rcfile []byte
 
@@ -20,5 +23,6 @@ var macosAerospaceConf []byte
 func TmuxConf() []byte           { return tmuxConf }
 func LinuxKittyConf() []byte     { return linuxKittyConf }
 func MacosKittyConf() []byte     { return macosKittyConf }
+func MochaKittyConf() []byte     { return mochaKittyConf }
 func Rcfile() []byte             { return rcfile }
 func MacosAerospaceConf() []byte { return macosAerospaceConf }

@@ -23,8 +23,8 @@ func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Pl
 		if p.OS == platform.Darwin {
 			content = []byte(strings.ReplaceAll(
 				string(content),
-				`bind-key -T copy-mode MouseDragEnd1Pane send -X copy-selection`,
-				`bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe "pbcopy"`,
+				`MouseDragEnd1Pane send -X copy-selection`,
+				`MouseDragEnd1Pane send-keys -X copy-pipe "pbcopy"`,
 			))
 		}
 
@@ -35,6 +35,10 @@ func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Pl
 			content = configs.MacosKittyConf()
 		}
 		destPath = filepath.Join(p.HomeDir, ".config", "kitty", "kitty.conf")
+
+	case "kitty-theme":
+		destPath = filepath.Join(p.HomeDir, ".config", "kitty", "current-theme.conf")
+		content = configs.MochaKittyConf()
 
 	case "aerospace-config":
 		if p.OS != platform.Darwin {

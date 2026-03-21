@@ -159,7 +159,7 @@ var AllTools = []Tool{
 	{
 		Name: "terraform", BinaryName: "terraform", Kind: DirectDownload, Category: Public,
 		Repo: "hashicorp/terraform", Description: "Infrastructure as code",
-		URL:  "https://releases.hashicorp.com/terraform/{version_bare}/terraform_{version_bare}_{os}_{arch}.zip",
+		URL: "https://releases.hashicorp.com/terraform/{version_bare}/terraform_{version_bare}_{os}_{arch}.zip",
 		Asset: AssetPattern{
 			ArchiveFormat:       "zip",
 			BinaryPathInArchive: "terraform",
@@ -336,25 +336,25 @@ var AllTools = []Tool{
 	{
 		Name: "core-utils", Kind: SystemPackage, Category: System,
 		Description: "Core system utilities",
-		AptPkgs:  []string{"git", "tree", "wget", "curl", "zip", "unzip", "file"},
-		BrewPkgs: []string{"git", "tree", "wget", "curl"},
+		AptPkgs:     []string{"git", "wget", "curl", "zip", "unzip", "file"},
+		BrewPkgs:    []string{"git", "wget", "curl"},
 	},
 	{
 		Name: "dev-tools", Kind: SystemPackage, Category: System,
 		Description: "Development build tools",
-		AptPkgs: []string{"cmake", "gcc", "make", "ninja-build", "gettext"},
+		AptPkgs:     []string{"cmake", "gcc", "make", "ninja-build", "gettext"},
 	},
 	{
 		Name: "network-tools", Kind: SystemPackage, Category: System,
 		Description: "Network utilities",
-		AptPkgs:  []string{"nmap", "ncat", "openssl"},
-		BrewPkgs: []string{"openssl", "nmap"},
+		AptPkgs:     []string{"nmap", "ncat", "openssl"},
+		BrewPkgs:    []string{"openssl", "nmap"},
 	},
 	{
 		Name: "other-tools", Kind: SystemPackage, Category: System,
 		Description: "Shell, terminal, and media tools",
-		AptPkgs:  []string{"tmux", "zsh", "ffmpeg"},
-		BrewPkgs: []string{"tmux", "ffmpeg"},
+		AptPkgs:     []string{"tmux", "zsh", "ffmpeg"},
+		BrewPkgs:    []string{"tmux", "ffmpeg"},
 	},
 	{
 		Name: "aerospace", Kind: SystemPackage, Category: System,
@@ -403,6 +403,12 @@ var AllTools = []Tool{
 		Description: "Kitty terminal configuration",
 		ConfigSrc:   "kittyconf",
 		ConfigDest:  "~/.config/kitty/kitty.conf",
+	},
+	{
+		Name: "kitty-theme", Kind: ConfigFile, Category: Config,
+		Description: "Kitty theme configuration",
+		ConfigSrc:   "mocha.kittyconf",
+		ConfigDest:  "~/.config/kitty/current-theme.conf",
 	},
 	{
 		Name: "aerospace-config", Kind: ConfigFile, Category: Config,

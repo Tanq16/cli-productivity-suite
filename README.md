@@ -131,6 +131,7 @@ cps clean
 - Cloud CLIs (AWS, Azure, gcloud) require sudo on Linux for system-level installation
 - The `.zshrc` deployed by `cps init` is a complete replacement - it includes Oh My Zsh config, tool integrations and aliases
 - `cps clean` removes `~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.nvm`, `~/nuclei-templates`, `~/google-cloud-sdk`, and `~/.config/cps` - it does not touch Oh My Zsh, deployed config files, or system packages
+- If you previously had `bat` installed and it is somehow quite slow now to load, it's likely due to an outdated cache, which can be rebuilt with `bat cache --build`
 
 ## Deep Removal
 
