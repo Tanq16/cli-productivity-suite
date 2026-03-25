@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/tanq16/cli-productivity-suite/internal/github"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
@@ -31,6 +32,8 @@ func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platf
 		return l.installGo(p, st)
 	case "python":
 		return l.installPython(p, st)
+	case "rust":
+		return l.installRust(p, st)
 	default:
 		return Result{Tool: tool.Name, Err: fmt.Errorf("unknown runtime: %s", tool.Name)}
 	}
@@ -168,6 +171,76 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 
 	st.SetToolVersion("go-sdk", version)
 	return Result{Tool: "go-sdk", Version: version}
+}
+
+func (l *LanguageRuntimeInstaller) installRust(p platform.Platform, st *state.State) Result {
+	var archStr string
+	switch p.Arch {
+	case platform.AMD64:
+		archStr = "x86_64"
+	case platform.ARM64:
+		archStr = "aarch64"
+	}
+
+	var target string
+	switch p.OS {
+	case platform.Darwin:
+		target = archStr + "-apple-darwin"
+	default:
+		target = archStr + "-unknown-linux-gnu"
+	}
+
+	rustDir := filepath.Join(p.ShellDir(), "rust")
+	rustupHome := filepath.Join(rustDir, ".rustup")
+	cargoHome := filepath.Join(rustDir, ".cargo")
+
+	if err := os.MkdirAll(rustDir, 0755); err != nil {
+		return Result{Tool: "rust", Err: fmt.Errorf("failed to create rust dir: %w", err)}
+	}
+
+	url := fmt.Sprintf("https://static.rust-lang.org/rustup/dist/%s/rustup-init", target)
+
+	tmpDir, err := os.MkdirTemp("", "cps-rust-*")
+	if err != nil {
+		return Result{Tool: "rust", Err: err}
+	}
+	defer os.RemoveAll(tmpDir)
+
+	initPath := filepath.Join(tmpDir, "rustup-init")
+	if err := DownloadToFile(url, initPath); err != nil {
+		return Result{Tool: "rust", Err: fmt.Errorf("download rustup-init failed: %w", err)}
+	}
+	if err := os.Chmod(initPath, 0755); err != nil {
+		return Result{Tool: "rust", Err: err}
+	}
+
+	cmd := exec.Command(initPath, "-y", "--no-modify-path")
+	cmd.Env = append(os.Environ(),
+		"RUSTUP_HOME="+rustupHome,
+		"CARGO_HOME="+cargoHome,
+	)
+	if err := utils.RunCmd(cmd); err != nil {
+		return Result{Tool: "rust", Err: fmt.Errorf("rustup-init failed: %w", err)}
+	}
+
+	// Get installed rustc version
+	rustcPath := filepath.Join(cargoHome, "bin", "rustc")
+	verCmd := exec.Command(rustcPath, "--version")
+	verCmd.Env = append(os.Environ(),
+		"RUSTUP_HOME="+rustupHome,
+		"CARGO_HOME="+cargoHome,
+	)
+	out, err := verCmd.Output()
+	version := "stable"
+	if err == nil {
+		parts := strings.Fields(strings.TrimSpace(string(out)))
+		if len(parts) >= 2 {
+			version = parts[1]
+		}
+	}
+
+	st.SetToolVersion("rust", version)
+	return Result{Tool: "rust", Version: version}
 }
 
 func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, st *state.State) Result {

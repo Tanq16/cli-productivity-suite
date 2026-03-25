@@ -13,7 +13,7 @@ A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driv
 - **CLI utilities** - bat, fd, ripgrep, lsd, jq, yq, fzf, gron, sq, and more
 - **Security tools** - nuclei, naabu, katana, subfinder, ffuf, gobuster, trufflehog, proxify
 - **Cloud & infra** - AWS CLI, Azure CLI, gcloud CLI, terraform, kubectl, kubelogin
-- **Language runtimes** - Go SDK, Python 3.14 (via uv), Node.js LTS (via nvm)
+- **Language runtimes** - Go SDK, Python 3.14 (via uv), Rust (via rustup), Node.js LTS (via nvm)
 - **Editor & shell** - Neovim (0.11+) with NvChad, spaceship-prompt, zsh plugins, tmux with TPM
 - **Config files** - complete `.zshrc`, tmux.conf, kitty.conf, aerospace.toml (macOS)
 

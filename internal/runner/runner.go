@@ -265,6 +265,21 @@ func Update(ghToken string, includeConf bool) {
 
 	hasErrors := runPhase("Updating tools", updatable, p, gh, st)
 
+	var compErrors []jobResult
+	var compLines int
+	utils.PrintRunning("(Running) Regenerating completions")
+	generateCompletions(p, &compErrors, &compLines)
+	utils.ClearLines(compLines + 1)
+	if len(compErrors) > 0 {
+		hasErrors = true
+		utils.PrintError("Regenerating completions: partially completed with errors", nil)
+		for _, e := range compErrors {
+			utils.PrintIndentedError(e.name, e.err)
+		}
+	} else {
+		utils.PrintInfo("Regenerating completions")
+	}
+
 	if err := st.Save(); err != nil {
 		utils.PrintError("failed to save state", err)
 	}
@@ -559,6 +574,8 @@ func runPostInstall(p platform.Platform) {
 		}
 	}
 
+	generateCompletions(p, &errors, &lineCount)
+
 	utils.ClearLines(lineCount + 1) // sub-lines + running header
 	if len(errors) > 0 {
 		utils.PrintError("Phase 12: partially completed with errors", nil)
@@ -567,6 +584,43 @@ func runPostInstall(p platform.Platform) {
 		}
 	} else {
 		utils.PrintInfo("Phase 12: Post-install tasks")
+	}
+}
+
+func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *int) {
+	compDir := filepath.Join(p.ShellDir(), "completions")
+	if err := os.MkdirAll(compDir, 0755); err != nil {
+		*errors = append(*errors, jobResult{name: "completions", err: err})
+		return
+	}
+
+	type compDef struct {
+		name    string
+		binary  string
+		args    []string
+		outFile string
+	}
+
+	defs := []compDef{
+		{"fzf", "fzf", []string{"--zsh"}, "fzf.zsh"},
+		{"uv", "uv", []string{"generate-shell-completion", "zsh"}, "uv.zsh"},
+	}
+
+	for _, d := range defs {
+		binPath := filepath.Join(p.ShellExecDir(), d.binary)
+		if _, err := os.Stat(binPath); err != nil {
+			continue
+		}
+		utils.PrintIndentedRunning("completions: " + d.name)
+		*lineCount++
+		out, err := exec.Command(binPath, d.args...).Output()
+		if err != nil {
+			*errors = append(*errors, jobResult{name: "completions-" + d.name, err: err})
+			continue
+		}
+		if err := os.WriteFile(filepath.Join(compDir, d.outFile), out, 0644); err != nil {
+			*errors = append(*errors, jobResult{name: "completions-" + d.name, err: err})
+		}
 	}
 }
 

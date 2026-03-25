@@ -284,6 +284,15 @@ var AllTools = []Tool{
 			BinaryPathInArchive: "ai-context",
 		},
 	},
+	{
+		Name: "raikiri", BinaryName: "raikiri", Kind: GitHubRelease, Category: Public,
+		Repo: "Tanq16/raikiri", Description: "Raikiri tool",
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
 
 	// ========== Own Private Tools (Tanq16) ==========
 	{
@@ -317,9 +326,10 @@ var AllTools = []Tool{
 		Name: "toon", BinaryName: "toon", Kind: GitHubRelease, Category: Private,
 		Repo: "Tanq16/toon", Description: "Private Toon tool", IsPrivate: true,
 		Asset: AssetPattern{
-			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat: "none",
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "toon-*",
 		},
 	},
 	{
@@ -389,6 +399,10 @@ var AllTools = []Tool{
 	{
 		Name: "python", Kind: LanguageRuntime, Category: Runtime,
 		Description: "Python 3.14 via uv + py-default venv",
+	},
+	{
+		Name: "rust", Kind: LanguageRuntime, Category: Runtime,
+		Description: "Rust toolchain via rustup",
 	},
 
 	// ========== Config Files ==========

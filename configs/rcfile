@@ -4,11 +4,15 @@ ZSH_THEME="spaceship"
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 
+# --- Rust ---
+export RUSTUP_HOME="$HOME/shell/rust/.rustup"
+export CARGO_HOME="$HOME/shell/rust/.cargo"
+
 # --- PATH ---
-export PATH="$HOME/shell/executables:$HOME/go/bin:/usr/local/go/bin:/opt/homebrew/bin:$HOME/.local/bin:$PATH"
+export PATH="$HOME/shell/rust/.cargo/bin:$HOME/shell/executables:$HOME/go/bin:/usr/local/go/bin:/opt/homebrew/bin:$HOME/.local/bin:$PATH"
 
 # --- FZF ---
-source <(fzf --zsh)
+[ -f "$HOME/shell/completions/fzf.zsh" ] && source "$HOME/shell/completions/fzf.zsh"
 export FZF_DEFAULT_OPTS="
 --layout=reverse
 --info=inline
@@ -31,7 +35,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ] && source "$HOME/google-cloud-sdk/completion.zsh.inc"
 
 # --- uv completions ---
-eval "$(uv generate-shell-completion zsh)" 2>/dev/null
+[ -f "$HOME/shell/completions/uv.zsh" ] && source "$HOME/shell/completions/uv.zsh"
 
 # --- AWS CLI completion ---
 autoload -Uz bashcompinit && bashcompinit
