@@ -293,6 +293,15 @@ var AllTools = []Tool{
 			ArchiveFormat: "none",
 		},
 	},
+	{
+		Name: "claudex", BinaryName: "claudex", Kind: GitHubRelease, Category: Public,
+		Repo: "Tanq16/claudex", Description: "Claudex tool",
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
 
 	// ========== Own Private Tools (Tanq16) ==========
 	{
@@ -307,15 +316,6 @@ var AllTools = []Tool{
 	{
 		Name: "box", BinaryName: "box", Kind: GitHubRelease, Category: Private,
 		Repo: "Tanq16/box-cli", Description: "Private box CLI", IsPrivate: true,
-		Asset: AssetPattern{
-			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat: "none",
-		},
-	},
-	{
-		Name: "claudex", BinaryName: "claudex", Kind: GitHubRelease, Category: Private,
-		Repo: "Tanq16/claudex", Description: "Private Claudex tool", IsPrivate: true,
 		Asset: AssetPattern{
 			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},

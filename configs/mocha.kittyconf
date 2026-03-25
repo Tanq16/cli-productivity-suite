@@ -33,6 +33,7 @@ bell_border_color #f9e2af
 # OS Window titlebar colors
 wayland_titlebar_color system
 macos_titlebar_color system
+macos_show_window_title_in none
 
 # Tab bar colors
 active_tab_foreground #11111b
