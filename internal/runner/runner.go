@@ -211,7 +211,7 @@ func Check(ghToken string, appVersion string) {
 	}
 }
 
-func Update(ghToken string, includeConf bool) {
+func Update(ghToken string, configsOnly bool) {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
@@ -225,7 +225,7 @@ func Update(ghToken string, includeConf bool) {
 	gh := github.NewClient(ghToken)
 	tools := registry.New().ForPlatform(p.OS.String())
 
-	// Pre-filter: skip private without token, skip system/cloud/runtime, skip config unless --include-conf
+	// Pre-filter: skip private without token, skip system/cloud/runtime, handle --configs-only
 	var checkable []registry.Tool
 	for _, t := range tools {
 		if t.IsPrivate && ghToken == "" {
@@ -238,7 +238,11 @@ func Update(ghToken string, includeConf bool) {
 		case registry.SystemPackage, registry.CloudCLI, registry.LanguageRuntime:
 			continue
 		case registry.ConfigFile:
-			if !includeConf {
+			if !configsOnly {
+				continue
+			}
+		default:
+			if configsOnly {
 				continue
 			}
 		}

@@ -83,8 +83,8 @@ cps check
 Update installed tools to their latest versions. Skips system packages, cloud CLIs, and language runtimes (use `cps init` for those).
 
 ```bash
-cps update                  # Update all
-cps update --include-conf   # Also overwrite deployed config files
+cps update                  # Update binaries
+cps update --configs-only   # Only update deployed config files
 ```
 
 ### `self-update`

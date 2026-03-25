@@ -7,17 +7,17 @@ import (
 )
 
 var updateFlags struct {
-	IncludeConf bool
+	ConfigsOnly bool
 }
 
 var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update installed tools to latest versions",
 	Run: func(cmd *cobra.Command, args []string) {
-		runner.Update(ghToken, updateFlags.IncludeConf)
+		runner.Update(ghToken, updateFlags.ConfigsOnly)
 	},
 }
 
 func init() {
-	updateCmd.Flags().BoolVarP(&updateFlags.IncludeConf, "include-conf", "c", false, "Also overwrite deployed config files")
+	updateCmd.Flags().BoolVarP(&updateFlags.ConfigsOnly, "configs-only", "c", false, "Only update deployed config files")
 }
