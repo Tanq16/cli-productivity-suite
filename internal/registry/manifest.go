@@ -226,6 +226,17 @@ var AllTools = []Tool{
 		},
 	},
 	{
+		Name: "zoxide", BinaryName: "zoxide", Kind: GitHubRelease, Category: Public,
+		Repo: "ajeetdsouza/zoxide", Description: "Smarter cd command",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
+			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "aarch64"},
+			ExcludeSubstrings:   []string{"android", ".deb"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "zoxide",
+		},
+	},
+	{
 		Name: "kubelogin", BinaryName: "kubelogin", Kind: GitHubRelease, Category: Public,
 		Repo: "Azure/kubelogin", Description: "Azure Kubernetes login",
 		Asset: AssetPattern{
@@ -363,8 +374,8 @@ var AllTools = []Tool{
 	{
 		Name: "other-tools", Kind: SystemPackage, Category: System,
 		Description: "Shell, terminal, and media tools",
-		AptPkgs:     []string{"tmux", "zsh", "ffmpeg"},
-		BrewPkgs:    []string{"tmux", "ffmpeg"},
+		AptPkgs:     []string{"tmux", "zsh", "ffmpeg", "htop"},
+		BrewPkgs:    []string{"tmux", "ffmpeg", "htop"},
 	},
 	{
 		Name: "aerospace", Kind: SystemPackage, Category: System,

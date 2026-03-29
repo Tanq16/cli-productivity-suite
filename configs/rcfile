@@ -1,7 +1,7 @@
 # --- Oh My Zsh ---
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="spaceship"
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(zsh-autosuggestions zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 
 # --- Rust ---
@@ -26,9 +26,12 @@ export FZF_DEFAULT_OPTS="
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude node_modules --exclude Library'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
-# --- nvm ---
+# --- nvm (lazy) ---
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm()  { unset -f nvm node npm npx; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; nvm "$@"; }
+node() { unset -f nvm node npm npx; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; node "$@"; }
+npm()  { unset -f nvm node npm npx; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; npm "$@"; }
+npx()  { unset -f nvm node npm npx; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; npx "$@"; }
 
 # --- gcloud ---
 [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ] && source "$HOME/google-cloud-sdk/path.zsh.inc"
@@ -37,9 +40,8 @@ export NVM_DIR="$HOME/.nvm"
 # --- uv completions ---
 [ -f "$HOME/shell/completions/uv.zsh" ] && source "$HOME/shell/completions/uv.zsh"
 
-# --- AWS CLI completion ---
-autoload -Uz bashcompinit && bashcompinit
-complete -C 'aws_completer' aws
+# --- AWS CLI completion (lazy) ---
+aws() { unset -f aws; autoload -Uz bashcompinit && bashcompinit; complete -C 'aws_completer' aws; command aws "$@"; }
 
 # --- Default Python venv (uv-managed) ---
 export VIRTUAL_ENV="$HOME/shell/py-default"
@@ -75,6 +77,9 @@ alias la='lsd -la'
 alias sshide='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null"'
 alias sessionrec='script -f $HOME/session-$(date +"%d-%b-%y_%H-%M-%S").log'
 alias dockernonerm='for i in $(docker images -f dangling=true -q); do docker image rm $i; done'
+
+# --- Zoxide ---
+[ -f "$HOME/shell/completions/zoxide.zsh" ] && source "$HOME/shell/completions/zoxide.zsh"
 
 # --- Cursor ---
 keymap-for-cursor-shape() { echo -ne '\e[5 q' }

@@ -608,6 +608,7 @@ func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *in
 	defs := []compDef{
 		{"fzf", "fzf", []string{"--zsh"}, "fzf.zsh"},
 		{"uv", "uv", []string{"generate-shell-completion", "zsh"}, "uv.zsh"},
+		{"zoxide", "zoxide", []string{"init", "zsh"}, "zoxide.zsh"},
 	}
 
 	for _, d := range defs {
