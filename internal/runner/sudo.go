@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
 	"github.com/tanq16/cli-productivity-suite/internal/registry"
@@ -18,6 +19,23 @@ func EnsureSudo() error {
 		return fmt.Errorf("sudo -v failed: %w", err)
 	}
 	return nil
+}
+
+func StartSudoRefresh() chan struct{} {
+	done := make(chan struct{})
+	go func() {
+		ticker := time.NewTicker(60 * time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-done:
+				return
+			case <-ticker.C:
+				exec.Command("sudo", "-n", "-v").Run()
+			}
+		}
+	}()
+	return done
 }
 
 func PhaseNeedsSudo(p platform.Platform, kinds ...registry.ToolKind) bool {

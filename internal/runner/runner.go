@@ -47,6 +47,7 @@ func Init(ghToken string) {
 	}
 	utils.PrintIndentedSuccess("prerequisites OK")
 
+	var sudoDone chan struct{}
 	if PhaseNeedsSudo(p, registry.SystemPackage, registry.CloudCLI, registry.LanguageRuntime) {
 		cached := exec.Command("sudo", "-n", "-v").Run() == nil
 		utils.ClearLines(2)
@@ -54,6 +55,7 @@ func Init(ghToken string) {
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
+		sudoDone = StartSudoRefresh()
 		if cached {
 			utils.ClearLines(1)
 		} else {
@@ -134,6 +136,10 @@ func Init(ghToken string) {
 
 	runPostInstall(p)
 
+	if sudoDone != nil {
+		close(sudoDone)
+	}
+
 	st.LastInit = time.Now()
 	if err := st.Save(); err != nil {
 		utils.PrintError("failed to save state", err)
@@ -146,7 +152,7 @@ func Init(ghToken string) {
 	}
 }
 
-func Check(ghToken string, appVersion string) {
+func Check(ghToken string, appVersion string, skipPrivate bool) {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
@@ -162,7 +168,7 @@ func Check(ghToken string, appVersion string) {
 
 	var checkable []registry.Tool
 	for _, t := range tools {
-		if t.IsPrivate && ghToken == "" {
+		if t.IsPrivate && (ghToken == "" || skipPrivate) {
 			continue
 		}
 		checkable = append(checkable, t)
@@ -318,12 +324,14 @@ func Install(toolName string, ghToken string) {
 		utils.PrintFatal(fmt.Sprintf("tool %s is private — provide --gh-token or set CPS_GITHUB_PAT", toolName), nil)
 	}
 
+	var sudoDone chan struct{}
 	if ToolNeedsSudo(*tool, p) {
 		cached := exec.Command("sudo", "-n", "-v").Run() == nil
 		utils.PrintRunning("authenticating sudo")
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
+		sudoDone = StartSudoRefresh()
 		if cached {
 			utils.ClearLines(1)
 		} else {
@@ -340,6 +348,10 @@ func Install(toolName string, ghToken string) {
 	st.Remove(tool.Name)
 	result := inst.Install(tool, p, gh, st)
 	utils.ClearLines(1)
+
+	if sudoDone != nil {
+		close(sudoDone)
+	}
 
 	if result.Err != nil {
 		utils.PrintFatal(fmt.Sprintf("%s: install failed", toolName), result.Err)
@@ -389,6 +401,7 @@ func SelfUpdate(appVersion string) {
 	if err := EnsureSudo(); err != nil {
 		utils.PrintFatal("sudo authentication failed", err)
 	}
+	sudoDone := StartSudoRefresh()
 	if cached {
 		utils.ClearLines(1)
 	} else {
@@ -430,6 +443,7 @@ func SelfUpdate(appVersion string) {
 	}
 	utils.ClearLines(1)
 
+	close(sudoDone)
 	utils.PrintSuccess(fmt.Sprintf("updated cps: %s → %s", appVersion, release.TagName))
 }
 

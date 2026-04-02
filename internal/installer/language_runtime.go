@@ -19,9 +19,96 @@ import (
 
 type LanguageRuntimeInstaller struct{}
 
-func (l *LanguageRuntimeInstaller) Check(tool *registry.Tool, _ platform.Platform, _ *github.Client, st *state.State) (current, latest string, err error) {
+func (l *LanguageRuntimeInstaller) Check(tool *registry.Tool, _ platform.Platform, gh *github.Client, st *state.State) (current, latest string, err error) {
 	current = st.ToolVersion(tool.Name)
-	return current, "check-manually", nil
+	switch tool.Name {
+	case "go-sdk":
+		return l.checkGo(current)
+	case "rust":
+		return l.checkRust(current)
+	case "neovim":
+		return l.checkNeovim(current, gh)
+	case "python":
+		return l.checkPython(current)
+	default:
+		return current, "check-manually", nil
+	}
+}
+
+func (l *LanguageRuntimeInstaller) checkGo(current string) (string, string, error) {
+	resp, err := httpGet("https://go.dev/dl/?mode=json")
+	if err != nil {
+		return current, "", err
+	}
+	defer resp.Body.Close()
+
+	var releases []struct {
+		Version string `json:"version"`
+		Stable  bool   `json:"stable"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
+		return current, "", err
+	}
+	for _, r := range releases {
+		if r.Stable {
+			return current, r.Version, nil
+		}
+	}
+	return current, "", fmt.Errorf("no stable Go release found")
+}
+
+func (l *LanguageRuntimeInstaller) checkRust(current string) (string, string, error) {
+	resp, err := httpGet("https://static.rust-lang.org/dist/channel-rust-stable.toml")
+	if err != nil {
+		return current, "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return current, "", err
+	}
+	for _, line := range strings.Split(string(body), "\n") {
+		if strings.HasPrefix(strings.TrimSpace(line), "version = ") {
+			v := strings.Trim(strings.TrimPrefix(strings.TrimSpace(line), "version = "), "\"")
+			parts := strings.Fields(v)
+			if len(parts) >= 1 {
+				return current, parts[0], nil
+			}
+		}
+	}
+	return current, "", fmt.Errorf("could not parse rust stable version")
+}
+
+func (l *LanguageRuntimeInstaller) checkNeovim(current string, gh *github.Client) (string, string, error) {
+	release, err := gh.LatestRelease("neovim/neovim")
+	if err != nil {
+		return current, "", err
+	}
+	return current, release.TagName, nil
+}
+
+func (l *LanguageRuntimeInstaller) checkPython(current string) (string, string, error) {
+	resp, err := httpGet("https://endoflife.date/api/python.json")
+	if err != nil {
+		return current, "", err
+	}
+	defer resp.Body.Close()
+
+	var releases []struct {
+		Cycle  string `json:"cycle"`
+		Latest string `json:"latest"`
+		EOL    any    `json:"eol"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
+		return current, "", err
+	}
+	for _, r := range releases {
+		if eol, ok := r.EOL.(bool); ok && !eol {
+			return current, r.Cycle, nil
+		}
+	}
+	return current, "", fmt.Errorf("no active Python release found")
 }
 
 func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platform, _ *github.Client, st *state.State) Result {
@@ -69,10 +156,9 @@ func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.
 		return Result{Tool: "neovim", Err: fmt.Errorf("download failed: %w", err)}
 	}
 
-	// macOS: remove quarantine attribute
 	if p.OS == platform.Darwin {
 		xattrCmd := exec.Command("xattr", "-c", tarPath)
-		utils.RunCmd(xattrCmd) // best-effort
+		utils.RunCmd(xattrCmd)
 	}
 
 	nvimDir := filepath.Join(p.ShellDir(), "nvim")
@@ -162,7 +248,7 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 	}
 
 	rmCmd := exec.Command("sudo", "rm", "-rf", "/usr/local/go")
-	utils.RunCmd(rmCmd) // ignore error — may not exist
+	utils.RunCmd(rmCmd)
 
 	extractCmd := exec.Command("sudo", "tar", "-C", "/usr/local", "-xzf", tarPath)
 	if err := utils.RunCmd(extractCmd); err != nil {
@@ -223,7 +309,6 @@ func (l *LanguageRuntimeInstaller) installRust(p platform.Platform, st *state.St
 		return Result{Tool: "rust", Err: fmt.Errorf("rustup-init failed: %w", err)}
 	}
 
-	// Get installed rustc version
 	rustcPath := filepath.Join(cargoHome, "bin", "rustc")
 	verCmd := exec.Command(rustcPath, "--version")
 	verCmd.Env = append(os.Environ(),
