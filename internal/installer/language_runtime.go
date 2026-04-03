@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/tanq16/cli-productivity-suite/internal/github"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
@@ -103,9 +104,17 @@ func (l *LanguageRuntimeInstaller) checkPython(current string) (string, string, 
 	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
 		return current, "", err
 	}
+	now := time.Now().Format("2006-01-02")
 	for _, r := range releases {
-		if eol, ok := r.EOL.(bool); ok && !eol {
-			return current, r.Cycle, nil
+		switch eol := r.EOL.(type) {
+		case bool:
+			if !eol {
+				return current, r.Cycle, nil
+			}
+		case string:
+			if eol > now {
+				return current, r.Cycle, nil
+			}
 		}
 	}
 	return current, "", fmt.Errorf("no active Python release found")
