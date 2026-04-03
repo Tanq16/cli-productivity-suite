@@ -90,34 +90,11 @@ func (l *LanguageRuntimeInstaller) checkNeovim(current string, gh *github.Client
 }
 
 func (l *LanguageRuntimeInstaller) checkPython(current string) (string, string, error) {
-	resp, err := httpGet("https://endoflife.date/api/python.json")
+	latest, err := l.latestPythonCycle()
 	if err != nil {
 		return current, "", err
 	}
-	defer resp.Body.Close()
-
-	var releases []struct {
-		Cycle  string `json:"cycle"`
-		Latest string `json:"latest"`
-		EOL    any    `json:"eol"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
-		return current, "", err
-	}
-	now := time.Now().Format("2006-01-02")
-	for _, r := range releases {
-		switch eol := r.EOL.(type) {
-		case bool:
-			if !eol {
-				return current, r.Cycle, nil
-			}
-		case string:
-			if eol > now {
-				return current, r.Cycle, nil
-			}
-		}
-	}
-	return current, "", fmt.Errorf("no active Python release found")
+	return current, latest, nil
 }
 
 func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platform, _ *github.Client, st *state.State) Result {
@@ -337,20 +314,69 @@ func (l *LanguageRuntimeInstaller) installRust(p platform.Platform, st *state.St
 	return Result{Tool: "rust", Version: version}
 }
 
+func (l *LanguageRuntimeInstaller) latestPythonCycle() (string, error) {
+	resp, err := httpGet("https://endoflife.date/api/python.json")
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var releases []struct {
+		Cycle string `json:"cycle"`
+		EOL   any    `json:"eol"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
+		return "", err
+	}
+	now := time.Now().Format("2006-01-02")
+	for _, r := range releases {
+		switch eol := r.EOL.(type) {
+		case bool:
+			if !eol {
+				return r.Cycle, nil
+			}
+		case string:
+			if eol > now {
+				return r.Cycle, nil
+			}
+		}
+	}
+	return "", fmt.Errorf("no active Python release found")
+}
+
 func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, st *state.State) Result {
 	uvPath := filepath.Join(p.ShellExecDir(), "uv")
 
-	cmd := exec.Command(uvPath, "python", "install", "3.14")
+	version, err := l.latestPythonCycle()
+	if err != nil {
+		return Result{Tool: "python", Err: err}
+	}
+
+	cmd := exec.Command(uvPath, "python", "install", version)
 	if err := utils.RunCmd(cmd); err != nil {
 		return Result{Tool: "python", Err: fmt.Errorf("uv python install failed: %w", err)}
 	}
 
 	venvPath := filepath.Join(p.HomeDir, "shell", "py-default")
-	venvCmd := exec.Command(uvPath, "venv", "--python", "3.14", "--clear", venvPath)
+	pipPath := filepath.Join(venvPath, "bin", "pip")
+
+	var frozen []byte
+	if _, err := os.Stat(pipPath); err == nil {
+		frozen, _ = exec.Command(pipPath, "freeze").Output()
+	}
+
+	venvCmd := exec.Command(uvPath, "venv", "--python", version, "--clear", venvPath)
 	if err := utils.RunCmd(venvCmd); err != nil {
 		return Result{Tool: "python", Err: fmt.Errorf("uv venv create failed: %w", err)}
 	}
 
-	st.SetToolVersion("python", "3.14")
-	return Result{Tool: "python", Version: "3.14"}
+	if len(frozen) > 0 {
+		pipNew := filepath.Join(venvPath, "bin", "pip")
+		installCmd := exec.Command(pipNew, "install", "--quiet", "-r", "/dev/stdin")
+		installCmd.Stdin = strings.NewReader(string(frozen))
+		installCmd.Run()
+	}
+
+	st.SetToolVersion("python", version)
+	return Result{Tool: "python", Version: version}
 }
