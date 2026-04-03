@@ -48,7 +48,6 @@ func init() {
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(installCmd)
 	rootCmd.AddCommand(selfUpdateCmd)
-	rootCmd.AddCommand(updateCmd)
 
 	cobra.OnInitialize(setupLogs)
 }

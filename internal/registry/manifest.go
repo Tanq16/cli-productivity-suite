@@ -313,26 +313,26 @@ var AllTools = []Tool{
 			ArchiveFormat: "none",
 		},
 	},
+	{
+		Name: "gcli", BinaryName: "gcli", Kind: GitHubRelease, Category: Public,
+		Repo: "Tanq16/gcli", Description: "Gcli tool",
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
+	{
+		Name: "box", BinaryName: "box", Kind: GitHubRelease, Category: Public,
+		Repo: "Tanq16/box-cli", Description: "Box CLI tool",
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
 
 	// ========== Own Private Tools (Tanq16) ==========
-	{
-		Name: "gcli", BinaryName: "gcli", Kind: GitHubRelease, Category: Private,
-		Repo: "Tanq16/gcli", Description: "Private CLI tool", IsPrivate: true,
-		Asset: AssetPattern{
-			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat: "none",
-		},
-	},
-	{
-		Name: "box", BinaryName: "box", Kind: GitHubRelease, Category: Private,
-		Repo: "Tanq16/box-cli", Description: "Private box CLI", IsPrivate: true,
-		Asset: AssetPattern{
-			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat: "none",
-		},
-	},
 	{
 		Name: "toon", BinaryName: "toon", Kind: GitHubRelease, Category: Private,
 		Repo: "Tanq16/toon", Description: "Private Toon tool", IsPrivate: true,

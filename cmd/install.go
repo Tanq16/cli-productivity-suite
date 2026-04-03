@@ -8,19 +8,17 @@ import (
 )
 
 var installCmd = &cobra.Command{
-	Use:               "install <tool>",
-	Short:             "Install a single tool by name",
-	Args:              cobra.ExactArgs(1),
-	ValidArgsFunction: completeToolNames,
+	Use:               "install <tools|categories>...",
+	Short:             "Install tools by name or category",
+	Args:              cobra.MinimumNArgs(1),
+	ValidArgsFunction: completeInstallArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		runner.Install(args[0], ghToken)
+		runner.Install(args, ghToken)
 	},
 }
 
-func completeToolNames(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	if len(args) != 0 {
-		return nil, cobra.ShellCompDirectiveNoFileComp
-	}
-	reg := registry.New()
-	return reg.Names(), cobra.ShellCompDirectiveNoFileComp
+func completeInstallArgs(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	suggestions := runner.CategoryAliasNames()
+	suggestions = append(suggestions, registry.New().Names()...)
+	return suggestions, cobra.ShellCompDirectiveNoFileComp
 }

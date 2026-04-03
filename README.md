@@ -23,7 +23,7 @@ A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driv
 |----------|----------|-------------|
 | Setup | `cps init` | Full environment setup - system packages, ~50 tools, cloud CLIs, language runtimes, shell plugins, and config files |
 | Monitoring | `cps check` | Compare installed versions against latest releases |
-| Updates | `cps update`, `cps install <tool>` | Update all installed tools or install a single tool by name |
+| Install | `cps install <tools\|categories>...` | Install or update tools by name or category |
 | Self-update | `cps self-update` | Update cps itself to the latest release |
 | Maintenance | `cps clean` | Remove all CPS-managed files and directories |
 
@@ -76,16 +76,31 @@ Compare installed tool versions against latest releases. Only shows actionable i
 
 ```bash
 cps check
+cps check --skip-private    # Skip private tools even with token
 ```
 
-### `update`
+### `install`
 
-Update installed tools to their latest versions. Skips system packages, cloud CLIs, and language runtimes (use `cps init` for those).
+Install or update tools by name or category. Accepts multiple arguments. When a single tool is specified, it shows a single-line result. When multiple tools or categories are specified, it runs as a batch with phase output.
 
 ```bash
-cps update                  # Update binaries
-cps update --configs-only   # Only update deployed config files
+cps install bat                     # Single tool
+cps install bat fd ripgrep          # Multiple tools
+cps install public                  # All public tools
+cps install configs                 # Config files + shell plugins
+cps install --gh-token TOKEN gcli   # Private tool with token
 ```
+
+**Category aliases:**
+
+| Alias | What it installs |
+|-------|-----------------|
+| `public` | All public GitHub release binaries, direct downloads, and own public tools |
+| `private` | Private tools (requires `--gh-token`) |
+| `system` | System packages via apt (Linux) or brew (macOS) |
+| `cloud` | Cloud CLIs (AWS, Azure, gcloud) |
+| `runtimes` | Language runtimes (Go, Python, Rust, Neovim) |
+| `configs` | Config files (.zshrc, tmux, kitty, aerospace) and shell plugins (spaceship, zsh plugins, tpm, nvchad, nvm) |
 
 ### `self-update`
 
@@ -93,16 +108,6 @@ Update cps itself to the latest release (requires sudo).
 
 ```bash
 cps self-update
-```
-
-### `install`
-
-Force install a single tool by name (reinstalls regardless of current version).
-
-```bash
-cps install bat
-cps install terraform
-cps install --gh-token TOKEN gcli
 ```
 
 ### `clean`
@@ -125,7 +130,7 @@ cps clean
 
 - All binary tools are installed to `~/shell/executables/` - automatically added to your PATH in `.zshrc`
 - Neovim is installed from GitHub releases (0.11+) on both Linux and macOS to meet NvChad requirements
-- State is tracked in `~/.config/cps/state.json` - this file records installed versions for `check` and `update` commands
+- State is tracked in `~/.config/cps/state.json` - this file records installed versions for `check` and `install` commands
 - If the `gh` CLI is authenticated (`gh auth login`), CPS automatically uses its token - no need to pass `--gh-token`
 - Running `cps init` is idempotent - it skips tools that are already at the latest version
 - Cloud CLIs (AWS, Azure, gcloud) require sudo on Linux for system-level installation

@@ -217,91 +217,40 @@ func Check(ghToken string, appVersion string, skipPrivate bool) {
 	}
 }
 
-func Update(ghToken string, configsOnly bool) {
-	p, err := platform.Detect()
-	if err != nil {
-		utils.PrintFatal("platform detection failed", err)
-	}
-
-	st, err := state.Load(p.StatePath())
-	if err != nil {
-		utils.PrintFatal("failed to load state", err)
-	}
-
-	gh := github.NewClient(ghToken)
-	tools := registry.New().ForPlatform(p.OS.String())
-
-	// Pre-filter: skip private without token, skip system/cloud/runtime, handle --configs-only
-	var checkable []registry.Tool
-	for _, t := range tools {
-		if t.IsPrivate && ghToken == "" {
-			continue
-		}
-		if st.ToolVersion(t.Name) == "" {
-			continue
-		}
-		switch t.Kind {
-		case registry.SystemPackage, registry.CloudCLI, registry.LanguageRuntime:
-			continue
-		case registry.ConfigFile:
-			if !configsOnly {
-				continue
-			}
-		default:
-			if configsOnly {
-				continue
-			}
-		}
-		checkable = append(checkable, t)
-	}
-
-	utils.PrintRunning("Checking tools")
-	results := checkTools(checkable, p, gh, st)
-	utils.ClearLines(1)
-
-	// Extract tools where status is actionable
-	var updatable []registry.Tool
-	for _, r := range results {
-		switch r.Status {
-		case "update", "config-differs", "not-deployed":
-			updatable = append(updatable, r.Tool)
-		}
-	}
-
-	if len(updatable) == 0 {
-		utils.PrintSuccess("everything is up to date")
-		return
-	}
-
-	hasErrors := runPhase("Updating tools", updatable, p, gh, st)
-
-	var compErrors []jobResult
-	var compLines int
-	utils.PrintRunning("(Running) Regenerating completions")
-	generateCompletions(p, &compErrors, &compLines)
-	utils.ClearLines(compLines + 1)
-	if len(compErrors) > 0 {
-		hasErrors = true
-		utils.PrintError("Regenerating completions: partially completed with errors", nil)
-		for _, e := range compErrors {
-			utils.PrintIndentedError(e.name, e.err)
-		}
-	} else {
-		utils.PrintInfo("Regenerating completions")
-	}
-
-	if err := st.Save(); err != nil {
-		utils.PrintError("failed to save state", err)
-	}
-
-	if hasErrors {
-		utils.PrintWarn("update finished with errors", nil)
-	} else {
-		utils.PrintSuccess("update complete!")
-	}
+var categoryAliases = map[string]func(*registry.Registry, platform.Platform) []registry.Tool{
+	"public": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
+		ghPublic := filterGitHubPublic(reg.ByKind(registry.GitHubRelease), false)
+		ownPublic := filterOwnPublic(reg.ByKind(registry.GitHubRelease))
+		dd := reg.ByKind(registry.DirectDownload)
+		combined := append(ghPublic, ownPublic...)
+		combined = append(combined, dd...)
+		return filterPlatformTools(combined, p)
+	},
+	"private": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
+		return filterPlatformTools(reg.ByCategory(registry.Private), p)
+	},
+	"system": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
+		return filterPlatformTools(reg.ByCategory(registry.System), p)
+	},
+	"cloud": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
+		return filterPlatformTools(reg.ByCategory(registry.CloudCLICat), p)
+	},
+	"runtimes": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
+		return filterPlatformTools(reg.ByCategory(registry.Runtime), p)
+	},
+	"configs": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
+		configs := reg.ByCategory(registry.Config)
+		shell := reg.ByCategory(registry.Shell)
+		combined := append(configs, shell...)
+		return filterPlatformTools(combined, p)
+	},
 }
 
-func Install(toolName string, ghToken string) {
+func CategoryAliasNames() []string {
+	return []string{"public", "private", "system", "cloud", "runtimes", "configs"}
+}
+
+func Install(args []string, ghToken string) {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
@@ -315,17 +264,49 @@ func Install(toolName string, ghToken string) {
 	gh := github.NewClient(ghToken)
 	reg := registry.New()
 
-	tool := reg.Get(toolName)
-	if tool == nil {
-		utils.PrintFatal(fmt.Sprintf("unknown tool: %s", toolName), nil)
+	var resolved []registry.Tool
+	for _, arg := range args {
+		if resolver, ok := categoryAliases[arg]; ok {
+			resolved = append(resolved, resolver(reg, p)...)
+		} else if tool := reg.Get(arg); tool != nil {
+			if !toolForPlatform(*tool, p) {
+				utils.PrintFatal(fmt.Sprintf("tool %s is not available on %s", arg, p.OS), nil)
+			}
+			resolved = append(resolved, *tool)
+		} else {
+			utils.PrintFatal(fmt.Sprintf("unknown tool or category: %s", arg), nil)
+		}
 	}
 
-	if tool.IsPrivate && ghToken == "" {
-		utils.PrintFatal(fmt.Sprintf("tool %s is private — provide --gh-token or set CPS_GITHUB_PAT", toolName), nil)
+	seen := map[string]bool{}
+	var tools []registry.Tool
+	for _, t := range resolved {
+		if !seen[t.Name] {
+			seen[t.Name] = true
+			tools = append(tools, t)
+		}
+	}
+
+	if len(tools) == 0 {
+		utils.PrintSuccess("no tools to install for this platform")
+		return
+	}
+
+	for _, t := range tools {
+		if t.IsPrivate && ghToken == "" {
+			utils.PrintFatal(fmt.Sprintf("tool %s is private — provide --gh-token or set CPS_GITHUB_PAT", t.Name), nil)
+		}
 	}
 
 	var sudoDone chan struct{}
-	if ToolNeedsSudo(*tool, p) {
+	needsSudo := false
+	for _, t := range tools {
+		if ToolNeedsSudo(t, p) {
+			needsSudo = true
+			break
+		}
+	}
+	if needsSudo {
 		cached := exec.Command("sudo", "-n", "-v").Run() == nil
 		utils.PrintRunning("authenticating sudo")
 		if err := EnsureSudo(); err != nil {
@@ -339,29 +320,90 @@ func Install(toolName string, ghToken string) {
 		}
 	}
 
-	inst := installer.Dispatch(tool.Kind)
-	if inst == nil {
-		utils.PrintFatal(fmt.Sprintf("no installer for kind: %s", tool.Kind), nil)
+	var hasErrors bool
+	if len(tools) == 1 {
+		tool := tools[0]
+		inst := installer.Dispatch(tool.Kind)
+		if inst == nil {
+			utils.PrintFatal(fmt.Sprintf("no installer for kind: %s", tool.Kind), nil)
+		}
+		utils.PrintRunning("installing " + tool.Name)
+		st.Remove(tool.Name)
+		result := inst.Install(&tool, p, gh, st)
+		utils.ClearLines(1)
+		if result.Err != nil {
+			utils.PrintFatal(fmt.Sprintf("%s: install failed", tool.Name), result.Err)
+		}
+		utils.PrintSuccess(fmt.Sprintf("%s: installed %s", tool.Name, result.Version))
+	} else {
+		hasErrors = runPhase("Installing tools", tools, p, gh, st)
 	}
 
-	utils.PrintRunning("installing " + toolName)
-	st.Remove(tool.Name)
-	result := inst.Install(tool, p, gh, st)
-	utils.ClearLines(1)
+	installPostTasks(tools, p)
 
 	if sudoDone != nil {
 		close(sudoDone)
-	}
-
-	if result.Err != nil {
-		utils.PrintFatal(fmt.Sprintf("%s: install failed", toolName), result.Err)
 	}
 
 	if err := st.Save(); err != nil {
 		utils.PrintError("failed to save state", err)
 	}
 
-	utils.PrintSuccess(fmt.Sprintf("%s: installed %s", toolName, result.Version))
+	if len(tools) > 1 {
+		if hasErrors {
+			utils.PrintWarn("install finished with errors", nil)
+		} else {
+			utils.PrintSuccess("install complete!")
+		}
+	}
+}
+
+func installPostTasks(tools []registry.Tool, p platform.Platform) {
+	var hasConfigs, hasBinaries bool
+	for _, t := range tools {
+		switch t.Category {
+		case registry.Config, registry.Shell:
+			hasConfigs = true
+		}
+		switch t.Kind {
+		case registry.GitHubRelease, registry.DirectDownload:
+			hasBinaries = true
+		}
+	}
+
+	if hasConfigs {
+		tpmInstall := filepath.Join(p.HomeDir, ".tmux", "plugins", "tpm", "bin", "install_plugins")
+		if _, err := os.Stat(tpmInstall); err == nil {
+			utils.PrintRunning("running tpm install")
+			tpmCmd := exec.Command("bash", tpmInstall)
+			tpmCmd.Env = append(os.Environ(), fmt.Sprintf("TMUX_PLUGIN_MANAGER_PATH=%s", filepath.Join(p.HomeDir, ".tmux", "plugins")))
+			utils.RunCmd(tpmCmd)
+			utils.ClearLines(1)
+		}
+
+		if _, err := exec.LookPath("nvim"); err == nil {
+			utils.PrintRunning("running nvchad setup")
+			nvimCmd := exec.Command("nvim", "--headless", "+MasonInstallAll", "+Lazy sync", "+qa")
+			utils.RunCmd(nvimCmd)
+			utils.ClearLines(1)
+		}
+	}
+
+	if hasBinaries {
+		var compErrors []jobResult
+		var compLines int
+		utils.PrintRunning("(Running) Regenerating completions")
+		generateCompletions(p, &compErrors, &compLines)
+		utils.ClearLines(compLines + 1)
+		if len(compErrors) > 0 {
+			utils.PrintError("Regenerating completions: partially completed with errors", nil)
+			for _, e := range compErrors {
+				utils.PrintIndentedError(e.name, e.err)
+			}
+		} else {
+			utils.PrintInfo("Regenerating completions")
+		}
+	}
 }
 
 func SelfUpdate(appVersion string) {
