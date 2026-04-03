@@ -69,12 +69,16 @@ func (l *LanguageRuntimeInstaller) checkRust(current string) (string, string, er
 	if err != nil {
 		return current, "", err
 	}
-	for _, line := range strings.Split(string(body), "\n") {
-		if strings.HasPrefix(strings.TrimSpace(line), "version = ") {
-			v := strings.Trim(strings.TrimPrefix(strings.TrimSpace(line), "version = "), "\"")
-			parts := strings.Fields(v)
-			if len(parts) >= 1 {
-				return current, parts[0], nil
+	lines := strings.Split(string(body), "\n")
+	for i, line := range lines {
+		if strings.TrimSpace(line) == "[pkg.rustc]" && i+1 < len(lines) {
+			next := strings.TrimSpace(lines[i+1])
+			if strings.HasPrefix(next, "version = ") {
+				v := strings.Trim(strings.TrimPrefix(next, "version = "), "\"")
+				parts := strings.Fields(v)
+				if len(parts) >= 1 {
+					return current, parts[0], nil
+				}
 			}
 		}
 	}
@@ -97,10 +101,10 @@ func (l *LanguageRuntimeInstaller) checkPython(current string) (string, string, 
 	return current, latest, nil
 }
 
-func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platform, _ *github.Client, st *state.State) Result {
+func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) Result {
 	switch tool.Name {
 	case "neovim":
-		return l.installNeovim(p, st)
+		return l.installNeovim(p, gh, st)
 	case "go-sdk":
 		return l.installGo(p, st)
 	case "python":
@@ -112,7 +116,7 @@ func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platf
 	}
 }
 
-func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.State) Result {
+func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, gh *github.Client, st *state.State) Result {
 	var archStr string
 	switch p.Arch {
 	case platform.AMD64:
@@ -165,8 +169,12 @@ func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, st *state.
 		return Result{Tool: "neovim", Err: fmt.Errorf("symlink failed: %w", err)}
 	}
 
-	st.SetToolVersion("neovim", "stable")
-	return Result{Tool: "neovim", Version: "stable"}
+	version := "stable"
+	if release, err := gh.LatestRelease("neovim/neovim"); err == nil {
+		version = release.TagName
+	}
+	st.SetToolVersion("neovim", version)
+	return Result{Tool: "neovim", Version: version}
 }
 
 func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.State) Result {
