@@ -484,7 +484,7 @@ var AllTools = []Tool{
 		PostClone:   "nvchad",
 	},
 	{
-		Name: "nvm", Kind: ShellPlugin, Category: Shell,
+		Name: "nvm", Kind: ShellPlugin, Category: Runtime,
 		Description: "Node Version Manager",
 		CloneURL:    "https://github.com/nvm-sh/nvm.git",
 		CloneDest:   "~/.nvm",
