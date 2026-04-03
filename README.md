@@ -166,12 +166,12 @@ rm -rf \
 Linux (apt):
 
 ```bash
-sudo apt-get remove -y tmux openssl nmap ncat cmake gcc make ninja-build gettext zip unzip file ffmpeg
+sudo apt-get remove -y tmux openssl nmap ncat cmake gcc make ninja-build gettext zip unzip file ffmpeg htop
 ```
 
 macOS (brew):
 
 ```bash
-brew uninstall tmux openssl nmap ffmpeg
+brew uninstall tmux openssl nmap ffmpeg htop
 brew uninstall --cask nikitabobko/tap/aerospace
 ```
