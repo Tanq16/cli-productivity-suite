@@ -36,7 +36,7 @@ func (k ToolKind) String() string {
 type ToolCategory int
 
 const (
-	Public ToolCategory = iota
+	Core ToolCategory = iota
 	Private
 	System
 	CloudCLICat
@@ -44,7 +44,7 @@ const (
 	Config
 	Shell
 	ExtSecurity
-	ExtCloud
+	ExtCloudSec
 	ExtAppSec
 	ExtMisc
 	ExtPrivate
@@ -52,8 +52,8 @@ const (
 
 func (c ToolCategory) String() string {
 	switch c {
-	case Public:
-		return "public"
+	case Core:
+		return "core"
 	case Private:
 		return "private"
 	case System:
@@ -68,8 +68,8 @@ func (c ToolCategory) String() string {
 		return "shell"
 	case ExtSecurity:
 		return "ext-security"
-	case ExtCloud:
-		return "ext-cloud"
+	case ExtCloudSec:
+		return "ext-cloud-sec"
 	case ExtAppSec:
 		return "ext-app-sec"
 	case ExtMisc:

@@ -67,12 +67,12 @@ var extensionPacks = []ExtensionPack{
 		},
 	},
 	{
-		Name:        "cloud",
+		Name:        "cloudsec",
 		Description: "Cloud security and infrastructure tools",
-		Category:    ExtCloud,
+		Category:    ExtCloudSec,
 		Tools: []Tool{
 			{
-				Name: "kubelogin", BinaryName: "kubelogin", Kind: GitHubRelease, Category: ExtCloud, Extension: true,
+				Name: "kubelogin", BinaryName: "kubelogin", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
 				Repo: "Azure/kubelogin", Description: "Azure Kubernetes login",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -82,7 +82,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "grpcurl", BinaryName: "grpcurl", Kind: GitHubRelease, Category: ExtCloud, Extension: true,
+				Name: "grpcurl", BinaryName: "grpcurl", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
 				Repo: "fullstorydev/grpcurl", Description: "curl for gRPC",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "osx"},
@@ -92,7 +92,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "terraform", BinaryName: "terraform", Kind: DirectDownload, Category: ExtCloud, Extension: true,
+				Name: "terraform", BinaryName: "terraform", Kind: DirectDownload, Category: ExtCloudSec, Extension: true,
 				Repo: "hashicorp/terraform", Description: "Infrastructure as code",
 				URL:  "https://releases.hashicorp.com/terraform/{version_bare}/terraform_{version_bare}_{os}_{arch}.zip",
 				Asset: AssetPattern{
@@ -101,7 +101,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "kubectl", BinaryName: "kubectl", Kind: DirectDownload, Category: ExtCloud, Extension: true,
+				Name: "kubectl", BinaryName: "kubectl", Kind: DirectDownload, Category: ExtCloudSec, Extension: true,
 				Description: "Kubernetes CLI",
 				StableURL:   "https://dl.k8s.io/release/stable.txt",
 				URL:         "https://dl.k8s.io/release/{version}/bin/{os}/{arch}/kubectl",

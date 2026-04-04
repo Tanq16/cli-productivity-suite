@@ -19,7 +19,7 @@ A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driv
 Additional tools are available as **extension packs** installed via `cps extend`:
 
 - **security** - nuclei, naabu, subfinder, proxify, trufflehog
-- **cloud** - terraform, kubectl, kubelogin, grpcurl
+- **cloudsec** - terraform, kubectl, kubelogin, grpcurl
 - **appsec** - katana, ffuf
 - **private** - personal/private tools (requires `--gh-token`)
 
@@ -89,19 +89,11 @@ Install or update tools by name or category. Accepts multiple arguments. When a 
 ```bash
 cps install bat                     # Single tool
 cps install bat fd ripgrep          # Multiple tools
-cps install public                  # All public tools
+cps install core                    # All core binary tools
 cps install configs                 # Config files + shell plugins
 ```
 
-**Category aliases:**
-
-| Alias | What it installs |
-|-------|-----------------|
-| `public` | All public GitHub release binaries and own public tools |
-| `system` | System packages via apt (Linux) or brew (macOS) |
-| `cloud` | Cloud CLIs (AWS, Azure, gcloud) |
-| `runtimes` | Language runtimes (Go, Python, Rust, Neovim) |
-| `configs` | Config files (.zshrc, tmux, kitty, aerospace) and shell plugins (spaceship, zsh plugins, tpm, nvchad, nvm) |
+**Category aliases:** `core`, `system`, `cloud`, `runtimes`, `configs`
 
 ### `extend`
 
@@ -109,11 +101,8 @@ Install extension tool packs. Extensions are installed to `~/shell/extensions/` 
 
 ```bash
 cps extend list                     # List available packs
-cps extend security                 # Install security tools
-cps extend cloud                    # Install cloud/infra tools
-cps extend appsec                   # Install appsec tools
-cps extend private                  # Install private tools (needs --gh-token)
-cps extend --check security         # Check a pack for updates
+cps extend <pack>                   # Install a pack
+cps extend --check <pack>           # Check a pack for updates
 ```
 
 ### `cheat`
@@ -121,14 +110,7 @@ cps extend --check security         # Check a pack for updates
 Print styled terminal cheat sheets for common tools tailored to the CPS environment.
 
 ```bash
-cps cheat list                      # List available cheat sheets
-cps cheat cps                       # CPS itself
-cps cheat uv                        # UV / Python
-cps cheat rust                      # Rust / Cargo
-cps cheat tmux                      # Tmux (CPS keybindings)
-cps cheat nvim                      # Neovim / NvChad
-cps cheat fzf                       # FZF
-cps cheat regex                     # grep, ripgrep, awk
+cps cheat <topic>                   # e.g., cps, uv, rust, tmux, nvim, fzf, regex
 ```
 
 ### `self-update`

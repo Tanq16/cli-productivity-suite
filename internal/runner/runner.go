@@ -89,9 +89,9 @@ func Init(ghToken string) {
 	}
 	st.Save()
 
-	publicGH := filterGitHubPublic(reg.ByKind(registry.GitHubRelease), false)
-	publicGH = filterPlatformTools(publicGH, p)
-	if runPhase("Phase 5: Public GitHub releases", publicGH, p, gh, st) {
+	coreGH := filterGitHubCore(reg.ByKind(registry.GitHubRelease), false)
+	coreGH = filterPlatformTools(coreGH, p)
+	if runPhase("Phase 5: Core GitHub releases", coreGH, p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
@@ -101,8 +101,8 @@ func Init(ghToken string) {
 	}
 	st.Save()
 
-	ownPublic := filterOwnPublic(reg.ByKind(registry.GitHubRelease))
-	if runPhase("Phase 7: Own public tools", ownPublic, p, gh, st) {
+	ownCore := filterOwnCore(reg.ByKind(registry.GitHubRelease))
+	if runPhase("Phase 7: Own core tools", ownCore, p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
@@ -208,12 +208,10 @@ func Check(ghToken string, appVersion string, skipPrivate bool) {
 }
 
 var categoryAliases = map[string]func(*registry.Registry, platform.Platform) []registry.Tool{
-	"public": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
-		ghPublic := filterNonExtension(filterGitHubPublic(reg.ByKind(registry.GitHubRelease), false))
-		ownPublic := filterNonExtension(filterOwnPublic(reg.ByKind(registry.GitHubRelease)))
-		dd := filterNonExtension(reg.ByKind(registry.DirectDownload))
-		combined := append(ghPublic, ownPublic...)
-		combined = append(combined, dd...)
+	"core": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
+		ghCore := filterNonExtension(filterGitHubCore(reg.ByKind(registry.GitHubRelease), false))
+		ownCore := filterNonExtension(filterOwnCore(reg.ByKind(registry.GitHubRelease)))
+		combined := append(ghCore, ownCore...)
 		return filterPlatformTools(combined, p)
 	},
 	"system": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
@@ -234,7 +232,7 @@ var categoryAliases = map[string]func(*registry.Registry, platform.Platform) []r
 }
 
 func CategoryAliasNames() []string {
-	return []string{"public", "system", "cloud", "runtimes", "configs"}
+	return []string{"core", "system", "cloud", "runtimes", "configs"}
 }
 
 func Install(args []string, ghToken string) {
@@ -684,10 +682,10 @@ func toolForPlatform(tool registry.Tool, p platform.Platform) bool {
 	return false
 }
 
-func filterGitHubPublic(tools []registry.Tool, includeOwn bool) []registry.Tool {
+func filterGitHubCore(tools []registry.Tool, includeOwn bool) []registry.Tool {
 	var result []registry.Tool
 	for _, t := range tools {
-		if t.Category == registry.Public && !t.IsPrivate {
+		if t.Category == registry.Core && !t.IsPrivate {
 			if !includeOwn && isOwnTool(t.Repo) {
 				continue
 			}
@@ -697,10 +695,10 @@ func filterGitHubPublic(tools []registry.Tool, includeOwn bool) []registry.Tool 
 	return result
 }
 
-func filterOwnPublic(tools []registry.Tool) []registry.Tool {
+func filterOwnCore(tools []registry.Tool) []registry.Tool {
 	var result []registry.Tool
 	for _, t := range tools {
-		if t.Category == registry.Public && isOwnTool(t.Repo) {
+		if t.Category == registry.Core && isOwnTool(t.Repo) {
 			result = append(result, t)
 		}
 	}

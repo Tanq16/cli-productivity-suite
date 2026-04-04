@@ -3,7 +3,7 @@ package registry
 var AllTools = []Tool{
 	// ========== GitHub Release Binaries (Public) ==========
 	{
-		Name: "bat", BinaryName: "bat", Kind: GitHubRelease, Category: Public,
+		Name: "bat", BinaryName: "bat", Kind: GitHubRelease, Category: Core,
 		Repo: "sharkdp/bat", Description: "Cat clone with syntax highlighting",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -14,7 +14,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "fd", BinaryName: "fd", Kind: GitHubRelease, Category: Public,
+		Name: "fd", BinaryName: "fd", Kind: GitHubRelease, Category: Core,
 		Repo: "sharkdp/fd", Description: "Simple fast alternative to find",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -25,7 +25,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "ripgrep", BinaryName: "rg", Kind: GitHubRelease, Category: Public,
+		Name: "ripgrep", BinaryName: "rg", Kind: GitHubRelease, Category: Core,
 		Repo: "BurntSushi/ripgrep", Description: "Fast recursive grep",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -35,7 +35,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "lsd", BinaryName: "lsd", Kind: GitHubRelease, Category: Public,
+		Name: "lsd", BinaryName: "lsd", Kind: GitHubRelease, Category: Core,
 		Repo: "lsd-rs/lsd", Description: "Next gen ls command",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -46,7 +46,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "jq", BinaryName: "jq", Kind: GitHubRelease, Category: Public,
+		Name: "jq", BinaryName: "jq", Kind: GitHubRelease, Category: Core,
 		Repo: "jqlang/jq", Description: "Command-line JSON processor",
 		Asset: AssetPattern{
 			OSPatterns:    map[string]string{"linux": "linux", "darwin": "macos"},
@@ -55,7 +55,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "yq", BinaryName: "yq", Kind: GitHubRelease, Category: Public,
+		Name: "yq", BinaryName: "yq", Kind: GitHubRelease, Category: Core,
 		Repo: "mikefarah/yq", Description: "YAML processor",
 		Asset: AssetPattern{
 			OSPatterns:        map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -65,7 +65,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "fzf", BinaryName: "fzf", Kind: GitHubRelease, Category: Public,
+		Name: "fzf", BinaryName: "fzf", Kind: GitHubRelease, Category: Core,
 		Repo: "junegunn/fzf", Description: "Fuzzy finder",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -75,7 +75,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "gh", BinaryName: "gh", Kind: GitHubRelease, Category: Public,
+		Name: "gh", BinaryName: "gh", Kind: GitHubRelease, Category: Core,
 		Repo: "cli/cli", Description: "GitHub CLI",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
@@ -85,7 +85,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "uv", BinaryName: "uv", Kind: GitHubRelease, Category: Public,
+		Name: "uv", BinaryName: "uv", Kind: GitHubRelease, Category: Core,
 		Repo: "astral-sh/uv", Description: "Python package manager",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -96,7 +96,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "bun", BinaryName: "bun", Kind: GitHubRelease, Category: Public,
+		Name: "bun", BinaryName: "bun", Kind: GitHubRelease, Category: Core,
 		Repo: "oven-sh/bun", Description: "JavaScript runtime",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -107,7 +107,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "gobuster", BinaryName: "gobuster", Kind: GitHubRelease, Category: Public,
+		Name: "gobuster", BinaryName: "gobuster", Kind: GitHubRelease, Category: Core,
 		Repo: "OJ/gobuster", Description: "Directory/DNS brute-forcer",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "Linux", "darwin": "Darwin"},
@@ -117,7 +117,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "gron", BinaryName: "gron", Kind: GitHubRelease, Category: Public,
+		Name: "gron", BinaryName: "gron", Kind: GitHubRelease, Category: Core,
 		Repo: "tomnomnom/gron", Description: "Make JSON greppable",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -127,7 +127,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "sq", BinaryName: "sq", Kind: GitHubRelease, Category: Public,
+		Name: "sq", BinaryName: "sq", Kind: GitHubRelease, Category: Core,
 		Repo: "neilotoole/sq", Description: "Data wrangler",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
@@ -137,7 +137,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "zoxide", BinaryName: "zoxide", Kind: GitHubRelease, Category: Public,
+		Name: "zoxide", BinaryName: "zoxide", Kind: GitHubRelease, Category: Core,
 		Repo: "ajeetdsouza/zoxide", Description: "Smarter cd command",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -150,7 +150,7 @@ var AllTools = []Tool{
 
 	// ========== Own Public Tools (Tanq16) ==========
 	{
-		Name: "anbu", BinaryName: "anbu", Kind: GitHubRelease, Category: Public,
+		Name: "anbu", BinaryName: "anbu", Kind: GitHubRelease, Category: Core,
 		Repo: "Tanq16/anbu", Description: "Anbu tool",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -160,7 +160,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "danzo", BinaryName: "danzo", Kind: GitHubRelease, Category: Public,
+		Name: "danzo", BinaryName: "danzo", Kind: GitHubRelease, Category: Core,
 		Repo: "Tanq16/danzo", Description: "Danzo tool",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -170,7 +170,7 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "ai-context", BinaryName: "ai-context", Kind: GitHubRelease, Category: Public,
+		Name: "ai-context", BinaryName: "ai-context", Kind: GitHubRelease, Category: Core,
 		Repo: "Tanq16/ai-context", Description: "AI context builder",
 		Asset: AssetPattern{
 			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
