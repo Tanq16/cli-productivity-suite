@@ -96,7 +96,7 @@ func Init(ghToken string) {
 	}
 	st.Save()
 
-	if runPhase("Phase 6: Direct downloads", reg.ByKind(registry.DirectDownload), p, gh, st) {
+	if runPhase("Phase 6: Direct downloads", filterNonExtension(reg.ByKind(registry.DirectDownload)), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
@@ -104,16 +104,6 @@ func Init(ghToken string) {
 	ownPublic := filterOwnPublic(reg.ByKind(registry.GitHubRelease))
 	if runPhase("Phase 7: Own public tools", ownPublic, p, gh, st) {
 		hadErrors = true
-	}
-	st.Save()
-
-	if ghToken != "" {
-		privateTools := reg.ByCategory(registry.Private)
-		if runPhase("Phase 8: Private tools", privateTools, p, gh, st) {
-			hadErrors = true
-		}
-	} else {
-		utils.PrintWarn("Phase 8: Skipping private tools (no --gh-token)", nil)
 	}
 	st.Save()
 
@@ -219,15 +209,12 @@ func Check(ghToken string, appVersion string, skipPrivate bool) {
 
 var categoryAliases = map[string]func(*registry.Registry, platform.Platform) []registry.Tool{
 	"public": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
-		ghPublic := filterGitHubPublic(reg.ByKind(registry.GitHubRelease), false)
-		ownPublic := filterOwnPublic(reg.ByKind(registry.GitHubRelease))
-		dd := reg.ByKind(registry.DirectDownload)
+		ghPublic := filterNonExtension(filterGitHubPublic(reg.ByKind(registry.GitHubRelease), false))
+		ownPublic := filterNonExtension(filterOwnPublic(reg.ByKind(registry.GitHubRelease)))
+		dd := filterNonExtension(reg.ByKind(registry.DirectDownload))
 		combined := append(ghPublic, ownPublic...)
 		combined = append(combined, dd...)
 		return filterPlatformTools(combined, p)
-	},
-	"private": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
-		return filterPlatformTools(reg.ByCategory(registry.Private), p)
 	},
 	"system": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
 		return filterPlatformTools(reg.ByCategory(registry.System), p)
@@ -247,7 +234,7 @@ var categoryAliases = map[string]func(*registry.Registry, platform.Platform) []r
 }
 
 func CategoryAliasNames() []string {
-	return []string{"public", "private", "system", "cloud", "runtimes", "configs"}
+	return []string{"public", "system", "cloud", "runtimes", "configs"}
 }
 
 func Install(args []string, ghToken string) {
@@ -714,6 +701,16 @@ func filterOwnPublic(tools []registry.Tool) []registry.Tool {
 	var result []registry.Tool
 	for _, t := range tools {
 		if t.Category == registry.Public && isOwnTool(t.Repo) {
+			result = append(result, t)
+		}
+	}
+	return result
+}
+
+func filterNonExtension(tools []registry.Tool) []registry.Tool {
+	var result []registry.Tool
+	for _, t := range tools {
+		if !t.Extension {
 			result = append(result, t)
 		}
 	}

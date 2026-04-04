@@ -107,75 +107,6 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "nuclei", BinaryName: "nuclei", Kind: GitHubRelease, Category: Public,
-		Repo: "projectdiscovery/nuclei", Description: "Vulnerability scanner",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "zip",
-			BinaryPathInArchive: "nuclei",
-		},
-	},
-	{
-		Name: "naabu", BinaryName: "naabu", Kind: GitHubRelease, Category: Public,
-		Repo: "projectdiscovery/naabu", Description: "Port scanner",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "zip",
-			BinaryPathInArchive: "naabu",
-		},
-	},
-	{
-		Name: "katana", BinaryName: "katana", Kind: GitHubRelease, Category: Public,
-		Repo: "projectdiscovery/katana", Description: "Web crawler",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "zip",
-			BinaryPathInArchive: "katana",
-		},
-	},
-	{
-		Name: "subfinder", BinaryName: "subfinder", Kind: GitHubRelease, Category: Public,
-		Repo: "projectdiscovery/subfinder", Description: "Subdomain discovery",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "zip",
-			BinaryPathInArchive: "subfinder",
-		},
-	},
-	{
-		Name: "proxify", BinaryName: "proxify", Kind: GitHubRelease, Category: Public,
-		Repo: "projectdiscovery/proxify", Description: "HTTP proxy",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "zip",
-			BinaryPathInArchive: "proxify",
-		},
-	},
-	{
-		Name: "terraform", BinaryName: "terraform", Kind: DirectDownload, Category: Public,
-		Repo: "hashicorp/terraform", Description: "Infrastructure as code",
-		URL: "https://releases.hashicorp.com/terraform/{version_bare}/terraform_{version_bare}_{os}_{arch}.zip",
-		Asset: AssetPattern{
-			ArchiveFormat:       "zip",
-			BinaryPathInArchive: "terraform",
-		},
-	},
-	{
-		Name: "trufflehog", BinaryName: "trufflehog", Kind: GitHubRelease, Category: Public,
-		Repo: "trufflesecurity/trufflehog", Description: "Secret scanner",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "tar.gz",
-			BinaryPathInArchive: "trufflehog",
-		},
-	},
-	{
 		Name: "gobuster", BinaryName: "gobuster", Kind: GitHubRelease, Category: Public,
 		Repo: "OJ/gobuster", Description: "Directory/DNS brute-forcer",
 		Asset: AssetPattern{
@@ -183,26 +114,6 @@ var AllTools = []Tool{
 			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "arm64"},
 			ArchiveFormat:       "tar.gz",
 			BinaryPathInArchive: "gobuster",
-		},
-	},
-	{
-		Name: "grpcurl", BinaryName: "grpcurl", Kind: GitHubRelease, Category: Public,
-		Repo: "fullstorydev/grpcurl", Description: "curl for gRPC",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "osx"},
-			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "arm64"},
-			ArchiveFormat:       "tar.gz",
-			BinaryPathInArchive: "grpcurl",
-		},
-	},
-	{
-		Name: "ffuf", BinaryName: "ffuf", Kind: GitHubRelease, Category: Public,
-		Repo: "ffuf/ffuf", Description: "Fast web fuzzer",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "tar.gz",
-			BinaryPathInArchive: "ffuf",
 		},
 	},
 	{
@@ -236,24 +147,6 @@ var AllTools = []Tool{
 			BinaryPathInArchive: "zoxide",
 		},
 	},
-	{
-		Name: "kubelogin", BinaryName: "kubelogin", Kind: GitHubRelease, Category: Public,
-		Repo: "Azure/kubelogin", Description: "Azure Kubernetes login",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "zip",
-			BinaryPathInArchive: "bin/*/kubelogin",
-		},
-	},
-
-	// ========== Direct Download ==========
-	{
-		Name: "kubectl", BinaryName: "kubectl", Kind: DirectDownload, Category: Public,
-		Description: "Kubernetes CLI",
-		StableURL:   "https://dl.k8s.io/release/stable.txt",
-		URL:         "https://dl.k8s.io/release/{version}/bin/{os}/{arch}/kubectl",
-	},
 
 	// ========== Own Public Tools (Tanq16) ==========
 	{
@@ -277,15 +170,6 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "nits", BinaryName: "nits", Kind: GitHubRelease, Category: Public,
-		Repo: "Tanq16/nits", Description: "Nits tool",
-		Asset: AssetPattern{
-			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat: "none",
-		},
-	},
-	{
 		Name: "ai-context", BinaryName: "ai-context", Kind: GitHubRelease, Category: Public,
 		Repo: "Tanq16/ai-context", Description: "AI context builder",
 		Asset: AssetPattern{
@@ -293,63 +177,6 @@ var AllTools = []Tool{
 			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
 			ArchiveFormat:       "zip",
 			BinaryPathInArchive: "ai-context",
-		},
-	},
-	{
-		Name: "raikiri", BinaryName: "raikiri", Kind: GitHubRelease, Category: Public,
-		Repo: "Tanq16/raikiri", Description: "Raikiri tool",
-		Asset: AssetPattern{
-			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat: "none",
-		},
-	},
-	{
-		Name: "claudex", BinaryName: "claudex", Kind: GitHubRelease, Category: Public,
-		Repo: "Tanq16/claudex", Description: "Claudex tool",
-		Asset: AssetPattern{
-			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat: "none",
-		},
-	},
-	{
-		Name: "gcli", BinaryName: "gcli", Kind: GitHubRelease, Category: Public,
-		Repo: "Tanq16/gcli", Description: "Gcli tool",
-		Asset: AssetPattern{
-			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat: "none",
-		},
-	},
-	{
-		Name: "box", BinaryName: "box", Kind: GitHubRelease, Category: Public,
-		Repo: "Tanq16/box-cli", Description: "Box CLI tool",
-		Asset: AssetPattern{
-			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat: "none",
-		},
-	},
-
-	// ========== Own Private Tools (Tanq16) ==========
-	{
-		Name: "toon", BinaryName: "toon", Kind: GitHubRelease, Category: Private,
-		Repo: "Tanq16/toon", Description: "Private Toon tool", IsPrivate: true,
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "zip",
-			BinaryPathInArchive: "toon-*",
-		},
-	},
-	{
-		Name: "cybernest", BinaryName: "cybernest", Kind: GitHubRelease, Category: Private,
-		Repo: "Tanq16/cybernest", Description: "Private Cybernest tool", IsPrivate: true,
-		Asset: AssetPattern{
-			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat: "none",
 		},
 	},
 
