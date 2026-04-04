@@ -6,8 +6,12 @@ type Registry struct {
 }
 
 func New() *Registry {
+	combined := make([]Tool, len(AllTools))
+	copy(combined, AllTools)
+	combined = append(combined, AllExtensionTools()...)
+
 	r := &Registry{
-		tools:  AllTools,
+		tools:  combined,
 		byName: make(map[string]*Tool),
 	}
 	for i := range r.tools {

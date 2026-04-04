@@ -87,6 +87,10 @@ func (p Platform) ShellExecDir() string {
 	return filepath.Join(p.HomeDir, "shell", "executables")
 }
 
+func (p Platform) ShellExtDir() string {
+	return filepath.Join(p.HomeDir, "shell", "extensions")
+}
+
 func (p Platform) ConfigDir() string {
 	return filepath.Join(p.HomeDir, ".config", "cps")
 }

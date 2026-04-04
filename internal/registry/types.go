@@ -43,6 +43,8 @@ const (
 	Runtime
 	Config
 	Shell
+	ExtCloudSec
+	ExtAppSec
 )
 
 func (c ToolCategory) String() string {
@@ -61,6 +63,10 @@ func (c ToolCategory) String() string {
 		return "config"
 	case Shell:
 		return "shell"
+	case ExtCloudSec:
+		return "ext-cloud-sec"
+	case ExtAppSec:
+		return "ext-app-sec"
 	default:
 		return "unknown"
 	}
@@ -78,9 +84,10 @@ type AssetPattern struct {
 
 type Tool struct {
 	Name        string
-	BinaryName  string // name of the binary in ~/shell/executables/
+	BinaryName  string // name of the binary in ~/shell/executables/ (or ~/shell/extensions/ for extensions)
 	Kind        ToolKind
 	Category    ToolCategory
+	Extension   bool   // true = install to ~/shell/extensions/ instead of ~/shell/executables/
 	Repo        string // "owner/repo" for GitHub tools
 	Asset       AssetPattern
 	IsPrivate   bool

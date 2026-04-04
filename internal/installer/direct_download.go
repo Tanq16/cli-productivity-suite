@@ -48,6 +48,9 @@ func (d *DirectDownloadInstaller) Install(tool *registry.Tool, p platform.Platfo
 	url = strings.ReplaceAll(url, "{arch}", p.Arch.String())
 
 	destDir := p.ShellExecDir()
+	if tool.Extension {
+		destDir = p.ShellExtDir()
+	}
 	if err := os.MkdirAll(destDir, 0755); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}

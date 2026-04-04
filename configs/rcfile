@@ -9,7 +9,7 @@ export RUSTUP_HOME="$HOME/shell/rust/.rustup"
 export CARGO_HOME="$HOME/shell/rust/.cargo"
 
 # --- PATH ---
-export PATH="$HOME/shell/rust/.cargo/bin:$HOME/shell/executables:$HOME/go/bin:/usr/local/go/bin:/opt/homebrew/bin:$HOME/.local/bin:$PATH"
+export PATH="$HOME/shell/rust/.cargo/bin:$HOME/shell/extensions:$HOME/shell/executables:$HOME/go/bin:/usr/local/go/bin:/opt/homebrew/bin:$HOME/.local/bin:$PATH"
 
 # --- FZF ---
 [ -f "$HOME/shell/completions/fzf.zsh" ] && source "$HOME/shell/completions/fzf.zsh"

@@ -59,6 +59,9 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 	}
 
 	destDir := p.ShellExecDir()
+	if tool.Extension {
+		destDir = p.ShellExtDir()
+	}
 	if err := os.MkdirAll(destDir, 0755); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
