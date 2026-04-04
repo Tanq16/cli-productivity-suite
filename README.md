@@ -8,22 +8,30 @@
 
 ---
 
-A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driven development environment on Linux and macOS. It installs and tracks ~50 tools across these categories:
+A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driven development environment on Linux and macOS. It installs and tracks tools across these categories:
 
-- **CLI utilities** - bat, fd, ripgrep, lsd, jq, yq, fzf, gron, sq, and more
-- **Security tools** - nuclei, naabu, katana, subfinder, ffuf, gobuster, trufflehog, proxify
-- **Cloud & infra** - AWS CLI, Azure CLI, gcloud CLI, terraform, kubectl, kubelogin
+- **CLI utilities** - bat, fd, ripgrep, lsd, jq, yq, fzf, gron, sq, gobuster, and more
+- **Cloud CLIs** - AWS CLI, Azure CLI, gcloud CLI
 - **Language runtimes** - Go SDK, Python 3.14 (via uv), Rust (via rustup), Node.js LTS (via nvm)
 - **Editor & shell** - Neovim (0.11+) with NvChad, spaceship-prompt, zsh plugins, tmux with TPM
 - **Config files** - complete `.zshrc`, tmux.conf, kitty.conf, aerospace.toml (macOS)
+
+Additional tools are available as **extension packs** installed via `cps extend`:
+
+- **security** - nuclei, naabu, subfinder, proxify, trufflehog
+- **cloud** - terraform, kubectl, kubelogin, grpcurl
+- **appsec** - katana, ffuf
+- **private** - personal/private tools (requires `--gh-token`)
 
 ## Capabilities
 
 | Category | Commands | Description |
 |----------|----------|-------------|
-| Setup | `cps init` | Full environment setup - system packages, ~50 tools, cloud CLIs, language runtimes, shell plugins, and config files |
+| Setup | `cps init` | Full environment setup - system packages, tools, cloud CLIs, language runtimes, shell plugins, and config files |
 | Monitoring | `cps check` | Compare installed versions against latest releases |
 | Install | `cps install <tools\|categories>...` | Install or update tools by name or category |
+| Extensions | `cps extend <pack>` | Install extension tool packs (security, cloud, appsec, private) |
+| Cheat sheets | `cps cheat <topic>` | Print styled cheat sheets for common tools |
 | Self-update | `cps self-update` | Update cps itself to the latest release |
 | Maintenance | `cps clean` | Remove all CPS-managed files and directories |
 
@@ -63,20 +71,15 @@ make build
 Full environment setup with all tools, plugins, and configs.
 
 ```bash
-# Public tools only
 cps init
-
-# Include private repos
-cps init --gh-token YOUR_GITHUB_PAT
 ```
 
 ### `check`
 
-Compare installed tool versions against latest releases. Only shows actionable items (tools needing update, config diffs, errors). Private tools are automatically included when a GitHub token is available.
+Compare installed tool versions against latest releases. Only shows actionable items (tools needing update, config diffs, errors).
 
 ```bash
 cps check
-cps check --skip-private    # Skip private tools even with token
 ```
 
 ### `install`
@@ -88,19 +91,45 @@ cps install bat                     # Single tool
 cps install bat fd ripgrep          # Multiple tools
 cps install public                  # All public tools
 cps install configs                 # Config files + shell plugins
-cps install --gh-token TOKEN gcli   # Private tool with token
 ```
 
 **Category aliases:**
 
 | Alias | What it installs |
 |-------|-----------------|
-| `public` | All public GitHub release binaries, direct downloads, and own public tools |
-| `private` | Private tools (requires `--gh-token`) |
+| `public` | All public GitHub release binaries and own public tools |
 | `system` | System packages via apt (Linux) or brew (macOS) |
 | `cloud` | Cloud CLIs (AWS, Azure, gcloud) |
 | `runtimes` | Language runtimes (Go, Python, Rust, Neovim) |
 | `configs` | Config files (.zshrc, tmux, kitty, aerospace) and shell plugins (spaceship, zsh plugins, tpm, nvchad, nvm) |
+
+### `extend`
+
+Install extension tool packs. Extensions are installed to `~/shell/extensions/` and tracked in the same state file. Individual extension tools can also be installed via `cps install <tool-name>`.
+
+```bash
+cps extend list                     # List available packs
+cps extend security                 # Install security tools
+cps extend cloud                    # Install cloud/infra tools
+cps extend appsec                   # Install appsec tools
+cps extend private                  # Install private tools (needs --gh-token)
+cps extend --check security         # Check a pack for updates
+```
+
+### `cheat`
+
+Print styled terminal cheat sheets for common tools tailored to the CPS environment.
+
+```bash
+cps cheat list                      # List available cheat sheets
+cps cheat cps                       # CPS itself
+cps cheat uv                        # UV / Python
+cps cheat rust                      # Rust / Cargo
+cps cheat tmux                      # Tmux (CPS keybindings)
+cps cheat nvim                      # Neovim / NvChad
+cps cheat fzf                       # FZF
+cps cheat regex                     # grep, ripgrep, awk
+```
 
 ### `self-update`
 
@@ -128,7 +157,7 @@ cps clean
 
 ## Tips and Notes
 
-- All binary tools are installed to `~/shell/executables/` - automatically added to your PATH in `.zshrc`
+- Core tools are installed to `~/shell/executables/`, extension tools to `~/shell/extensions/` - both are on PATH via `.zshrc`
 - Neovim is installed from GitHub releases (0.11+) on both Linux and macOS to meet NvChad requirements
 - State is tracked in `~/.config/cps/state.json` - this file records installed versions for `check` and `install` commands
 - If the `gh` CLI is authenticated (`gh auth login`), CPS automatically uses its token - no need to pass `--gh-token`
