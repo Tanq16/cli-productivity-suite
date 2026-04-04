@@ -10,6 +10,7 @@ type Sheet struct {
 }
 
 var sheets = []Sheet{
+	cpsSheet,
 	uvSheet,
 	rustSheet,
 	tmuxSheet,
