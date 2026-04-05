@@ -64,6 +64,36 @@ var extensionPacks = []ExtensionPack{
 					BinaryPathInArchive: "trufflehog",
 				},
 			},
+			{
+				Name: "httpx", BinaryName: "httpx", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
+				Repo: "projectdiscovery/httpx", Description: "HTTP toolkit",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat:       "zip",
+					BinaryPathInArchive: "httpx",
+				},
+			},
+			{
+				Name: "dnsx", BinaryName: "dnsx", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
+				Repo: "projectdiscovery/dnsx", Description: "DNS toolkit",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat:       "zip",
+					BinaryPathInArchive: "dnsx",
+				},
+			},
+			{
+				Name: "titus", BinaryName: "titus", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
+				Repo: "praetorian-inc/titus", Description: "Security assessment tool",
+				Asset: AssetPattern{
+					OSPatterns:        map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:      map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings: []string{"windows", ".zip", ".jar", "browser-extension"},
+					ArchiveFormat:     "none",
+				},
+			},
 		},
 	},
 	{
@@ -106,6 +136,50 @@ var extensionPacks = []ExtensionPack{
 				StableURL:   "https://dl.k8s.io/release/stable.txt",
 				URL:         "https://dl.k8s.io/release/{version}/bin/{os}/{arch}/kubectl",
 			},
+			{
+				Name: "cloudfox", BinaryName: "cloudfox", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
+				Repo: "BishopFox/cloudfox", Description: "Cloud security enumeration",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows"},
+					ArchiveFormat:       "zip",
+					BinaryPathInArchive: "cloudfox/cloudfox",
+				},
+			},
+			{
+				Name: "aurelian", BinaryName: "aurelian", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
+				Repo: "praetorian-inc/aurelian", Description: "Cloud security tool",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows", "SHA256SUMS"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "aurelian",
+				},
+			},
+			{
+				Name: "trivy", BinaryName: "trivy", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
+				Repo: "aquasecurity/trivy", Description: "Vulnerability and misconfiguration scanner",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "Linux", "darwin": "macOS"},
+					ArchPatterns:        map[string]string{"amd64": "64bit", "arm64": "ARM64"},
+					ExcludeSubstrings:   []string{"checksums", ".deb", ".rpm", "FreeBSD", "windows", "PPC64LE", "s390x", "bom.json", ".sigstore"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "trivy",
+				},
+			},
+			{
+				Name: "cloudlist", BinaryName: "cloudlist", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
+				Repo: "projectdiscovery/cloudlist", Description: "Cloud asset discovery",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"checksums", "windows"},
+					ArchiveFormat:       "zip",
+					BinaryPathInArchive: "cloudlist",
+				},
+			},
 		},
 	},
 	{
@@ -133,13 +207,122 @@ var extensionPacks = []ExtensionPack{
 					BinaryPathInArchive: "ffuf",
 				},
 			},
+			{
+				Name: "hadrian", BinaryName: "hadrian", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
+				Repo: "praetorian-inc/hadrian", Description: "Application security scanner",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"checksums", "windows"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "hadrian",
+				},
+			},
+			{
+				Name: "dalfox", BinaryName: "dalfox", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
+				Repo: "hahwul/dalfox", Description: "XSS scanner",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows", ".zip"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "dalfox",
+				},
+			},
+			{
+				Name: "reaper", BinaryName: "reaper", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
+				Repo: "ghostsecurity/reaper", Description: "API security testing",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"checksums", "sigstore"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "reaper",
+				},
+			},
+			{
+				Name: "poltergeist", BinaryName: "poltergeist", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
+				Repo: "ghostsecurity/poltergeist", Description: "API security tool",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"sigstore", "windows", ".zip"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "poltergeist",
+				},
+			},
+			{
+				Name: "wraith", BinaryName: "wraith", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
+				Repo: "ghostsecurity/wraith", Description: "API security tool",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"checksums", "sigstore", "windows", ".zip"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "wraith",
+				},
+			},
+			{
+				Name: "gau", BinaryName: "gau", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
+				Repo: "lc/gau", Description: "URL fetcher",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"checksums", "windows", ".zip"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "gau",
+				},
+			},
 		},
 	},
 	{
 		Name:        "misc",
 		Description: "Miscellaneous utility tools",
 		Category:    ExtMisc,
-		Tools:       []Tool{},
+		Tools: []Tool{
+			{
+				Name: "julius", BinaryName: "julius", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
+				Repo: "praetorian-inc/julius", Description: "AI security testing tool",
+				Asset: AssetPattern{
+					OSPatterns:        map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:      map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings: []string{"checksums", ".exe"},
+					ArchiveFormat:     "none",
+				},
+			},
+			{
+				Name: "trajan", BinaryName: "trajan", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
+				Repo: "praetorian-inc/trajan", Description: "Security tool",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"checksums", ".zip", "windows"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "trajan",
+				},
+			},
+			{
+				Name: "gowitness", BinaryName: "gowitness", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
+				Repo: "sensepost/gowitness", Description: "Web screenshot tool",
+				Asset: AssetPattern{
+					OSPatterns:        map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:      map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings: []string{"windows"},
+					ArchiveFormat:     "none",
+				},
+			},
+			{
+				Name: "snitch", BinaryName: "snitch", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
+				Repo: "karol-broda/snitch", Description: "Secret scanner",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"checksums", ".deb", ".rpm", ".apk", "windows"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "snitch",
+				},
+			},
+		},
 	},
 	{
 		Name:        "private",

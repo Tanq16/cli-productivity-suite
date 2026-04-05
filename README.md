@@ -18,9 +18,10 @@ A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driv
 
 Additional tools are available as **extension packs** installed via `cps extend`:
 
-- **security** - nuclei, naabu, subfinder, proxify, trufflehog
-- **cloudsec** - terraform, kubectl, kubelogin, grpcurl
-- **appsec** - katana, ffuf
+- **security** - nuclei, naabu, subfinder, proxify, trufflehog, httpx, dnsx, titus
+- **cloudsec** - terraform, kubectl, kubelogin, grpcurl, cloudfox, aurelian, trivy, cloudlist
+- **appsec** - katana, ffuf, hadrian, dalfox, reaper, poltergeist, wraith, gau
+- **misc** - julius, trajan, gowitness, snitch
 - **private** - personal/private tools (requires `--gh-token`)
 
 ## Capabilities
