@@ -32,7 +32,7 @@ func buildCPSSheet() string {
 	// --- Extend ---
 	b.WriteString(headingStyle.Render("Extend — Extension Packs") + "\n")
 	b.WriteString(cmdStyle.Render("  cps extend list") + "                 List available packs\n")
-	b.WriteString(cmdStyle.Render("  cps extend <pack>") + "               Install a pack (security, cloudsec, appsec, etc.)\n")
+	b.WriteString(cmdStyle.Render("  cps extend <pack>") + "               Install a pack (security, cloudsec, appsec, misc, private)\n")
 	b.WriteString(cmdStyle.Render("  cps extend --check <pack>") + "       Check extension pack for updates\n")
 	b.WriteString(noteStyle.Render("  Extension tools also work with: cps install <tool-name>") + "\n")
 	b.WriteString(divider + "\n")
