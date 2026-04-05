@@ -397,7 +397,7 @@ var extensionPacks = []ExtensionPack{
 			},
 			{
 				Name: "nblm", BinaryName: "nblm", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
-				Repo: "Tanq16/nblm", Description: "NBLM tool",
+				Repo: "Tanq16/nblm", Description: "Private NBLM tool", IsPrivate: true,
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
