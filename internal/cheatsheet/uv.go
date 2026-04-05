@@ -7,11 +7,11 @@ import (
 )
 
 var (
-	titleStyle   = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("12")).PaddingBottom(1)
-	headingStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("11"))
-	cmdStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("10"))
-	noteStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).Italic(true)
-	dividerStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
+	titleStyle   = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.ANSIColor(12)).PaddingBottom(1)
+	headingStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.ANSIColor(11))
+	cmdStyle     = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(10))
+	noteStyle    = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(8)).Italic(true)
+	dividerStyle = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(8))
 )
 
 func buildUVSheet() string {

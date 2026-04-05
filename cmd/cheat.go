@@ -17,26 +17,18 @@ var cheatCmd = &cobra.Command{
 		if len(args) > 0 {
 			return nil, cobra.ShellCompDirectiveNoFileComp
 		}
-		return cheatsheet.AllNames(), cobra.ShellCompDirectiveNoFileComp
+		suggestions := append([]string{"list"}, cheatsheet.AllNames()...)
+		return suggestions, cobra.ShellCompDirectiveNoFileComp
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		if args[0] == "list" {
+			for _, s := range cheatsheet.List() {
+				utils.PrintInfo(fmt.Sprintf("%s — %s", s.Name, s.Description))
+			}
+			return
+		}
 		if err := cheatsheet.Print(args[0]); err != nil {
-			utils.PrintFatal(err.Error(), nil)
+			utils.PrintFatal("failed to print cheat sheet", err)
 		}
 	},
-}
-
-var cheatListCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List available cheat sheets",
-	Args:  cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		for _, s := range cheatsheet.List() {
-			utils.PrintInfo(fmt.Sprintf("%s — %s", s.Name, s.Description))
-		}
-	},
-}
-
-func init() {
-	cheatCmd.AddCommand(cheatListCmd)
 }

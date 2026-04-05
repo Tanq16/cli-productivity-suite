@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -21,21 +22,19 @@ func EnsureSudo() error {
 	return nil
 }
 
-func StartSudoRefresh() chan struct{} {
-	done := make(chan struct{})
+func StartSudoRefresh(ctx context.Context) {
 	go func() {
 		ticker := time.NewTicker(60 * time.Second)
 		defer ticker.Stop()
 		for {
 			select {
-			case <-done:
+			case <-ctx.Done():
 				return
 			case <-ticker.C:
 				exec.Command("sudo", "-n", "-v").Run()
 			}
 		}
 	}()
-	return done
 }
 
 func PhaseNeedsSudo(p platform.Platform, kinds ...registry.ToolKind) bool {

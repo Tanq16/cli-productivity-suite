@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -47,7 +48,7 @@ func Init(ghToken string) {
 	}
 	utils.PrintIndentedSuccess("prerequisites OK")
 
-	var sudoDone chan struct{}
+	var sudoCancel context.CancelFunc
 	if PhaseNeedsSudo(p, registry.SystemPackage, registry.CloudCLI, registry.LanguageRuntime) {
 		cached := exec.Command("sudo", "-n", "-v").Run() == nil
 		utils.ClearLines(2)
@@ -55,7 +56,9 @@ func Init(ghToken string) {
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
-		sudoDone = StartSudoRefresh()
+		ctx, cancel := context.WithCancel(context.Background())
+		sudoCancel = cancel
+		StartSudoRefresh(ctx)
 		if cached {
 			utils.ClearLines(1)
 		} else {
@@ -126,8 +129,8 @@ func Init(ghToken string) {
 
 	runPostInstall(p)
 
-	if sudoDone != nil {
-		close(sudoDone)
+	if sudoCancel != nil {
+		sudoCancel()
 	}
 
 	st.LastInit = time.Now()
@@ -283,7 +286,7 @@ func Install(args []string, ghToken string) {
 		}
 	}
 
-	var sudoDone chan struct{}
+	var sudoCancel context.CancelFunc
 	needsSudo := false
 	for _, t := range tools {
 		if ToolNeedsSudo(t, p) {
@@ -297,7 +300,9 @@ func Install(args []string, ghToken string) {
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
-		sudoDone = StartSudoRefresh()
+		ctx, cancel := context.WithCancel(context.Background())
+		sudoCancel = cancel
+		StartSudoRefresh(ctx)
 		if cached {
 			utils.ClearLines(1)
 		} else {
@@ -326,8 +331,8 @@ func Install(args []string, ghToken string) {
 
 	installPostTasks(tools, p)
 
-	if sudoDone != nil {
-		close(sudoDone)
+	if sudoCancel != nil {
+		sudoCancel()
 	}
 
 	if err := st.Save(); err != nil {
@@ -428,7 +433,8 @@ func SelfUpdate(appVersion string) {
 	if err := EnsureSudo(); err != nil {
 		utils.PrintFatal("sudo authentication failed", err)
 	}
-	sudoDone := StartSudoRefresh()
+	sudoCtx, sudoCancel := context.WithCancel(context.Background())
+	StartSudoRefresh(sudoCtx)
 	if cached {
 		utils.ClearLines(1)
 	} else {
@@ -455,7 +461,12 @@ func SelfUpdate(appVersion string) {
 		destPath = "/usr/local/bin/cps"
 	}
 	rmCmd := exec.Command("sudo", "rm", "-f", destPath)
+	var rmStderr strings.Builder
+	rmCmd.Stderr = &rmStderr
 	if err := rmCmd.Run(); err != nil {
+		if detail := strings.TrimSpace(rmStderr.String()); detail != "" {
+			err = fmt.Errorf("%s: %w", detail, err)
+		}
 		utils.PrintFatal(fmt.Sprintf("failed to remove old binary at %s", destPath), err)
 	}
 	cpCmd := exec.Command("sudo", "cp", tmpBinary, destPath)
@@ -470,7 +481,7 @@ func SelfUpdate(appVersion string) {
 	}
 	utils.ClearLines(1)
 
-	close(sudoDone)
+	sudoCancel()
 	utils.PrintSuccess(fmt.Sprintf("updated cps: %s → %s", appVersion, release.TagName))
 }
 
