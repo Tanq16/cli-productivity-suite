@@ -40,3 +40,30 @@ func FindBinary(dir, pattern string) (string, error) {
 	}
 	return "", fmt.Errorf("binary not found matching pattern %s in %s", pattern, dir)
 }
+
+func AtomicInstallBinary(srcPath, destPath string) error {
+	data, err := os.ReadFile(srcPath)
+	if err != nil {
+		return err
+	}
+	dir := filepath.Dir(destPath)
+	tmp, err := os.CreateTemp(dir, ".cps-tmp-*")
+	if err != nil {
+		return err
+	}
+	tmpPath := tmp.Name()
+	if _, err := tmp.Write(data); err != nil {
+		tmp.Close()
+		os.Remove(tmpPath)
+		return err
+	}
+	if err := tmp.Close(); err != nil {
+		os.Remove(tmpPath)
+		return err
+	}
+	if err := os.Chmod(tmpPath, 0755); err != nil {
+		os.Remove(tmpPath)
+		return err
+	}
+	return os.Rename(tmpPath, destPath)
+}

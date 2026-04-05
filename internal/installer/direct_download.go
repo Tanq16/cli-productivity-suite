@@ -71,17 +71,27 @@ func (d *DirectDownloadInstaller) Install(tool *registry.Tool, p platform.Platfo
 	}
 
 	destPath := filepath.Join(destDir, tool.BinaryName)
-	f, err := os.Create(destPath)
+	tmp, err := os.CreateTemp(destDir, ".cps-tmp-*")
 	if err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
-	defer f.Close()
+	tmpPath := tmp.Name()
 
-	if _, err := io.Copy(f, resp.Body); err != nil {
+	if _, err := io.Copy(tmp, resp.Body); err != nil {
+		tmp.Close()
+		os.Remove(tmpPath)
 		return Result{Tool: tool.Name, Err: err}
 	}
-
-	if err := os.Chmod(destPath, 0755); err != nil {
+	if err := tmp.Close(); err != nil {
+		os.Remove(tmpPath)
+		return Result{Tool: tool.Name, Err: err}
+	}
+	if err := os.Chmod(tmpPath, 0755); err != nil {
+		os.Remove(tmpPath)
+		return Result{Tool: tool.Name, Err: err}
+	}
+	if err := os.Rename(tmpPath, destPath); err != nil {
+		os.Remove(tmpPath)
 		return Result{Tool: tool.Name, Err: err}
 	}
 
@@ -157,11 +167,7 @@ func (d *DirectDownloadInstaller) installArchive(tool *registry.Tool, url, versi
 	}
 
 	destPath := filepath.Join(destDir, tool.BinaryName)
-	data, err := os.ReadFile(binaryPath)
-	if err != nil {
-		return Result{Tool: tool.Name, Err: err}
-	}
-	if err := os.WriteFile(destPath, data, 0755); err != nil {
+	if err := AtomicInstallBinary(binaryPath, destPath); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
 

@@ -107,11 +107,7 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 	}
 
 	destPath := filepath.Join(destDir, tool.BinaryName)
-	data, err := os.ReadFile(binaryPath)
-	if err != nil {
-		return Result{Tool: tool.Name, Err: err}
-	}
-	if err := os.WriteFile(destPath, data, 0755); err != nil {
+	if err := AtomicInstallBinary(binaryPath, destPath); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
 
