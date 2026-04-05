@@ -322,6 +322,17 @@ var extensionPacks = []ExtensionPack{
 					BinaryPathInArchive: "snitch",
 				},
 			},
+			{
+				Name: "age", BinaryName: "age", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
+				Repo: "FiloSottile/age", Description: "File encryption tool",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows", "freebsd"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "age/age",
+				},
+			},
 		},
 	},
 	{
@@ -382,6 +393,15 @@ var extensionPacks = []ExtensionPack{
 					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
 					ArchiveFormat:       "zip",
 					BinaryPathInArchive: "toon-*",
+				},
+			},
+			{
+				Name: "nblm", BinaryName: "nblm", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
+				Repo: "Tanq16/nblm", Description: "NBLM tool",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
 				},
 			},
 			{

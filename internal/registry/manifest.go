@@ -147,6 +147,17 @@ var AllTools = []Tool{
 			BinaryPathInArchive: "zoxide",
 		},
 	},
+	{
+		Name: "sd", BinaryName: "sd", Kind: GitHubRelease, Category: Core,
+		Repo: "chmln/sd", Description: "Find and replace CLI tool",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
+			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "aarch64"},
+			ExcludeSubstrings:   []string{"windows", "gnueabi"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "*/sd",
+		},
+	},
 
 	// ========== Own Public Tools (Tanq16) ==========
 	{
