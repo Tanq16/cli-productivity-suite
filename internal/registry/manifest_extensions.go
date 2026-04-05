@@ -226,7 +226,7 @@ var extensionPacks = []ExtensionPack{
 					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
 					ExcludeSubstrings:   []string{"windows", ".zip"},
 					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "dalfox",
+					BinaryPathInArchive: "dalfox*",
 				},
 			},
 			{
