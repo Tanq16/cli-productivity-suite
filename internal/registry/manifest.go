@@ -107,16 +107,6 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "gobuster", BinaryName: "gobuster", Kind: GitHubRelease, Category: Core,
-		Repo: "OJ/gobuster", Description: "Directory/DNS brute-forcer",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "Linux", "darwin": "Darwin"},
-			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "arm64"},
-			ArchiveFormat:       "tar.gz",
-			BinaryPathInArchive: "gobuster",
-		},
-	},
-	{
 		Name: "gron", BinaryName: "gron", Kind: GitHubRelease, Category: Core,
 		Repo: "tomnomnom/gron", Description: "Make JSON greppable",
 		Asset: AssetPattern{

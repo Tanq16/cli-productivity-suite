@@ -10,7 +10,7 @@
 
 A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driven development environment on Linux and macOS. It installs and tracks tools across these categories:
 
-- **CLI utilities** - bat, fd, ripgrep, lsd, jq, yq, fzf, sd, gron, sq, gobuster, and more
+- **CLI utilities** - bat, fd, ripgrep, lsd, jq, yq, fzf, sd, gron, sq, and more
 - **Cloud CLIs** - AWS CLI, Azure CLI, gcloud CLI
 - **Language runtimes** - Go SDK, Python 3.14 (via uv), Rust (via rustup), Node.js LTS (via nvm)
 - **Editor & shell** - Neovim (0.11+) with NvChad, spaceship-prompt, zsh plugins, tmux with TPM
@@ -18,7 +18,7 @@ A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driv
 
 Additional tools are available as **extension packs** installed via `cps extend`:
 
-- **security** - nuclei, naabu, subfinder, proxify, trufflehog, httpx, dnsx, titus
+- **security** - nuclei, naabu, subfinder, proxify, trufflehog, httpx, dnsx, gobuster, titus
 - **cloudsec** - terraform, kubectl, kubelogin, grpcurl, cloudfox, aurelian, trivy, cloudlist
 - **appsec** - katana, ffuf, hadrian, dalfox, reaper, poltergeist, wraith, gau
 - **misc** - julius, trajan, gowitness, snitch, age

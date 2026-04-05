@@ -85,6 +85,16 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
+				Name: "gobuster", BinaryName: "gobuster", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
+				Repo: "OJ/gobuster", Description: "Directory/DNS brute-forcer",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "Linux", "darwin": "Darwin"},
+					ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "arm64"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "gobuster",
+				},
+			},
+			{
 				Name: "titus", BinaryName: "titus", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
 				Repo: "praetorian-inc/titus", Description: "Security assessment tool",
 				Asset: AssetPattern{
@@ -407,6 +417,15 @@ var extensionPacks = []ExtensionPack{
 			{
 				Name: "cybernest", BinaryName: "cybernest", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
 				Repo: "Tanq16/cybernest", Description: "Private Cybernest tool", IsPrivate: true,
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
+				Name: "lincli", BinaryName: "lincli", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
+				Repo: "Tanq16/lincli", Description: "Private LinCLI tool", IsPrivate: true,
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
