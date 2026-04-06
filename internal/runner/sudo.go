@@ -31,7 +31,9 @@ func StartSudoRefresh(ctx context.Context) {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				exec.Command("sudo", "-n", "-v").Run()
+				cmd := exec.Command("sudo", "-n", "-v")
+				cmd.Stdin = os.Stdin
+				cmd.Run()
 			}
 		}
 	}()
