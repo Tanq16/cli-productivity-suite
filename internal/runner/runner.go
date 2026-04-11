@@ -49,7 +49,7 @@ func Init(ghToken string) {
 	utils.PrintIndentedSuccess("prerequisites OK")
 
 	var sudoCancel context.CancelFunc
-	if PhaseNeedsSudo(p, registry.SystemPackage, registry.CloudCLI, registry.LanguageRuntime) {
+	if PhaseNeedsSudo(p, registry.SystemPackage, registry.CloudCLI) {
 		cached := exec.Command("sudo", "-n", "-v").Run() == nil
 		utils.ClearLines(2)
 		utils.PrintRunning("(Running) Phase 1: Authenticating sudo")
@@ -86,43 +86,36 @@ func Init(ghToken string) {
 	}
 	st.Save()
 
-	goSDK := filterByName(reg.ByKind(registry.LanguageRuntime), "go-sdk")
-	if runPhase("Phase 4: Go SDK", goSDK, p, gh, st) {
-		hadErrors = true
-	}
-	st.Save()
-
 	coreGH := filterGitHubCore(reg.ByKind(registry.GitHubRelease), false)
 	coreGH = filterPlatformTools(coreGH, p)
-	if runPhase("Phase 5: Core GitHub releases", coreGH, p, gh, st) {
+	if runPhase("Phase 4: Core GitHub releases", coreGH, p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	if runPhase("Phase 6: Direct downloads", filterNonExtension(reg.ByKind(registry.DirectDownload)), p, gh, st) {
+	if runPhase("Phase 5: Direct downloads", filterNonExtension(reg.ByKind(registry.DirectDownload)), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
 	ownCore := filterOwnCore(reg.ByKind(registry.GitHubRelease))
-	if runPhase("Phase 7: Own core tools", ownCore, p, gh, st) {
+	if runPhase("Phase 6: Own core tools", ownCore, p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	nonSudoRuntimes := excludeByName(reg.ByKind(registry.LanguageRuntime), "go-sdk")
-	if runPhase("Phase 9: Language runtimes", nonSudoRuntimes, p, gh, st) {
+	if runPhase("Phase 7: Language runtimes", reg.ByKind(registry.LanguageRuntime), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
 	disableOMZSlowPaste(p)
-	if runPhase("Phase 10: Shell plugins", reg.ByKind(registry.ShellPlugin), p, gh, st) {
+	if runPhase("Phase 8: Shell plugins", reg.ByKind(registry.ShellPlugin), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	if runPhase("Phase 11: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
+	if runPhase("Phase 9: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
@@ -356,7 +349,7 @@ func installPostTasks(tools []registry.Tool, p platform.Platform) {
 			hasConfigs = true
 		}
 		switch t.Kind {
-		case registry.GitHubRelease, registry.DirectDownload:
+		case registry.GitHubRelease, registry.DirectDownload, registry.LanguageRuntime:
 			hasBinaries = true
 		}
 	}
@@ -495,9 +488,6 @@ func Clean() {
 		filepath.Join(p.HomeDir, "shell"),
 		filepath.Join(p.HomeDir, ".tmux"),
 		filepath.Join(p.HomeDir, ".config", "nvim"),
-		filepath.Join(p.HomeDir, ".nvm"),
-		filepath.Join(p.HomeDir, "nuclei-templates"),
-		filepath.Join(p.HomeDir, "google-cloud-sdk"),
 		filepath.Join(p.HomeDir, ".config", "cps"),
 	}
 
@@ -606,7 +596,7 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 }
 
 func runPostInstall(p platform.Platform) {
-	utils.PrintRunning("(Running) Phase 12: Post-install tasks")
+	utils.PrintRunning("(Running) Phase 10: Post-install tasks")
 	var lineCount int
 	var errors []jobResult
 
@@ -634,12 +624,12 @@ func runPostInstall(p platform.Platform) {
 
 	utils.ClearLines(lineCount + 1) // sub-lines + running header
 	if len(errors) > 0 {
-		utils.PrintError("Phase 12: partially completed with errors", nil)
+		utils.PrintError("Phase 10: partially completed with errors", nil)
 		for _, e := range errors {
 			utils.PrintIndentedError(e.name, e.err)
 		}
 	} else {
-		utils.PrintInfo("Phase 12: Post-install tasks")
+		utils.PrintInfo("Phase 10: Post-install tasks")
 	}
 }
 
@@ -660,6 +650,7 @@ func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *in
 	defs := []compDef{
 		{"fzf", "fzf", []string{"--zsh"}, "fzf.zsh"},
 		{"uv", "uv", []string{"generate-shell-completion", "zsh"}, "uv.zsh"},
+		{"fnm", "fnm", []string{"completions", "--shell", "zsh"}, "fnm.zsh"},
 		{"zoxide", "zoxide", []string{"init", "zsh"}, "zoxide.zsh"},
 	}
 

@@ -56,8 +56,6 @@ func (s *ShellPluginInstaller) runPostClone(tool *registry.Tool, p platform.Plat
 	case "tpm":
 		// TPM install_plugins runs after tmux.conf is deployed (in init flow)
 		return Result{Tool: tool.Name, Version: "git-managed"}
-	case "nvm":
-		return s.postCloneNvm(tool, p)
 	default:
 		return Result{Tool: tool.Name, Version: "git-managed"}
 	}
@@ -88,21 +86,6 @@ func (s *ShellPluginInstaller) postCloneNvChad(tool *registry.Tool, p platform.P
 		if err := os.WriteFile(chadrcPath, []byte(patched), 0644); err != nil {
 			return Result{Tool: tool.Name, Err: fmt.Errorf("failed to patch chadrc.lua: %w", err)}
 		}
-	}
-
-	return Result{Tool: tool.Name, Version: "git-managed"}
-}
-
-func (s *ShellPluginInstaller) postCloneNvm(tool *registry.Tool, p platform.Platform) Result {
-	nvmDir := expandHome(tool.CloneDest, p.HomeDir)
-	nvmScript := filepath.Join(nvmDir, "nvm.sh")
-
-	cmd := exec.Command("bash", "-c", fmt.Sprintf(
-		`export NVM_DIR="%s" && . "%s" && nvm install --lts`,
-		nvmDir, nvmScript,
-	))
-	if err := utils.RunCmd(cmd); err != nil {
-		return Result{Tool: tool.Name, Err: fmt.Errorf("nvm install --lts failed: %w", err)}
 	}
 
 	return Result{Tool: tool.Name, Version: "git-managed"}

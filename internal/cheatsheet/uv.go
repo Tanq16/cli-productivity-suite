@@ -50,8 +50,8 @@ func buildUVSheet() string {
 
 	// --- Tool Install ---
 	b.WriteString(headingStyle.Render("Tool Install — Isolated CLI Tools") + "\n")
-	b.WriteString(noteStyle.Render("  Each tool gets its own hidden venv (~/.local/share/uv/tools/<name>/).") + "\n")
-	b.WriteString(noteStyle.Render("  CLI entry points are symlinked to ~/.local/bin/ (or --bin-dir).") + "\n")
+	b.WriteString(noteStyle.Render("  Each tool gets its own isolated venv (~/shell/uv-tools/<name>/).") + "\n")
+	b.WriteString(noteStyle.Render("  CLI entry points are symlinked to ~/shell/uv-tool-executables/.") + "\n")
 	b.WriteString(noteStyle.Render("  Only works for packages with console_scripts entry points.") + "\n\n")
 	b.WriteString(cmdStyle.Render("  uv tool install <pkg>") + "           Install from PyPI\n")
 	b.WriteString(cmdStyle.Render("  uv tool install <pkg> --bin-dir <path>") + "\n")

@@ -243,6 +243,10 @@ var AllTools = []Tool{
 		Name: "rust", Kind: LanguageRuntime, Category: Runtime,
 		Description: "Rust toolchain via rustup",
 	},
+	{
+		Name: "node", Kind: LanguageRuntime, Category: Runtime,
+		Description: "Node.js LTS via fnm",
+	},
 
 	// ========== Config Files ==========
 	{
@@ -312,16 +316,9 @@ var AllTools = []Tool{
 		PostClone:   "nvchad",
 	},
 	{
-		Name: "nvm", Kind: ShellPlugin, Category: Runtime,
-		Description: "Node Version Manager",
-		CloneURL:    "https://github.com/nvm-sh/nvm.git",
-		CloneDest:   "~/.nvm",
-		PostClone:   "nvm",
-	},
-	{
 		Name: "nuclei-templates", Kind: ShellPlugin, Category: Shell,
 		Description: "Nuclei vulnerability templates",
 		CloneURL:    "https://github.com/projectdiscovery/nuclei-templates.git",
-		CloneDest:   "~/nuclei-templates",
+		CloneDest:   "~/shell/nuclei-templates",
 	},
 }

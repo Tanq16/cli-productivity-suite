@@ -12,7 +12,7 @@ A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driv
 
 - **CLI utilities** - bat, fd, ripgrep, lsd, jq, yq, fzf, sd, gron, sq, and more
 - **Cloud CLIs** - AWS CLI, Azure CLI, gcloud CLI
-- **Language runtimes** - Go SDK, Python 3.14 (via uv), Rust (via rustup), Node.js LTS (via nvm)
+- **Language runtimes** - Go SDK, Python 3.14 (via uv), Rust (via rustup), Node.js LTS (via fnm)
 - **Editor & shell** - Neovim (0.11+) with NvChad, spaceship-prompt, zsh plugins, tmux with TPM
 - **Config files** - complete `.zshrc`, tmux.conf, kitty.conf, aerospace.toml (macOS)
 
@@ -111,7 +111,7 @@ cps extend --check <pack>           # Check a pack for updates
 Print styled terminal cheat sheets for common tools tailored to the CPS environment.
 
 ```bash
-cps cheat <topic>                   # e.g., cps, uv, rust, tmux, nvim, fzf, regex
+cps cheat <topic>                   # e.g., cps, go, uv, fnm, rust, tmux, nvim, fzf, regex
 ```
 
 ### `self-update`
@@ -147,14 +147,14 @@ cps clean
 - Running `cps init` is idempotent - it skips tools that are already at the latest version
 - Cloud CLIs (AWS, Azure, gcloud) require sudo on Linux for system-level installation
 - The `.zshrc` deployed by `cps init` is a complete replacement - it includes Oh My Zsh config, tool integrations and aliases
-- `cps clean` removes `~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.nvm`, `~/nuclei-templates`, `~/google-cloud-sdk`, and `~/.config/cps` - it does not touch Oh My Zsh, deployed config files, or system packages
+- `cps clean` removes `~/shell`, `~/.tmux`, `~/.config/nvim`, and `~/.config/cps` - it does not touch Oh My Zsh, deployed config files, or system packages
 - If you previously had `bat` installed and it is somehow quite slow now to load, it's likely due to an outdated cache, which can be rebuilt with `bat cache --build`
 
 ## Deep Removal
 
 The `cps clean` command performs a superficial cleanup of CPS-managed directories. For a full removal of everything CPS installs, follow these steps:
 
-**Step 1** - Run `cps clean` to remove the primary managed directories (`~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.nvm`, `~/nuclei-templates`, `~/google-cloud-sdk`, `~/.config/cps`):
+**Step 1** - Run `cps clean` to remove the primary managed directories (`~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.config/cps`):
 
 ```bash
 cps clean
@@ -170,7 +170,7 @@ rm -rf \
   $HOME/.aerospace.toml \
   $HOME/.config/kitty/kitty.conf \
   $HOME/.local/share/nvim \
-  && sudo rm -rf /usr/local/go /usr/local/aws-cli /usr/local/bin/cps
+  && sudo rm -rf /usr/local/aws-cli /usr/local/bin/cps
 ```
 
 **Step 3** - Remove system packages installed by CPS:

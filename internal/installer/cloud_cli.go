@@ -111,11 +111,15 @@ func (c *CloudCLIInstaller) installGcloudCLI(p platform.Platform, st *state.Stat
 		return Result{Tool: "gcloud-cli", Err: err}
 	}
 
-	destDir := filepath.Join(p.HomeDir, "google-cloud-sdk")
+	destDir := filepath.Join(p.ShellDir(), "gcloud-sdk")
 	os.RemoveAll(destDir)
 
-	if err := ExtractTarGz(tarPath, p.HomeDir); err != nil {
+	if err := ExtractTarGz(tarPath, tmpDir); err != nil {
 		return Result{Tool: "gcloud-cli", Err: fmt.Errorf("extract failed: %w", err)}
+	}
+
+	if err := os.Rename(filepath.Join(tmpDir, "google-cloud-sdk"), destDir); err != nil {
+		return Result{Tool: "gcloud-cli", Err: fmt.Errorf("move gcloud-sdk failed: %w", err)}
 	}
 
 	installScript := filepath.Join(destDir, "install.sh")

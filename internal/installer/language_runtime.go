@@ -31,6 +31,8 @@ func (l *LanguageRuntimeInstaller) Check(tool *registry.Tool, _ platform.Platfor
 		return l.checkNeovim(current, gh)
 	case "python":
 		return l.checkPython(current)
+	case "node":
+		return l.checkNode(current, gh)
 	default:
 		return current, "check-manually", nil
 	}
@@ -111,6 +113,8 @@ func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platf
 		return l.installPython(p, st)
 	case "rust":
 		return l.installRust(p, st)
+	case "node":
+		return l.installNode(p, gh, st)
 	default:
 		return Result{Tool: tool.Name, Err: fmt.Errorf("unknown runtime: %s", tool.Name)}
 	}
@@ -241,12 +245,15 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 		return Result{Tool: "go-sdk", Err: err}
 	}
 
-	rmCmd := exec.Command("sudo", "rm", "-rf", "/usr/local/go")
-	utils.RunCmd(rmCmd)
+	goDir := filepath.Join(p.ShellDir(), "go-sdk")
+	os.RemoveAll(goDir)
 
-	extractCmd := exec.Command("sudo", "tar", "-C", "/usr/local", "-xzf", tarPath)
-	if err := utils.RunCmd(extractCmd); err != nil {
+	if err := ExtractTarGz(tarPath, tmpDir); err != nil {
 		return Result{Tool: "go-sdk", Err: fmt.Errorf("extract Go SDK failed: %w", err)}
+	}
+
+	if err := os.Rename(filepath.Join(tmpDir, "go"), goDir); err != nil {
+		return Result{Tool: "go-sdk", Err: fmt.Errorf("move Go SDK failed: %w", err)}
 	}
 
 	st.SetToolVersion("go-sdk", version)
@@ -387,4 +394,133 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, st *state.
 
 	st.SetToolVersion("python", version)
 	return Result{Tool: "python", Version: version}
+}
+
+func (l *LanguageRuntimeInstaller) checkNode(current string, gh *github.Client) (string, string, error) {
+	release, err := gh.LatestRelease("Schniz/fnm")
+	if err != nil {
+		return current, "", err
+	}
+	// State stores "fnmVersion/nodeVersion"; if fnm version changed, signal update
+	if strings.HasPrefix(current, release.TagName+"/") {
+		return current, current, nil
+	}
+	return current, release.TagName, nil
+}
+
+func (l *LanguageRuntimeInstaller) fnmAssetName(p platform.Platform) string {
+	if p.OS == platform.Darwin {
+		return "fnm-macos.zip"
+	}
+	if p.Arch == platform.ARM64 {
+		return "fnm-arm64.zip"
+	}
+	return "fnm-linux.zip"
+}
+
+func (l *LanguageRuntimeInstaller) installNode(p platform.Platform, gh *github.Client, st *state.State) Result {
+	release, err := gh.LatestRelease("Schniz/fnm")
+	if err != nil {
+		return Result{Tool: "node", Err: fmt.Errorf("failed to fetch fnm release: %w", err)}
+	}
+
+	fnmPath := filepath.Join(p.ShellExecDir(), "fnm")
+	fnmDir := filepath.Join(p.ShellDir(), "fnm")
+
+	if err := os.MkdirAll(fnmDir, 0755); err != nil {
+		return Result{Tool: "node", Err: err}
+	}
+
+	// Download and install fnm binary
+	assetName := l.fnmAssetName(p)
+	var downloadURL string
+	for _, a := range release.Assets {
+		if a.Name == assetName {
+			downloadURL = a.BrowserDownloadURL
+			break
+		}
+	}
+	if downloadURL == "" {
+		return Result{Tool: "node", Err: fmt.Errorf("no fnm asset found for %s/%s", p.OS, p.Arch)}
+	}
+
+	tmpDir, err := os.MkdirTemp("", "cps-fnm-*")
+	if err != nil {
+		return Result{Tool: "node", Err: err}
+	}
+	defer os.RemoveAll(tmpDir)
+
+	zipPath := filepath.Join(tmpDir, "fnm.zip")
+	if err := DownloadToFile(downloadURL, zipPath); err != nil {
+		return Result{Tool: "node", Err: fmt.Errorf("download fnm failed: %w", err)}
+	}
+
+	if err := ExtractZip(zipPath, tmpDir); err != nil {
+		return Result{Tool: "node", Err: fmt.Errorf("extract fnm failed: %w", err)}
+	}
+
+	extractedBin := filepath.Join(tmpDir, "fnm")
+	if err := AtomicInstallBinary(extractedBin, fnmPath); err != nil {
+		return Result{Tool: "node", Err: fmt.Errorf("install fnm binary failed: %w", err)}
+	}
+
+	// Capture existing global npm packages before installing new Node
+	var frozen []byte
+	npmPath := filepath.Join(fnmDir, "aliases", "lts-latest", "installation", "bin", "npm")
+	if _, err := os.Stat(npmPath); err == nil {
+		env := append(os.Environ(), "FNM_DIR="+fnmDir)
+		listCmd := exec.Command(npmPath, "list", "-g", "--depth=0", "--json")
+		listCmd.Env = env
+		frozen, _ = listCmd.Output()
+	}
+
+	// Install Node LTS via fnm
+	env := append(os.Environ(), "FNM_DIR="+fnmDir)
+
+	installCmd := exec.Command(fnmPath, "install", "--lts")
+	installCmd.Env = env
+	if err := utils.RunCmd(installCmd); err != nil {
+		return Result{Tool: "node", Err: fmt.Errorf("fnm install --lts failed: %w", err)}
+	}
+
+	defaultCmd := exec.Command(fnmPath, "default", "lts-latest")
+	defaultCmd.Env = env
+	utils.RunCmd(defaultCmd)
+
+	// Reinstall global npm packages if any were captured
+	if len(frozen) > 0 {
+		var pkgList struct {
+			Dependencies map[string]struct {
+				Version string `json:"version"`
+			} `json:"dependencies"`
+		}
+		if json.Unmarshal(frozen, &pkgList) == nil {
+			var pkgs []string
+			for name := range pkgList.Dependencies {
+				if name != "npm" && name != "corepack" {
+					pkgs = append(pkgs, name)
+				}
+			}
+			if len(pkgs) > 0 {
+				newNpmPath := filepath.Join(fnmDir, "aliases", "lts-latest", "installation", "bin", "npm")
+				if _, err := os.Stat(newNpmPath); err == nil {
+					reinstallCmd := exec.Command(newNpmPath, append([]string{"install", "-g"}, pkgs...)...)
+					reinstallCmd.Env = env
+					reinstallCmd.Run()
+				}
+			}
+		}
+	}
+
+	// Get the installed Node version via fnm exec (doesn't need fnm env)
+	versionCmd := exec.Command(fnmPath, "exec", "--using=lts-latest", "--", "node", "--version")
+	versionCmd.Env = env
+	out, err := versionCmd.Output()
+	nodeVersion := "lts"
+	if err == nil {
+		nodeVersion = strings.TrimSpace(string(out))
+	}
+
+	st.SetToolVersion("node", release.TagName+"/"+nodeVersion)
+	return Result{Tool: "node", Version: release.TagName + "/" + nodeVersion}
 }

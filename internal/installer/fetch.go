@@ -5,13 +5,12 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"time"
+
+	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
-var httpClient = &http.Client{Timeout: 60 * time.Second}
-
 func httpGet(url string) (*http.Response, error) {
-	return httpClient.Get(url)
+	return utils.HTTPClient.Get(url)
 }
 
 func DownloadToFile(url, destPath string) error {

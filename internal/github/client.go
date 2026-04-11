@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
 type Client struct {
@@ -17,7 +19,7 @@ type Client struct {
 
 func NewClient(token string) *Client {
 	return &Client{
-		httpClient: &http.Client{Timeout: 60 * time.Second},
+		httpClient: utils.HTTPClient,
 		token:      token,
 	}
 }

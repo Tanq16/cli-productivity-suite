@@ -24,16 +24,14 @@ func EnsureSudo() error {
 
 func StartSudoRefresh(ctx context.Context) {
 	go func() {
-		ticker := time.NewTicker(60 * time.Second)
+		ticker := time.NewTicker(30 * time.Second)
 		defer ticker.Stop()
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				cmd := exec.Command("sudo", "-n", "-v")
-				cmd.Stdin = os.Stdin
-				cmd.Run()
+				exec.Command("sudo", "-n", "true").Run()
 			}
 		}
 	}()
@@ -50,8 +48,6 @@ func PhaseNeedsSudo(p platform.Platform, kinds ...registry.ToolKind) bool {
 			if p.OS == platform.Linux {
 				return true
 			}
-		case registry.LanguageRuntime:
-			return true
 		}
 	}
 	return false
@@ -67,10 +63,6 @@ func ToolNeedsSudo(tool registry.Tool, p platform.Platform) bool {
 			return p.OS == platform.Linux
 		case "azure-cli":
 			return p.OS == platform.Linux
-		}
-	case registry.LanguageRuntime:
-		if tool.Name == "go-sdk" {
-			return true
 		}
 	}
 	return false
