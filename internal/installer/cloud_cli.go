@@ -15,11 +15,6 @@ import (
 
 type CloudCLIInstaller struct{}
 
-func (c *CloudCLIInstaller) Check(tool *registry.Tool, _ platform.Platform, _ *github.Client, st *state.State) (current, latest string, err error) {
-	current = st.ToolVersion(tool.Name)
-	return current, "check-manually", nil
-}
-
 func (c *CloudCLIInstaller) Install(tool *registry.Tool, p platform.Platform, _ *github.Client, st *state.State) Result {
 	switch tool.Name {
 	case "aws-cli":
@@ -111,13 +106,12 @@ func (c *CloudCLIInstaller) installGcloudCLI(p platform.Platform, st *state.Stat
 		return Result{Tool: "gcloud-cli", Err: err}
 	}
 
-	destDir := filepath.Join(p.ShellDir(), "gcloud-sdk")
-	os.RemoveAll(destDir)
-
 	if err := ExtractTarGz(tarPath, tmpDir); err != nil {
 		return Result{Tool: "gcloud-cli", Err: fmt.Errorf("extract failed: %w", err)}
 	}
 
+	destDir := filepath.Join(p.ShellDir(), "gcloud-sdk")
+	os.RemoveAll(destDir)
 	if err := os.Rename(filepath.Join(tmpDir, "google-cloud-sdk"), destDir); err != nil {
 		return Result{Tool: "gcloud-cli", Err: fmt.Errorf("move gcloud-sdk failed: %w", err)}
 	}
@@ -126,6 +120,12 @@ func (c *CloudCLIInstaller) installGcloudCLI(p platform.Platform, st *state.Stat
 	cmd := exec.Command("bash", installScript, "--quiet", "--path-update=false", "--command-completion=false")
 	if err := utils.RunCmd(cmd); err != nil {
 		return Result{Tool: "gcloud-cli", Err: fmt.Errorf("gcloud install script failed: %w", err)}
+	}
+
+	gcloudBin := filepath.Join(destDir, "bin", "gcloud")
+	verifyCmd := exec.Command(gcloudBin, "version")
+	if err := utils.RunCmd(verifyCmd); err != nil {
+		return Result{Tool: "gcloud-cli", Err: fmt.Errorf("gcloud post-install verification failed: %w", err)}
 	}
 
 	st.SetToolVersion("gcloud-cli", "latest")

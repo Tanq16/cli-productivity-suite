@@ -18,15 +18,6 @@ import (
 
 type DirectDownloadInstaller struct{}
 
-func (d *DirectDownloadInstaller) Check(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) (current, latest string, err error) {
-	current = st.ToolVersion(tool.Name)
-	latest, err = d.fetchVersion(tool, gh)
-	if err != nil {
-		return current, "", err
-	}
-	return current, latest, nil
-}
-
 func (d *DirectDownloadInstaller) Install(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) Result {
 	log.Debug().Str("package", "installer").Msgf("installing %s via direct download", tool.Name)
 

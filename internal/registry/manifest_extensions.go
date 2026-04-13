@@ -104,6 +104,12 @@ var extensionPacks = []ExtensionPack{
 					ArchiveFormat:     "none",
 				},
 			},
+			{
+				Name: "nuclei-templates", Kind: ShellPlugin, Category: ExtSecurity, Extension: true,
+				Description: "Nuclei vulnerability templates",
+				CloneURL:    "https://github.com/projectdiscovery/nuclei-templates.git",
+				CloneDest:   "~/shell/nuclei-templates",
+			},
 		},
 	},
 	{
@@ -434,11 +440,120 @@ var extensionPacks = []ExtensionPack{
 			},
 		},
 	},
+	// ========== Infrastructure Extension Packs ==========
+	{
+		Name:        "core",
+		Description: "Dev tools, network utils, and media packages",
+		Category:    ExtSystem,
+		Tools: []Tool{
+			{
+				Name: "dev-tools", Kind: SystemPackage, Category: ExtSystem, Extension: true,
+				Description: "Development build tools",
+				Platforms:   []string{"linux"},
+				AptPkgs:     []string{"cmake", "gcc", "make", "ninja-build", "gettext"},
+			},
+			{
+				Name: "network-tools", Kind: SystemPackage, Category: ExtSystem, Extension: true,
+				Description: "Network utilities",
+				AptPkgs:     []string{"nmap", "ncat", "openssl"},
+				BrewPkgs:    []string{"openssl", "nmap"},
+			},
+			{
+				Name: "media-tools", Kind: SystemPackage, Category: ExtSystem, Extension: true,
+				Description: "Media and monitoring tools",
+				AptPkgs:     []string{"ffmpeg"},
+				BrewPkgs:    []string{"ffmpeg"},
+			},
+			{
+				Name: "aerospace", Kind: SystemPackage, Category: ExtSystem, Extension: true,
+				Description: "macOS tiling window manager",
+				Platforms:   []string{"darwin"},
+				BrewCasks:   []string{"nikitabobko/tap/aerospace"},
+			},
+		},
+	},
+	{
+		Name:        "cloud",
+		Description: "Cloud CLIs (AWS, Azure, GCP)",
+		Category:    ExtCloud,
+		Tools: []Tool{
+			{
+				Name: "aws-cli", Kind: CloudCLI, Category: ExtCloud, Extension: true,
+				Description: "AWS CLI v2",
+			},
+			{
+				Name: "azure-cli", Kind: CloudCLI, Category: ExtCloud, Extension: true,
+				Description: "Azure CLI",
+			},
+			{
+				Name: "gcloud-cli", Kind: CloudCLI, Category: ExtCloud, Extension: true,
+				Description: "Google Cloud CLI",
+			},
+		},
+	},
+	{
+		Name:        "runtimes",
+		Description: "Language runtimes (Go, Rust, Python, Node)",
+		Category:    ExtRuntimes,
+		Tools: []Tool{
+			{
+				Name: "uv", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Description: "Python package manager (binary only)",
+			},
+			{
+				Name: "fnm", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Description: "Node version manager (binary only)",
+			},
+			{
+				Name: "bun", BinaryName: "bun", Kind: GitHubRelease, Category: ExtRuntimes, Extension: true,
+				Repo: "oven-sh/bun", Description: "JavaScript runtime",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "x64", "arm64": "aarch64"},
+					ExcludeSubstrings:   []string{"profile", "baseline", "musl"},
+					ArchiveFormat:       "zip",
+					BinaryPathInArchive: "*/bun",
+				},
+			},
+			{
+				Name: "go-sdk", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Description: "Go programming language SDK",
+			},
+			{
+				Name: "python", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Description: "Python via uv + py-default venv",
+			},
+			{
+				Name: "rust", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Description: "Rust toolchain via rustup",
+			},
+			{
+				Name: "node", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Description: "Node.js LTS via fnm",
+			},
+		},
+	},
 }
 
-// AllExtensionPacks returns the list of available extension packs.
+var customPacks []ExtensionPack
+
+// LoadCustomPacks registers dynamically loaded custom extension packs.
+func LoadCustomPacks(packs []ExtensionPack) {
+	customPacks = packs
+}
+
+// BuiltinPackNames returns the set of built-in extension pack names.
+func BuiltinPackNames() map[string]bool {
+	names := make(map[string]bool, len(extensionPacks))
+	for _, p := range extensionPacks {
+		names[p.Name] = true
+	}
+	return names
+}
+
+// AllExtensionPacks returns built-in and custom extension packs.
 func AllExtensionPacks() []ExtensionPack {
-	return extensionPacks
+	return append(extensionPacks, customPacks...)
 }
 
 // ExtensionPackByName returns the pack with the given name, or nil.
@@ -448,13 +563,18 @@ func ExtensionPackByName(name string) *ExtensionPack {
 			return &extensionPacks[i]
 		}
 	}
+	for i := range customPacks {
+		if customPacks[i].Name == name {
+			return &customPacks[i]
+		}
+	}
 	return nil
 }
 
 // AllExtensionTools returns every tool across all extension packs.
 func AllExtensionTools() []Tool {
 	var all []Tool
-	for _, pack := range extensionPacks {
+	for _, pack := range AllExtensionPacks() {
 		all = append(all, pack.Tools...)
 	}
 	return all

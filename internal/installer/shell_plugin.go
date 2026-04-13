@@ -16,22 +16,16 @@ import (
 
 type ShellPluginInstaller struct{}
 
-func (s *ShellPluginInstaller) Check(tool *registry.Tool, _ platform.Platform, _ *github.Client, st *state.State) (current, latest string, err error) {
-	current = st.ToolVersion(tool.Name)
-	return current, "git-managed", nil
-}
-
 func (s *ShellPluginInstaller) Install(tool *registry.Tool, p platform.Platform, _ *github.Client, st *state.State) Result {
 	dest := expandHome(tool.CloneDest, p.HomeDir)
 
 	if _, err := os.Stat(dest); err == nil {
 		cmd := exec.Command("git", "-C", dest, "pull", "--ff-only")
 		if err := utils.RunCmd(cmd); err != nil {
-			os.RemoveAll(dest)
-		} else {
-			st.SetToolVersion(tool.Name, "git-managed")
-			return s.runPostClone(tool, p, st)
+			return Result{Tool: tool.Name, Err: fmt.Errorf("git pull failed (local changes?): %w — remove %s manually to reclone", err, dest)}
 		}
+		st.SetToolVersion(tool.Name, "git-managed")
+		return s.runPostClone(tool, p, st)
 	}
 
 	if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {

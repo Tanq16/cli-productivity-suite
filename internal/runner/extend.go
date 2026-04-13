@@ -3,7 +3,12 @@ package runner
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
+	"sync"
 
+	"github.com/tanq16/cli-productivity-suite/internal/configs"
+	"github.com/tanq16/cli-productivity-suite/internal/custom"
 	"github.com/tanq16/cli-productivity-suite/internal/github"
 	"github.com/tanq16/cli-productivity-suite/internal/installer"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
@@ -12,7 +17,25 @@ import (
 	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
+var customOnce sync.Once
+
+func ensureCustomPacks() {
+	customOnce.Do(func() {
+		p, err := platform.Detect()
+		if err != nil {
+			return
+		}
+		extDir := filepath.Join(p.ConfigDir(), "extensions")
+		packs, warnings := custom.LoadDir(extDir, registry.BuiltinPackNames())
+		for _, w := range warnings {
+			utils.PrintWarn(w, nil)
+		}
+		registry.LoadCustomPacks(packs)
+	})
+}
+
 func ExtendList() {
+	ensureCustomPacks()
 	packs := registry.AllExtensionPacks()
 	for _, pack := range packs {
 		tools := filterExtPackForPlatform(pack)
@@ -30,7 +53,8 @@ func ExtendList() {
 	}
 }
 
-func Extend(packName string, ghToken string) {
+func Extend(packName string, toolFilter []string, ghToken string) {
+	ensureCustomPacks()
 	pack := registry.ExtensionPackByName(packName)
 	if pack == nil {
 		available := ""
@@ -59,15 +83,67 @@ func Extend(packName string, ghToken string) {
 		utils.PrintFatal(fmt.Sprintf("failed to create %s", p.ShellExtDir()), err)
 	}
 
-	tools := filterExtPackForPlatform(*pack)
-	if len(tools) == 0 {
+	allTools := filterExtPackForPlatform(*pack)
+	if len(allTools) == 0 {
 		utils.PrintSuccess(fmt.Sprintf("extension pack %s: no tools for this platform", pack.Name))
 		return
 	}
 
-	for _, t := range tools {
+	if len(toolFilter) > 0 {
+		nameSet := make(map[string]bool, len(toolFilter))
+		for _, n := range toolFilter {
+			nameSet[n] = true
+		}
+		var filtered []registry.Tool
+		for _, t := range allTools {
+			if nameSet[t.Name] {
+				filtered = append(filtered, t)
+				delete(nameSet, t.Name)
+			}
+		}
+		if len(nameSet) > 0 {
+			var unknown []string
+			for name := range nameSet {
+				unknown = append(unknown, name)
+			}
+			utils.PrintFatal(fmt.Sprintf("tools not found in extension pack %s: %s", packName, strings.Join(unknown, ", ")), nil)
+		}
+		allTools = filtered
+	}
+
+	var tools []registry.Tool
+	for _, t := range allTools {
 		if t.IsPrivate && ghToken == "" {
-			utils.PrintFatal(fmt.Sprintf("tool %s is private — provide --gh-token", t.Name), nil)
+			utils.PrintWarn(fmt.Sprintf("skipping %s (private repo, no --gh-token)", t.Name), nil)
+			continue
+		}
+		tools = append(tools, t)
+	}
+
+	if len(tools) == 0 {
+		utils.PrintSuccess(fmt.Sprintf("extension pack %s: all tools require --gh-token, nothing to install", pack.Name))
+		return
+	}
+
+	var sudoCancel func()
+	if packNeedsSudo(tools, p) {
+		cached := sudoCached()
+		utils.PrintRunning("authenticating sudo")
+		if err := EnsureSudo(); err != nil {
+			utils.PrintFatal("sudo authentication failed", err)
+		}
+		ctx, cancel := startSudoCtx()
+		sudoCancel = cancel
+		StartSudoRefresh(ctx)
+		if cached {
+			utils.ClearLines(1)
+		} else {
+			utils.ClearLines(2)
+		}
+
+		if p.OS == platform.Linux && packHasKind(tools, registry.SystemPackage) {
+			aptCmd := aptUpdateCmd()
+			utils.RunCmd(aptCmd)
 		}
 	}
 
@@ -87,9 +163,44 @@ func Extend(packName string, ghToken string) {
 		if result.Err != nil {
 			utils.PrintFatal(fmt.Sprintf("%s: install failed", tool.Name), result.Err)
 		}
-		utils.PrintSuccess(fmt.Sprintf("%s: installed %s", tool.Name, result.Version))
+		if result.Skipped {
+			utils.PrintSuccess(fmt.Sprintf("%s: already at %s", tool.Name, result.Version))
+		} else if result.WasUpdated {
+			utils.PrintSuccess(fmt.Sprintf("%s: updated to %s", tool.Name, result.Version))
+		} else {
+			utils.PrintSuccess(fmt.Sprintf("%s: installed %s", tool.Name, result.Version))
+		}
 	} else if len(tools) > 1 {
 		hadErrors = runPhase(phaseName, tools, p, gh, st)
+	}
+
+	deployPackFragment(packName, p)
+
+	var hasBinaries bool
+	for _, t := range tools {
+		switch t.Kind {
+		case registry.GitHubRelease, registry.DirectDownload, registry.LanguageRuntime:
+			hasBinaries = true
+		}
+	}
+	if hasBinaries {
+		var compErrors []jobResult
+		var compLines int
+		utils.PrintRunning("(Running) Regenerating completions")
+		generateCompletions(p, &compErrors, &compLines)
+		utils.ClearLines(compLines + 1)
+		if len(compErrors) > 0 {
+			utils.PrintError("Regenerating completions: partially completed with errors", nil)
+			for _, e := range compErrors {
+				utils.PrintIndentedError(e.name, e.err)
+			}
+		} else {
+			utils.PrintInfo("Regenerating completions")
+		}
+	}
+
+	if sudoCancel != nil {
+		sudoCancel()
 	}
 
 	if err := st.Save(); err != nil {
@@ -103,58 +214,6 @@ func Extend(packName string, ghToken string) {
 	}
 }
 
-func ExtendCheck(packName string, ghToken string) {
-	pack := registry.ExtensionPackByName(packName)
-	if pack == nil {
-		utils.PrintFatal(fmt.Sprintf("unknown extension pack: %s", packName), nil)
-	}
-
-	p, err := platform.Detect()
-	if err != nil {
-		utils.PrintFatal("platform detection failed", err)
-	}
-
-	st, err := state.Load(p.StatePath())
-	if err != nil {
-		utils.PrintFatal("failed to load state", err)
-	}
-
-	gh := github.NewClient(ghToken)
-	tools := filterExtPackForPlatform(*pack)
-
-	var checkable []registry.Tool
-	for _, t := range tools {
-		if t.IsPrivate && ghToken == "" {
-			continue
-		}
-		checkable = append(checkable, t)
-	}
-
-	if len(checkable) == 0 {
-		utils.PrintSuccess(fmt.Sprintf("extension pack %s: no tools to check", pack.Name))
-		return
-	}
-
-	utils.PrintRunning(fmt.Sprintf("Checking extension pack: %s", pack.Name))
-	results := checkTools(checkable, p, gh, st)
-	utils.ClearLines(1)
-
-	if len(results) == 0 {
-		utils.PrintSuccess(fmt.Sprintf("extension pack %s: everything up to date", pack.Name))
-		return
-	}
-
-	utils.PrintInfo(fmt.Sprintf("Extension pack %s check complete", pack.Name))
-	for _, r := range results {
-		switch r.Status {
-		case "update":
-			utils.PrintIndentedWarn(fmt.Sprintf("%s: update available (%s → %s)", r.Tool.Name, r.Current, r.Latest), nil)
-		case "error":
-			utils.PrintIndentedError(fmt.Sprintf("%s: check failed", r.Tool.Name), r.Err)
-		}
-	}
-}
-
 func filterExtPackForPlatform(pack registry.ExtensionPack) []registry.Tool {
 	p, err := platform.Detect()
 	if err != nil {
@@ -164,10 +223,77 @@ func filterExtPackForPlatform(pack registry.ExtensionPack) []registry.Tool {
 }
 
 func ExtensionPackNames() []string {
+	ensureCustomPacks()
 	packs := registry.AllExtensionPacks()
 	names := make([]string, len(packs))
 	for i, p := range packs {
 		names[i] = p.Name
 	}
 	return names
+}
+
+func ExtensionPackToolNames(packName string) []string {
+	ensureCustomPacks()
+	pack := registry.ExtensionPackByName(packName)
+	if pack == nil {
+		return nil
+	}
+	tools := filterExtPackForPlatform(*pack)
+	names := make([]string, len(tools))
+	for i, t := range tools {
+		names[i] = t.Name
+	}
+	return names
+}
+
+func packNeedsSudo(tools []registry.Tool, p platform.Platform) bool {
+	if p.OS != platform.Linux {
+		return false
+	}
+	for _, t := range tools {
+		switch t.Kind {
+		case registry.SystemPackage, registry.CloudCLI:
+			return true
+		}
+	}
+	return false
+}
+
+func packHasKind(tools []registry.Tool, kind registry.ToolKind) bool {
+	for _, t := range tools {
+		if t.Kind == kind {
+			return true
+		}
+	}
+	return false
+}
+
+func deployPackFragment(packName string, p platform.Platform) {
+	switch packName {
+	case "runtimes":
+		deployFragment(p, "10-runtimes.zsh", configs.RcRuntimes())
+	case "cloud":
+		deployFragment(p, "20-cloud.zsh", configs.RcCloud())
+	case "security":
+		content := []byte("export NUCLEI_TEMPLATES_DIR=\"$HOME/shell/nuclei-templates\"\n")
+		deployFragment(p, "30-security.zsh", content)
+	default:
+		if pf := custom.GetPackFile(packName); pf != nil {
+			content := custom.RenderFragment(*pf)
+			if content != nil {
+				deployFragment(p, filepath.Join("custom", packName+".zsh"), content)
+			}
+		}
+	}
+}
+
+func deployFragment(p platform.Platform, filename string, content []byte) {
+	dest := filepath.Join(p.ShellDir(), "rc", filename)
+	if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
+		utils.PrintError(fmt.Sprintf("failed to create %s", filepath.Dir(dest)), err)
+		return
+	}
+	if err := os.WriteFile(dest, content, 0644); err != nil {
+		utils.PrintError(fmt.Sprintf("failed to write %s", dest), err)
+	}
 }

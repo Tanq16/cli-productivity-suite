@@ -4,23 +4,8 @@ ZSH_THEME="spaceship"
 plugins=(zsh-autosuggestions zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 
-# --- Language Runtimes ---
-export GOROOT="$HOME/shell/go-sdk"
-export GOPATH="$HOME/shell/go"
-export RUSTUP_HOME="$HOME/shell/rust/.rustup"
-export CARGO_HOME="$HOME/shell/rust/.cargo"
-export FNM_DIR="$HOME/shell/fnm"
-
-# --- UV (Python) ---
-export UV_TOOL_DIR="$HOME/shell/uv-tools"
-export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
-export VIRTUAL_ENV="$HOME/shell/py-default"
-
-# --- Nuclei ---
-export NUCLEI_TEMPLATES_DIR="$HOME/shell/nuclei-templates"
-
 # --- PATH ---
-export PATH="$GOROOT/bin:$GOPATH/bin:$CARGO_HOME/bin:$UV_TOOL_BIN_DIR:$VIRTUAL_ENV/bin:$HOME/shell/extensions:$HOME/shell/executables:/opt/homebrew/bin:$HOME/.local/bin:$PATH"
+export PATH="$HOME/shell/extensions:$HOME/shell/executables:/opt/homebrew/bin:$HOME/.local/bin:$PATH"
 
 # --- FZF ---
 [ -f "$HOME/shell/completions/fzf.zsh" ] && source "$HOME/shell/completions/fzf.zsh"
@@ -37,20 +22,6 @@ export FZF_DEFAULT_OPTS="
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude node_modules --exclude Library'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
-# --- fnm (Node version manager) ---
-[ -f "$HOME/shell/completions/fnm.zsh" ] && source "$HOME/shell/completions/fnm.zsh"
-command -v fnm &>/dev/null && eval "$(fnm env)"
-
-# --- gcloud ---
-[ -f "$HOME/shell/gcloud-sdk/path.zsh.inc" ] && source "$HOME/shell/gcloud-sdk/path.zsh.inc"
-[ -f "$HOME/shell/gcloud-sdk/completion.zsh.inc" ] && source "$HOME/shell/gcloud-sdk/completion.zsh.inc"
-
-# --- uv completions ---
-[ -f "$HOME/shell/completions/uv.zsh" ] && source "$HOME/shell/completions/uv.zsh"
-
-# --- AWS CLI completion (lazy) ---
-aws() { unset -f aws; autoload -Uz bashcompinit && bashcompinit; complete -C 'aws_completer' aws; command aws "$@"; }
-
 # --- Environment ---
 export BAT_PAGER=''
 export SPACESHIP_TIME_SHOW=true
@@ -66,7 +37,6 @@ export LESS_TERMCAP_us=$'\e[1;4;31m'
 # --- Aliases ---
 alias f='fzf'
 alias gitn='git --no-pager'
-alias awsn='aws --no-cli-pager'
 alias tt='tmux -u new -s default'
 alias t='tmux -u a -t default'
 alias tree='lsd --tree'

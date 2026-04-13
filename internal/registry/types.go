@@ -10,6 +10,7 @@ const (
 	LanguageRuntime
 	ConfigFile
 	ShellPlugin
+	CustomScript
 )
 
 func (k ToolKind) String() string {
@@ -28,6 +29,8 @@ func (k ToolKind) String() string {
 		return "config-file"
 	case ShellPlugin:
 		return "shell-plugin"
+	case CustomScript:
+		return "custom-script"
 	default:
 		return "unknown"
 	}
@@ -48,6 +51,10 @@ const (
 	ExtAppSec
 	ExtMisc
 	ExtPrivate
+	ExtSystem
+	ExtCloud
+	ExtRuntimes
+	ExtCustom
 )
 
 func (c ToolCategory) String() string {
@@ -76,6 +83,14 @@ func (c ToolCategory) String() string {
 		return "ext-misc"
 	case ExtPrivate:
 		return "ext-private"
+	case ExtSystem:
+		return "ext-system"
+	case ExtCloud:
+		return "ext-cloud"
+	case ExtRuntimes:
+		return "ext-runtimes"
+	case ExtCustom:
+		return "ext-custom"
 	default:
 		return "unknown"
 	}
@@ -110,6 +125,5 @@ type Tool struct {
 	CloneURL    string // for ShellPlugin: full git clone URL
 	CloneDest   string // for ShellPlugin: destination path (can use ~ for home)
 	PostClone   string // for ShellPlugin: identifier for post-clone hook logic
-	ConfigSrc   string // for ConfigFile: which embedded config to use
-	ConfigDest  string // for ConfigFile: destination path
+	InstallCmd  string // for CustomScript: shell command run via bash -c
 }

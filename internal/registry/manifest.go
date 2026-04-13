@@ -85,28 +85,6 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "uv", BinaryName: "uv", Kind: GitHubRelease, Category: Core,
-		Repo: "astral-sh/uv", Description: "Python package manager",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
-			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "aarch64"},
-			ExcludeSubstrings:   []string{"musl"},
-			ArchiveFormat:       "tar.gz",
-			BinaryPathInArchive: "*/uv",
-		},
-	},
-	{
-		Name: "bun", BinaryName: "bun", Kind: GitHubRelease, Category: Core,
-		Repo: "oven-sh/bun", Description: "JavaScript runtime",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:        map[string]string{"amd64": "x64", "arm64": "aarch64"},
-			ExcludeSubstrings:   []string{"profile", "baseline"},
-			ArchiveFormat:       "zip",
-			BinaryPathInArchive: "*/bun",
-		},
-	},
-	{
 		Name: "gron", BinaryName: "gron", Kind: GitHubRelease, Category: Core,
 		Repo: "tomnomnom/gron", Description: "Make JSON greppable",
 		Asset: AssetPattern{
@@ -181,7 +159,7 @@ var AllTools = []Tool{
 		},
 	},
 
-	// ========== System Packages ==========
+	// ========== System Packages (base) ==========
 	{
 		Name: "core-utils", Kind: SystemPackage, Category: System,
 		Description: "Core system utilities",
@@ -189,96 +167,39 @@ var AllTools = []Tool{
 		BrewPkgs:    []string{"git", "wget", "curl"},
 	},
 	{
-		Name: "dev-tools", Kind: SystemPackage, Category: System,
-		Description: "Development build tools",
-		AptPkgs:     []string{"cmake", "gcc", "make", "ninja-build", "gettext"},
-	},
-	{
-		Name: "network-tools", Kind: SystemPackage, Category: System,
-		Description: "Network utilities",
-		AptPkgs:     []string{"nmap", "ncat", "openssl"},
-		BrewPkgs:    []string{"openssl", "nmap"},
-	},
-	{
-		Name: "other-tools", Kind: SystemPackage, Category: System,
-		Description: "Shell, terminal, and media tools",
-		AptPkgs:     []string{"tmux", "zsh", "ffmpeg", "htop"},
-		BrewPkgs:    []string{"tmux", "ffmpeg", "htop"},
-	},
-	{
-		Name: "aerospace", Kind: SystemPackage, Category: System,
-		Description: "macOS tiling window manager",
-		Platforms:   []string{"darwin"},
-		BrewCasks:   []string{"nikitabobko/tap/aerospace"},
+		Name: "shell-base", Kind: SystemPackage, Category: System,
+		Description: "Shell and terminal essentials",
+		AptPkgs:     []string{"tmux", "zsh", "htop"},
+		BrewPkgs:    []string{"tmux", "htop"},
 	},
 
-	// ========== Cloud CLIs ==========
-	{
-		Name: "aws-cli", Kind: CloudCLI, Category: CloudCLICat,
-		Description: "AWS CLI v2",
-	},
-	{
-		Name: "azure-cli", Kind: CloudCLI, Category: CloudCLICat,
-		Description: "Azure CLI",
-	},
-	{
-		Name: "gcloud-cli", Kind: CloudCLI, Category: CloudCLICat,
-		Description: "Google Cloud CLI",
-	},
-
-	// ========== Language Runtimes ==========
+	// ========== Language Runtimes (base only) ==========
 	{
 		Name: "neovim", Kind: LanguageRuntime, Category: Runtime,
 		Description: "Neovim text editor (0.11+ for NvChad)",
-	},
-	{
-		Name: "go-sdk", Kind: LanguageRuntime, Category: Runtime,
-		Description: "Go programming language SDK",
-	},
-	{
-		Name: "python", Kind: LanguageRuntime, Category: Runtime,
-		Description: "Python 3.14 via uv + py-default venv",
-	},
-	{
-		Name: "rust", Kind: LanguageRuntime, Category: Runtime,
-		Description: "Rust toolchain via rustup",
-	},
-	{
-		Name: "node", Kind: LanguageRuntime, Category: Runtime,
-		Description: "Node.js LTS via fnm",
 	},
 
 	// ========== Config Files ==========
 	{
 		Name: "tmux-config", Kind: ConfigFile, Category: Config,
 		Description: "Tmux configuration",
-		ConfigSrc:   "tmux.conf",
-		ConfigDest:  "~/.tmux.conf",
 	},
 	{
 		Name: "kitty-config", Kind: ConfigFile, Category: Config,
 		Description: "Kitty terminal configuration",
-		ConfigSrc:   "kittyconf",
-		ConfigDest:  "~/.config/kitty/kitty.conf",
 	},
 	{
 		Name: "kitty-theme", Kind: ConfigFile, Category: Config,
 		Description: "Kitty theme configuration",
-		ConfigSrc:   "mocha.kittyconf",
-		ConfigDest:  "~/.config/kitty/current-theme.conf",
 	},
 	{
 		Name: "aerospace-config", Kind: ConfigFile, Category: Config,
 		Description: "Aerospace WM configuration",
 		Platforms:   []string{"darwin"},
-		ConfigSrc:   "macos.aerospaceconf",
-		ConfigDest:  "~/.aerospace.toml",
 	},
 	{
 		Name: "rcfile", Kind: ConfigFile, Category: Config,
 		Description: "Zsh RC file (complete .zshrc)",
-		ConfigSrc:   "rcfile",
-		ConfigDest:  "~/.zshrc",
 	},
 
 	// ========== Shell Plugins ==========
@@ -314,11 +235,5 @@ var AllTools = []Tool{
 		CloneURL:    "https://github.com/NvChad/starter.git",
 		CloneDest:   "~/.config/nvim",
 		PostClone:   "nvchad",
-	},
-	{
-		Name: "nuclei-templates", Kind: ShellPlugin, Category: Shell,
-		Description: "Nuclei vulnerability templates",
-		CloneURL:    "https://github.com/projectdiscovery/nuclei-templates.git",
-		CloneDest:   "~/shell/nuclei-templates",
 	},
 }

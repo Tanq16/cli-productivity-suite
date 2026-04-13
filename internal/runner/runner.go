@@ -31,6 +31,7 @@ func Init(ghToken string) {
 	gh := github.NewClient(ghToken)
 	reg := registry.New()
 
+	// Phase 1: Prerequisites
 	utils.PrintRunning("(Running) Phase 1: Checking prerequisites")
 	omzDir := filepath.Join(p.HomeDir, ".oh-my-zsh")
 	if _, err := os.Stat(omzDir); os.IsNotExist(err) {
@@ -40,23 +41,32 @@ func Init(ghToken string) {
 	if _, err := exec.LookPath("git"); err != nil {
 		utils.PrintFatal("git not found in PATH", err)
 	}
-	if err := os.MkdirAll(p.ShellDir(), 0755); err != nil {
-		utils.PrintFatal(fmt.Sprintf("failed to create %s", p.ShellDir()), err)
+	for _, dir := range []string{
+		p.ShellDir(),
+		p.ShellExecDir(),
+		filepath.Join(p.ShellDir(), "rc"),
+		filepath.Join(p.ShellDir(), "rc", "custom"),
+		filepath.Join(p.ShellDir(), "custom"),
+		filepath.Join(p.ConfigDir(), "extensions"),
+	} {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			utils.PrintFatal(fmt.Sprintf("failed to create %s", dir), err)
+		}
 	}
-	if err := os.MkdirAll(p.ShellExecDir(), 0755); err != nil {
-		utils.PrintFatal(fmt.Sprintf("failed to create %s", p.ShellExecDir()), err)
-	}
-	utils.PrintIndentedSuccess("prerequisites OK")
+	utils.ClearLines(1)
+	utils.PrintInfo("Phase 1: Checking prerequisites")
 
-	var sudoCancel context.CancelFunc
-	if PhaseNeedsSudo(p, registry.SystemPackage, registry.CloudCLI) {
-		cached := exec.Command("sudo", "-n", "-v").Run() == nil
-		utils.ClearLines(2)
+	var hadErrors bool
+
+	sysPkgs := filterBaseTools(filterPlatformTools(reg.ByKind(registry.SystemPackage), p))
+	var sudoCancel func()
+	if len(sysPkgs) > 0 && p.OS == platform.Linux {
+		cached := sudoCached()
 		utils.PrintRunning("(Running) Phase 1: Authenticating sudo")
 		if err := EnsureSudo(); err != nil {
 			utils.PrintFatal("sudo authentication failed", err)
 		}
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := startSudoCtx()
 		sudoCancel = cancel
 		StartSudoRefresh(ctx)
 		if cached {
@@ -64,67 +74,57 @@ func Init(ghToken string) {
 		} else {
 			utils.ClearLines(2)
 		}
-	} else {
-		utils.ClearLines(2)
-	}
-	utils.PrintInfo("Phase 1: Checking prerequisites")
-
-	var hadErrors bool
-
-	if p.OS == platform.Linux {
-		cmd := exec.Command("sudo", "apt-get", "update", "-qq")
-		utils.RunCmd(cmd)
+		aptCmd := aptUpdateCmd()
+		utils.RunCmd(aptCmd)
 	}
 
-	if runPhase("Phase 2: System packages", filterPlatformTools(reg.ByKind(registry.SystemPackage), p), p, gh, st) {
+	// Phase 2: System packages
+	if runPhase("Phase 2: System packages", sysPkgs, p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	if runPhase("Phase 3: Cloud CLIs", reg.ByKind(registry.CloudCLI), p, gh, st) {
-		hadErrors = true
-	}
-	st.Save()
-
+	// Phase 3: Core GitHub releases
 	coreGH := filterGitHubCore(reg.ByKind(registry.GitHubRelease), false)
 	coreGH = filterPlatformTools(coreGH, p)
-	if runPhase("Phase 4: Core GitHub releases", coreGH, p, gh, st) {
+	if runPhase("Phase 3: Core GitHub releases", coreGH, p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	if runPhase("Phase 5: Direct downloads", filterNonExtension(reg.ByKind(registry.DirectDownload)), p, gh, st) {
-		hadErrors = true
-	}
-	st.Save()
-
+	// Phase 4: Own core tools
 	ownCore := filterOwnCore(reg.ByKind(registry.GitHubRelease))
-	if runPhase("Phase 6: Own core tools", ownCore, p, gh, st) {
+	if runPhase("Phase 4: Own core tools", ownCore, p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	if runPhase("Phase 7: Language runtimes", reg.ByKind(registry.LanguageRuntime), p, gh, st) {
+	// Phase 5: Neovim
+	neovim := filterByName(reg.ByKind(registry.LanguageRuntime), "neovim")
+	if runPhase("Phase 5: Neovim", neovim, p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
-
-	disableOMZSlowPaste(p)
-	if runPhase("Phase 8: Shell plugins", reg.ByKind(registry.ShellPlugin), p, gh, st) {
-		hadErrors = true
-	}
-	st.Save()
-
-	if runPhase("Phase 9: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
-		hadErrors = true
-	}
-	st.Save()
-
-	runPostInstall(p)
 
 	if sudoCancel != nil {
 		sudoCancel()
 	}
+
+	// Phase 6: Shell plugins (base only, exclude extension tools)
+	disableOMZSlowPaste(p)
+	if runPhase("Phase 6: Shell plugins", filterBaseTools(reg.ByKind(registry.ShellPlugin)), p, gh, st) {
+		hadErrors = true
+	}
+	st.Save()
+
+	// Phase 7: Config files
+	if runPhase("Phase 7: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
+		hadErrors = true
+	}
+	st.Save()
+
+	// Phase 8: Post-install tasks
+	runPostInstall(p)
 
 	st.LastInit = time.Now()
 	if err := st.Save(); err != nil {
@@ -135,257 +135,6 @@ func Init(ghToken string) {
 		utils.PrintWarn("init finished with errors", nil)
 	} else {
 		utils.PrintSuccess("init complete!")
-	}
-}
-
-func Check(ghToken string, appVersion string, skipPrivate bool) {
-	p, err := platform.Detect()
-	if err != nil {
-		utils.PrintFatal("platform detection failed", err)
-	}
-
-	st, err := state.Load(p.StatePath())
-	if err != nil {
-		utils.PrintFatal("failed to load state", err)
-	}
-
-	gh := github.NewClient(ghToken)
-	tools := registry.New().ForPlatform(p.OS.String())
-
-	var checkable []registry.Tool
-	for _, t := range tools {
-		if t.IsPrivate && (ghToken == "" || skipPrivate) {
-			continue
-		}
-		checkable = append(checkable, t)
-	}
-
-	utils.PrintRunning("Checking tools")
-
-	// Check CPS version inline
-	var cpsResult *CheckResult
-	if rel, err := gh.LatestRelease("Tanq16/cli-productivity-suite"); err == nil {
-		if appVersion == "dev-build" {
-			cpsResult = &CheckResult{Current: appVersion, Latest: rel.TagName, Status: "update"}
-		} else if appVersion != rel.TagName {
-			cpsResult = &CheckResult{Current: appVersion, Latest: rel.TagName, Status: "update"}
-		}
-	}
-
-	results := checkTools(checkable, p, gh, st)
-	utils.ClearLines(1)
-
-	hasResults := len(results) > 0 || cpsResult != nil
-	if !hasResults {
-		utils.PrintSuccess("everything is up to date")
-		return
-	}
-
-	utils.PrintInfo("Check complete")
-	if cpsResult != nil {
-		if appVersion == "dev-build" {
-			utils.PrintIndentedWarn(fmt.Sprintf("cps: dev build (latest: %s)", cpsResult.Latest), nil)
-		} else {
-			utils.PrintIndentedWarn(fmt.Sprintf("cps: update available (%s → %s)", cpsResult.Current, cpsResult.Latest), nil)
-		}
-	}
-	for _, r := range results {
-		switch r.Status {
-		case "update":
-			utils.PrintIndentedWarn(fmt.Sprintf("%s: update available (%s → %s)", r.Tool.Name, r.Current, r.Latest), nil)
-		case "error":
-			utils.PrintIndentedError(fmt.Sprintf("%s: check failed", r.Tool.Name), r.Err)
-		case "config-differs":
-			utils.PrintIndentedWarn(fmt.Sprintf("%s: config differs", r.Tool.Name), nil)
-		case "not-deployed":
-			utils.PrintIndentedWarn(fmt.Sprintf("%s: not deployed", r.Tool.Name), nil)
-		}
-	}
-}
-
-var categoryAliases = map[string]func(*registry.Registry, platform.Platform) []registry.Tool{
-	"core": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
-		ghCore := filterNonExtension(filterGitHubCore(reg.ByKind(registry.GitHubRelease), false))
-		ownCore := filterNonExtension(filterOwnCore(reg.ByKind(registry.GitHubRelease)))
-		combined := append(ghCore, ownCore...)
-		return filterPlatformTools(combined, p)
-	},
-	"system": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
-		return filterPlatformTools(reg.ByCategory(registry.System), p)
-	},
-	"cloud": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
-		return filterPlatformTools(reg.ByCategory(registry.CloudCLICat), p)
-	},
-	"runtimes": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
-		return filterPlatformTools(reg.ByCategory(registry.Runtime), p)
-	},
-	"configs": func(reg *registry.Registry, p platform.Platform) []registry.Tool {
-		configs := reg.ByCategory(registry.Config)
-		shell := reg.ByCategory(registry.Shell)
-		combined := append(configs, shell...)
-		return filterPlatformTools(combined, p)
-	},
-}
-
-func CategoryAliasNames() []string {
-	return []string{"core", "system", "cloud", "runtimes", "configs"}
-}
-
-func Install(args []string, ghToken string) {
-	p, err := platform.Detect()
-	if err != nil {
-		utils.PrintFatal("platform detection failed", err)
-	}
-
-	st, err := state.Load(p.StatePath())
-	if err != nil {
-		utils.PrintFatal("failed to load state", err)
-	}
-
-	gh := github.NewClient(ghToken)
-	reg := registry.New()
-
-	var resolved []registry.Tool
-	for _, arg := range args {
-		if resolver, ok := categoryAliases[arg]; ok {
-			resolved = append(resolved, resolver(reg, p)...)
-		} else if tool := reg.Get(arg); tool != nil {
-			if !toolForPlatform(*tool, p) {
-				utils.PrintFatal(fmt.Sprintf("tool %s is not available on %s", arg, p.OS), nil)
-			}
-			resolved = append(resolved, *tool)
-		} else {
-			utils.PrintFatal(fmt.Sprintf("unknown tool or category: %s", arg), nil)
-		}
-	}
-
-	seen := map[string]bool{}
-	var tools []registry.Tool
-	for _, t := range resolved {
-		if !seen[t.Name] {
-			seen[t.Name] = true
-			tools = append(tools, t)
-		}
-	}
-
-	if len(tools) == 0 {
-		utils.PrintSuccess("no tools to install for this platform")
-		return
-	}
-
-	for _, t := range tools {
-		if t.IsPrivate && ghToken == "" {
-			utils.PrintFatal(fmt.Sprintf("tool %s is private — provide --gh-token or set CPS_GITHUB_PAT", t.Name), nil)
-		}
-	}
-
-	var sudoCancel context.CancelFunc
-	needsSudo := false
-	for _, t := range tools {
-		if ToolNeedsSudo(t, p) {
-			needsSudo = true
-			break
-		}
-	}
-	if needsSudo {
-		cached := exec.Command("sudo", "-n", "-v").Run() == nil
-		utils.PrintRunning("authenticating sudo")
-		if err := EnsureSudo(); err != nil {
-			utils.PrintFatal("sudo authentication failed", err)
-		}
-		ctx, cancel := context.WithCancel(context.Background())
-		sudoCancel = cancel
-		StartSudoRefresh(ctx)
-		if cached {
-			utils.ClearLines(1)
-		} else {
-			utils.ClearLines(2)
-		}
-	}
-
-	var hasErrors bool
-	if len(tools) == 1 {
-		tool := tools[0]
-		inst := installer.Dispatch(tool.Kind)
-		if inst == nil {
-			utils.PrintFatal(fmt.Sprintf("no installer for kind: %s", tool.Kind), nil)
-		}
-		utils.PrintRunning("installing " + tool.Name)
-		st.Remove(tool.Name)
-		result := inst.Install(&tool, p, gh, st)
-		utils.ClearLines(1)
-		if result.Err != nil {
-			utils.PrintFatal(fmt.Sprintf("%s: install failed", tool.Name), result.Err)
-		}
-		utils.PrintSuccess(fmt.Sprintf("%s: installed %s", tool.Name, result.Version))
-	} else {
-		hasErrors = runPhase("Installing tools", tools, p, gh, st)
-	}
-
-	installPostTasks(tools, p)
-
-	if sudoCancel != nil {
-		sudoCancel()
-	}
-
-	if err := st.Save(); err != nil {
-		utils.PrintError("failed to save state", err)
-	}
-
-	if len(tools) > 1 {
-		if hasErrors {
-			utils.PrintWarn("install finished with errors", nil)
-		} else {
-			utils.PrintSuccess("install complete!")
-		}
-	}
-}
-
-func installPostTasks(tools []registry.Tool, p platform.Platform) {
-	var hasConfigs, hasBinaries bool
-	for _, t := range tools {
-		switch t.Category {
-		case registry.Config, registry.Shell:
-			hasConfigs = true
-		}
-		switch t.Kind {
-		case registry.GitHubRelease, registry.DirectDownload, registry.LanguageRuntime:
-			hasBinaries = true
-		}
-	}
-
-	if hasConfigs {
-		tpmInstall := filepath.Join(p.HomeDir, ".tmux", "plugins", "tpm", "bin", "install_plugins")
-		if _, err := os.Stat(tpmInstall); err == nil {
-			utils.PrintRunning("running tpm install")
-			tpmCmd := exec.Command("bash", tpmInstall)
-			tpmCmd.Env = append(os.Environ(), fmt.Sprintf("TMUX_PLUGIN_MANAGER_PATH=%s", filepath.Join(p.HomeDir, ".tmux", "plugins")))
-			utils.RunCmd(tpmCmd)
-			utils.ClearLines(1)
-		}
-
-		if _, err := exec.LookPath("nvim"); err == nil {
-			utils.PrintRunning("running nvchad setup")
-			nvimCmd := exec.Command("nvim", "--headless", "+MasonInstallAll", "+Lazy sync", "+qa")
-			utils.RunCmd(nvimCmd)
-			utils.ClearLines(1)
-		}
-	}
-
-	if hasBinaries {
-		var compErrors []jobResult
-		var compLines int
-		utils.PrintRunning("(Running) Regenerating completions")
-		generateCompletions(p, &compErrors, &compLines)
-		utils.ClearLines(compLines + 1)
-		if len(compErrors) > 0 {
-			utils.PrintError("Regenerating completions: partially completed with errors", nil)
-			for _, e := range compErrors {
-				utils.PrintIndentedError(e.name, e.err)
-			}
-		} else {
-			utils.PrintInfo("Regenerating completions")
-		}
 	}
 }
 
@@ -421,12 +170,12 @@ func SelfUpdate(appVersion string) {
 		utils.PrintFatal(fmt.Sprintf("no release asset found for %s", assetName), nil)
 	}
 
-	cached := exec.Command("sudo", "-n", "-v").Run() == nil
+	cached := sudoCached()
 	utils.PrintRunning("authenticating sudo")
 	if err := EnsureSudo(); err != nil {
 		utils.PrintFatal("sudo authentication failed", err)
 	}
-	sudoCtx, sudoCancel := context.WithCancel(context.Background())
+	sudoCtx, sudoCancel := startSudoCtx()
 	StartSudoRefresh(sudoCtx)
 	if cached {
 		utils.ClearLines(1)
@@ -478,79 +227,6 @@ func SelfUpdate(appVersion string) {
 	utils.PrintSuccess(fmt.Sprintf("updated cps: %s → %s", appVersion, release.TagName))
 }
 
-func Clean() {
-	p, err := platform.Detect()
-	if err != nil {
-		utils.PrintFatal("platform detection failed", err)
-	}
-
-	dirs := []string{
-		filepath.Join(p.HomeDir, "shell"),
-		filepath.Join(p.HomeDir, ".tmux"),
-		filepath.Join(p.HomeDir, ".config", "nvim"),
-		filepath.Join(p.HomeDir, ".config", "cps"),
-	}
-
-	utils.PrintWarn("this will remove the following directories:", nil)
-	for _, d := range dirs {
-		utils.PrintInfo("  " + d)
-	}
-	answer, err := utils.PromptInput("\nare you sure? (yes/no):", "yes/no")
-	if err != nil {
-		utils.PrintFatal("failed to read input", err)
-	}
-	answer = strings.TrimSpace(strings.ToLower(answer))
-
-	if answer != "yes" {
-		utils.PrintInfo("clean aborted")
-		return
-	}
-
-	for _, d := range dirs {
-		if _, err := os.Stat(d); os.IsNotExist(err) {
-			continue
-		}
-		if err := os.RemoveAll(d); err != nil {
-			utils.PrintError(fmt.Sprintf("failed to remove %s", d), err)
-		} else {
-			utils.PrintSuccess(fmt.Sprintf("removed %s", d))
-		}
-	}
-
-	utils.PrintSuccess("clean complete")
-}
-
-func checkTools(tools []registry.Tool, p platform.Platform, gh *github.Client, st *state.State) []CheckResult {
-	var results []CheckResult
-	for _, t := range tools {
-		if st.ToolVersion(t.Name) == "" {
-			continue
-		}
-		inst := installer.Dispatch(t.Kind)
-		if inst == nil {
-			continue
-		}
-		cur, lat, err := inst.Check(&t, p, gh, st)
-		if err != nil {
-			results = append(results, CheckResult{Tool: t, Current: cur, Latest: "", Status: "error", Err: err})
-			continue
-		}
-		switch lat {
-		case "skipped", "system-managed", "check-manually", "git-managed", "up-to-date":
-			continue
-		case "not-deployed":
-			results = append(results, CheckResult{Tool: t, Current: cur, Latest: lat, Status: "not-deployed"})
-		case "config-differs":
-			results = append(results, CheckResult{Tool: t, Current: cur, Latest: lat, Status: "config-differs"})
-		default:
-			if cur != lat && lat != "" {
-				results = append(results, CheckResult{Tool: t, Current: cur, Latest: lat, Status: "update"})
-			}
-		}
-	}
-	return results
-}
-
 func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *github.Client, st *state.State) bool {
 	if len(tools) == 0 {
 		return false
@@ -596,7 +272,7 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 }
 
 func runPostInstall(p platform.Platform) {
-	utils.PrintRunning("(Running) Phase 10: Post-install tasks")
+	utils.PrintRunning("(Running) Phase 8: Post-install tasks")
 	var lineCount int
 	var errors []jobResult
 
@@ -611,10 +287,11 @@ func runPostInstall(p platform.Platform) {
 		}
 	}
 
-	if _, err := exec.LookPath("nvim"); err == nil {
+	nvimBin := filepath.Join(p.ShellExecDir(), "nvim")
+	if _, err := os.Stat(nvimBin); err == nil {
 		utils.PrintIndentedRunning("nvchad-setup: running")
 		lineCount++
-		nvimCmd := exec.Command("nvim", "--headless", "+MasonInstallAll", "+Lazy sync", "+qa")
+		nvimCmd := exec.Command(nvimBin, "--headless", "+MasonInstallAll", "+Lazy sync", "+qa")
 		if err := utils.RunCmd(nvimCmd); err != nil {
 			errors = append(errors, jobResult{name: "nvchad-setup", err: err})
 		}
@@ -624,12 +301,12 @@ func runPostInstall(p platform.Platform) {
 
 	utils.ClearLines(lineCount + 1) // sub-lines + running header
 	if len(errors) > 0 {
-		utils.PrintError("Phase 10: partially completed with errors", nil)
+		utils.PrintError("Phase 8: partially completed with errors", nil)
 		for _, e := range errors {
 			utils.PrintIndentedError(e.name, e.err)
 		}
 	} else {
-		utils.PrintInfo("Phase 10: Post-install tasks")
+		utils.PrintInfo("Phase 8: Post-install tasks")
 	}
 }
 
@@ -643,26 +320,33 @@ func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *in
 	type compDef struct {
 		name    string
 		binary  string
+		dir     string
 		args    []string
 		outFile string
 	}
 
 	defs := []compDef{
-		{"fzf", "fzf", []string{"--zsh"}, "fzf.zsh"},
-		{"uv", "uv", []string{"generate-shell-completion", "zsh"}, "uv.zsh"},
-		{"fnm", "fnm", []string{"completions", "--shell", "zsh"}, "fnm.zsh"},
-		{"zoxide", "zoxide", []string{"init", "zsh"}, "zoxide.zsh"},
+		{"fzf", "fzf", p.ShellExecDir(), []string{"--zsh"}, "fzf.zsh"},
+		{"uv", "uv", p.ShellExtDir(), []string{"generate-shell-completion", "zsh"}, "uv.zsh"},
+		{"fnm", "fnm", p.ShellExtDir(), []string{"completions", "--shell", "zsh"}, "fnm.zsh"},
+		{"zoxide", "zoxide", p.ShellExecDir(), []string{"init", "zsh"}, "zoxide.zsh"},
 	}
 
 	for _, d := range defs {
-		binPath := filepath.Join(p.ShellExecDir(), d.binary)
+		binPath := filepath.Join(d.dir, d.binary)
 		if _, err := os.Stat(binPath); err != nil {
 			continue
 		}
 		utils.PrintIndentedRunning("completions: " + d.name)
 		*lineCount++
-		out, err := exec.Command(binPath, d.args...).Output()
+		cmd := exec.Command(binPath, d.args...)
+		var stderr strings.Builder
+		cmd.Stderr = &stderr
+		out, err := cmd.Output()
 		if err != nil {
+			if detail := strings.TrimSpace(stderr.String()); detail != "" {
+				err = fmt.Errorf("%s: %w", detail, err)
+			}
 			*errors = append(*errors, jobResult{name: "completions-" + d.name, err: err})
 			continue
 		}
@@ -670,6 +354,20 @@ func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *in
 			*errors = append(*errors, jobResult{name: "completions-" + d.name, err: err})
 		}
 	}
+}
+
+// --- Helpers ---
+
+func sudoCached() bool {
+	return exec.Command("sudo", "-n", "-v").Run() == nil
+}
+
+func startSudoCtx() (context.Context, context.CancelFunc) {
+	return context.WithCancel(context.Background())
+}
+
+func aptUpdateCmd() *exec.Cmd {
+	return exec.Command("sudo", "apt-get", "update", "-qq")
 }
 
 func toolForPlatform(tool registry.Tool, p platform.Platform) bool {
@@ -707,20 +405,20 @@ func filterOwnCore(tools []registry.Tool) []registry.Tool {
 	return result
 }
 
-func filterNonExtension(tools []registry.Tool) []registry.Tool {
+func filterPlatformTools(tools []registry.Tool, p platform.Platform) []registry.Tool {
 	var result []registry.Tool
 	for _, t := range tools {
-		if !t.Extension {
+		if toolForPlatform(t, p) {
 			result = append(result, t)
 		}
 	}
 	return result
 }
 
-func filterPlatformTools(tools []registry.Tool, p platform.Platform) []registry.Tool {
+func filterBaseTools(tools []registry.Tool) []registry.Tool {
 	var result []registry.Tool
 	for _, t := range tools {
-		if toolForPlatform(t, p) {
+		if !t.Extension {
 			result = append(result, t)
 		}
 	}
@@ -735,20 +433,6 @@ func filterByName(tools []registry.Tool, names ...string) []registry.Tool {
 	var result []registry.Tool
 	for _, t := range tools {
 		if nameSet[t.Name] {
-			result = append(result, t)
-		}
-	}
-	return result
-}
-
-func excludeByName(tools []registry.Tool, names ...string) []registry.Tool {
-	nameSet := make(map[string]bool, len(names))
-	for _, n := range names {
-		nameSet[n] = true
-	}
-	var result []registry.Tool
-	for _, t := range tools {
-		if !nameSet[t.Name] {
 			result = append(result, t)
 		}
 	}

@@ -15,15 +15,6 @@ import (
 
 type GitHubReleaseInstaller struct{}
 
-func (g *GitHubReleaseInstaller) Check(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) (current, latest string, err error) {
-	current = st.ToolVersion(tool.Name)
-	release, err := gh.LatestRelease(tool.Repo)
-	if err != nil {
-		return current, "", err
-	}
-	return current, release.TagName, nil
-}
-
 func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) Result {
 	log.Debug().Str("package", "installer").Msgf("installing %s from %s", tool.Name, tool.Repo)
 

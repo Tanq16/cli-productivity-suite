@@ -1,0 +1,3 @@
+# CPS managed — sources shell configuration fragments
+for f in "$HOME/shell/rc/"*.zsh(N); do source "$f"; done
+for f in "$HOME/shell/rc/custom/"*.zsh(N); do source "$f"; done

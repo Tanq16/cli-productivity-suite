@@ -8,33 +8,30 @@ func buildCPSSheet() string {
 
 	b.WriteString(titleStyle.Render("CPS Cheat Sheet") + "\n")
 	b.WriteString(noteStyle.Render("  Tools: ~/shell/executables/   Extensions: ~/shell/extensions/") + "\n")
-	b.WriteString(noteStyle.Render("  State: ~/.config/cps/state.json") + "\n\n")
+	b.WriteString(noteStyle.Render("  RC fragments: ~/shell/rc/     Custom scripts: ~/shell/custom/") + "\n\n")
 
 	// --- Core Commands ---
 	b.WriteString(headingStyle.Render("Core Commands") + "\n")
-	b.WriteString(cmdStyle.Render("  cps init") + "                        Full environment setup\n")
-	b.WriteString(cmdStyle.Render("  cps check") + "                       Check all tools for updates\n")
+	b.WriteString(cmdStyle.Render("  cps init") + "                        Base shell environment setup\n")
 	b.WriteString(cmdStyle.Render("  cps self-update") + "                 Update cps binary itself\n")
-	b.WriteString(cmdStyle.Render("  cps clean") + "                       Remove all CPS-managed dirs\n")
-	b.WriteString(divider + "\n")
-
-	// --- Install ---
-	b.WriteString(headingStyle.Render("Install — Individual Tools or Categories") + "\n")
-	b.WriteString(cmdStyle.Render("  cps install <tool>") + "              Install a single tool by name\n")
-	b.WriteString(cmdStyle.Render("  cps install <tool1> <tool2>") + "     Install multiple tools\n")
-	b.WriteString(cmdStyle.Render("  cps install core") + "                All core binary tools\n")
-	b.WriteString(cmdStyle.Render("  cps install system") + "              System packages (apt/brew)\n")
-	b.WriteString(cmdStyle.Render("  cps install cloud") + "               Cloud CLIs (AWS, Azure, gcloud)\n")
-	b.WriteString(cmdStyle.Render("  cps install runtimes") + "            Language runtimes (Go, Python, Rust, etc.)\n")
-	b.WriteString(cmdStyle.Render("  cps install configs") + "             Config files + shell plugins\n")
 	b.WriteString(divider + "\n")
 
 	// --- Extend ---
 	b.WriteString(headingStyle.Render("Extend — Extension Packs") + "\n")
 	b.WriteString(cmdStyle.Render("  cps extend list") + "                 List available packs\n")
-	b.WriteString(cmdStyle.Render("  cps extend <pack>") + "               Install a pack (security, cloudsec, appsec, misc, private)\n")
-	b.WriteString(cmdStyle.Render("  cps extend --check <pack>") + "       Check extension pack for updates\n")
-	b.WriteString(noteStyle.Render("  Extension tools also work with: cps install <tool-name>") + "\n")
+	b.WriteString(cmdStyle.Render("  cps extend <pack>") + "               Install entire extension pack\n")
+	b.WriteString(cmdStyle.Render("  cps extend <pack> <tool> ...") + "    Install specific tools from a pack\n")
+	b.WriteString(noteStyle.Render("  Packs: core, cloud, runtimes, security, cloudsec, appsec, misc, private") + "\n")
+	b.WriteString(divider + "\n")
+
+	// --- RC Fragments ---
+	b.WriteString(headingStyle.Render("Shell Integration — RC Fragments") + "\n")
+	b.WriteString(noteStyle.Render("  ~/.zshrc sources ~/shell/rc/*.zsh and ~/shell/rc/custom/*.zsh") + "\n")
+	b.WriteString(noteStyle.Render("  00-base.zsh        deployed by cps init") + "\n")
+	b.WriteString(noteStyle.Render("  10-runtimes.zsh    deployed by cps extend runtimes") + "\n")
+	b.WriteString(noteStyle.Render("  20-cloud.zsh       deployed by cps extend cloud") + "\n")
+	b.WriteString(noteStyle.Render("  30-security.zsh    deployed by cps extend security") + "\n")
+	b.WriteString(noteStyle.Render("  custom/*.zsh       user-managed fragments") + "\n")
 	b.WriteString(divider + "\n")
 
 	// --- Other ---
@@ -50,6 +47,6 @@ func buildCPSSheet() string {
 var cpsSheet = Sheet{
 	Name:        "cps",
 	Aliases:     []string{},
-	Description: "CPS commands, install categories, extensions, and init phases",
+	Description: "CPS commands, extension packs, and shell integration",
 	Content:     buildCPSSheet(),
 }

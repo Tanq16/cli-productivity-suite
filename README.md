@@ -2,188 +2,152 @@
   <img src=".github/assets/logo.png" alt="CLI Productivity Suite Logo" width="200">
   <h1>CLI Productivity Suite</h1>
 
-  <a href="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml"><img alt="Build Workflow" src="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml/badge.svg"></a>&nbsp;<a href="https://github.com/tanq16/cli-productivity-suite/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/tanq16/cli-productivity-suite"></a><br><br>
-  <a href="#capabilities">Capabilities</a> &bull; <a href="#installation">Installation</a> &bull; <a href="#usage">Usage</a> &bull; <a href="#tips-and-notes">Tips & Notes</a> &bull; <a href="#deep-removal">Deep Removal</a>
+  <a href="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml"><img alt="Build Workflow" src="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml/badge.svg"></a>&nbsp;<a href="https://github.com/tanq16/cli-productivity-suite/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/tanq16/cli-productivity-suite"></a>
 </div>
 
 ---
 
-A single Go binary (`cps`) to initialize, manage, and update a complete CLI-driven development environment on Linux and macOS. It installs and tracks tools across these categories:
+A single Go binary (`cps`) that sets up and manages a complete CLI development environment on **Linux** and **macOS**. Run `cps init` once to get a working shell with core tools, Neovim, tmux, and configs. Extend it with `cps extend` for language runtimes, cloud CLIs, security tools, and more.
 
-- **CLI utilities** - bat, fd, ripgrep, lsd, jq, yq, fzf, sd, gron, sq, and more
-- **Cloud CLIs** - AWS CLI, Azure CLI, gcloud CLI
-- **Language runtimes** - Go SDK, Python 3.14 (via uv), Rust (via rustup), Node.js LTS (via fnm)
-- **Editor & shell** - Neovim (0.11+) with NvChad, spaceship-prompt, zsh plugins, tmux with TPM
-- **Config files** - complete `.zshrc`, tmux.conf, kitty.conf, aerospace.toml (macOS)
+## Prerequisites
 
-Additional tools are available as **extension packs** installed via `cps extend`:
+| Requirement | Why |
+|---|---|
+| [Oh My Zsh](https://ohmyz.sh/) | Shell framework — `cps init` will not run without it |
+| Git | Used to clone plugins and configs |
+| [Homebrew](https://brew.sh/) (macOS only) | System package installs on macOS |
 
-- **security** - nuclei, naabu, subfinder, proxify, trufflehog, httpx, dnsx, gobuster, titus
-- **cloudsec** - terraform, kubectl, kubelogin, grpcurl, cloudfox, aurelian, trivy, cloudlist
-- **appsec** - katana, ffuf, hadrian, dalfox, reaper, poltergeist, wraith, gau
-- **misc** - julius, trajan, gowitness, snitch, age
-- **private** - personal/private tools (requires `--gh-token`)
+**Recommended:**
 
-## Capabilities
+- [Kitty](https://sw.kovidgoez.net/kitty/) terminal — CPS deploys a Kitty config and Catppuccin theme. Without Kitty, those config files are harmless but unused.
+- [JetBrains Mono Nerd Font](https://www.nerdfonts.com/font-downloads) — the Kitty and Neovim configs expect a nerd font. Without one, icons and glyphs will render as boxes.
 
-| Category | Commands | Description |
-|----------|----------|-------------|
-| Setup | `cps init` | Full environment setup - system packages, tools, cloud CLIs, language runtimes, shell plugins, and config files |
-| Monitoring | `cps check` | Compare installed versions against latest releases |
-| Install | `cps install <tools\|categories>...` | Install or update tools by name or category |
-| Extensions | `cps extend <pack>` | Install extension tool packs (security, cloud, appsec, private) |
-| Cheat sheets | `cps cheat <topic>` | Print styled cheat sheets for common tools |
-| Self-update | `cps self-update` | Update cps itself to the latest release |
-| Maintenance | `cps clean` | Remove all CPS-managed files and directories |
-
-## Installation
-
-### Binary
-
-Download from [releases](https://github.com/tanq16/cli-productivity-suite/releases):
+## Install
 
 ```bash
-# Linux/macOS
 ARCH=$(uname -m); [ "$ARCH" = "x86_64" ] && ARCH=amd64; [ "$ARCH" = "aarch64" ] && ARCH=arm64
-curl -sL https://github.com/tanq16/cli-productivity-suite/releases/latest/download/cps-$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCH -o cps
-chmod +x cps
-sudo mv cps /usr/local/bin/
+curl -sL "https://github.com/tanq16/cli-productivity-suite/releases/latest/download/cps-$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCH" -o cps
+chmod +x cps && sudo mv cps /usr/local/bin/
 ```
 
-### Build from Source
+Or build from source:
 
 ```bash
-git clone https://github.com/tanq16/cli-productivity-suite
-cd cli-productivity-suite
-make build
+git clone https://github.com/tanq16/cli-productivity-suite && cd cli-productivity-suite
+make build   # produces ./cps
 ```
-
-### Prerequisites
-
-- [Oh My Zsh](https://ohmyz.sh/) must be installed before running `cps init`
-- Git must be available in PATH
-- **macOS only:** [Homebrew](https://brew.sh/) must be installed for system package installation
-- Install a nerd font for your terminal emulator - recommended: [JetBrains Mono Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip)
 
 ## Usage
 
-### `init`
+### `cps init`
 
-Full environment setup with all tools, plugins, and configs.
+Sets up the base environment — core CLI tools (bat, fd, ripgrep, lsd, jq, yq, fzf, sd, gron, sq, zoxide, gh, anbu, danzo, ai-context), Neovim with NvChad, zsh plugins, tmux with TPM, and config files. Requires sudo on Linux for system packages.
 
 ```bash
 cps init
+cps extend core
 ```
 
-### `check`
+These two commands are the standard way to set up this suite. `init` handles the base shell environment and `core` adds dev tools, network utilities, and media packages. Everything else via `cps extend` is optional — install what you need.
 
-Compare installed tool versions against latest releases. Only shows actionable items (tools needing update, config diffs, errors).
+### `cps extend <pack> [tools...]`
+
+Install extension packs or pick specific tools from a pack.
 
 ```bash
-cps check
+cps extend list                       # list all packs
+cps extend runtimes                   # install all language runtimes
+cps extend runtimes go-sdk            # install only Go
+cps extend security nuclei subfinder  # pick specific tools
 ```
 
-### `install`
+| Pack | Contents |
+|---|---|
+| core | Dev tools, network utils, media packages (cmake, nmap, ffmpeg, aerospace) |
+| runtimes | uv, fnm, bun, Go, Python (includes uv), Rust, Node.js LTS (includes fnm) |
+| cloud | AWS CLI, Azure CLI, gcloud CLI |
+| security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, gobuster, titus, nuclei-templates |
+| cloudsec | terraform, kubectl, kubelogin, grpcurl, cloudfox, aurelian, trivy, cloudlist |
+| appsec | katana, ffuf, hadrian, dalfox, reaper, poltergeist, wraith, gau |
+| misc | julius, trajan, gowitness, snitch, age |
+| private | Personal tools (requires `--gh-token`) |
 
-Install or update tools by name or category. Accepts multiple arguments. When a single tool is specified, it shows a single-line result. When multiple tools or categories are specified, it runs as a batch with phase output.
+Packs with shell integration (`runtimes`, `cloud`, `security`) deploy RC fragments automatically.
 
-```bash
-cps install bat                     # Single tool
-cps install bat fd ripgrep          # Multiple tools
-cps install core                    # All core binary tools
-cps install configs                 # Config files + shell plugins
-```
+### `cps cheat <topic>`
 
-**Category aliases:** `core`, `system`, `cloud`, `runtimes`, `configs`
+Terminal cheat sheets — `cps`, `go`, `uv`, `fnm`, `rust`, `tmux`, `nvim`, `fzf`, `regex`.
 
-### `extend`
+### `cps self-update`
 
-Install extension tool packs. Extensions are installed to `~/shell/extensions/` and tracked in the same state file. Individual extension tools can also be installed via `cps install <tool-name>`.
+Updates the `cps` binary to the latest release. Requires sudo.
 
-```bash
-cps extend list                     # List available packs
-cps extend <pack>                   # Install a pack
-cps extend --check <pack>           # Check a pack for updates
-```
-
-### `cheat`
-
-Print styled terminal cheat sheets for common tools tailored to the CPS environment.
-
-```bash
-cps cheat <topic>                   # e.g., cps, go, uv, fnm, rust, tmux, nvim, fzf, regex
-```
-
-### `self-update`
-
-Update cps itself to the latest release (requires sudo).
-
-```bash
-cps self-update
-```
-
-### `clean`
-
-Remove all CPS-managed files and directories with confirmation.
-
-```bash
-cps clean
-```
-
-**Global flags:**
+### Flags
 
 | Flag | Description |
-|------|-------------|
-| `--debug` | Enable debug logging |
-| `--for-ai` | AI-friendly output (markdown tables, no color) |
+|---|---|
 | `--gh-token` | GitHub PAT for private repos (falls back to `gh auth token`) |
+| `--debug` | Verbose debug logging |
+| `--for-ai` | AI-friendly output (no color) |
 
-## Tips and Notes
+## Custom Extension Packs
 
-- Core tools are installed to `~/shell/executables/`, extension tools to `~/shell/extensions/` - both are on PATH via `.zshrc`
-- Neovim is installed from GitHub releases (0.11+) on both Linux and macOS to meet NvChad requirements
-- State is tracked in `~/.config/cps/state.json` - this file records installed versions for `check` and `install` commands
-- If the `gh` CLI is authenticated (`gh auth login`), CPS automatically uses its token - no need to pass `--gh-token`
-- Running `cps init` is idempotent - it skips tools that are already at the latest version
-- Cloud CLIs (AWS, Azure, gcloud) require sudo on Linux for system-level installation
-- The `.zshrc` deployed by `cps init` is a complete replacement - it includes Oh My Zsh config, tool integrations and aliases
-- `cps clean` removes `~/shell`, `~/.tmux`, `~/.config/nvim`, and `~/.config/cps` - it does not touch Oh My Zsh, deployed config files, or system packages
-- If you previously had `bat` installed and it is somehow quite slow now to load, it's likely due to an outdated cache, which can be rebuilt with `bat cache --build`
+Drop a YAML file in `~/.config/cps/extensions/` to define your own pack:
+
+```yaml
+name: my-tools
+description: My custom tools
+shell:
+  env:
+    MY_VAR: "value"
+  path_prepend:
+    - "$HOME/.local/bin"
+  source:
+    - "$HOME/.cargo/env"
+tools:
+  - name: my-tool
+    install: curl -sL https://example.com/install.sh | bash
+```
+
+Then run `cps extend my-tools`. Custom packs appear in `cps extend list` alongside built-in packs.
+
+The `shell` block controls what gets added to your shell environment via a generated RC fragment at `~/shell/rc/custom/<pack-name>.zsh`:
+
+- **`env`** — key-value pairs exported as environment variables
+- **`path_prepend`** — directories prepended to `$PATH`
+- **`source`** — files conditionally sourced (only if they exist)
+
+All three fields are optional. If the entire `shell` block is omitted, no fragment is generated.
+
+## Shell Integration
+
+CPS uses a modular fragment system instead of a monolithic `.zshrc`:
+
+| Fragment | Deployed by |
+|---|---|
+| `~/shell/rc/00-base.zsh` | `cps init` |
+| `~/shell/rc/10-runtimes.zsh` | `cps extend runtimes` |
+| `~/shell/rc/20-cloud.zsh` | `cps extend cloud` |
+| `~/shell/rc/30-security.zsh` | `cps extend security` |
+| `~/shell/rc/custom/*.zsh` | Custom packs or user-managed |
+
+`~/.zshrc` is a thin loader that sources all fragments in order.
+
+## Notes
+
+- Core tools install to `~/shell/executables/`, extensions to `~/shell/extensions/` — both on PATH
+- State tracked in `~/.config/cps/state.json` — runs are idempotent, already-current tools are skipped
+- If `gh` CLI is authenticated, CPS uses its token automatically — no need for `--gh-token`
 
 ## Deep Removal
 
-The `cps clean` command performs a superficial cleanup of CPS-managed directories. For a full removal of everything CPS installs, follow these steps:
-
-**Step 1** - Run `cps clean` to remove the primary managed directories (`~/shell`, `~/.tmux`, `~/.config/nvim`, `~/.config/cps`):
-
 ```bash
-cps clean
-```
+# CPS directories
+rm -rf $HOME/shell $HOME/.tmux $HOME/.config/nvim $HOME/.config/cps
 
-**Step 2** - Remove remaining configs, data directories, Oh My Zsh, and system-level installs:
-
-```bash
-rm -rf \
-  $HOME/.oh-my-zsh \
-  $HOME/.tmux.conf \
-  $HOME/.zshrc \
-  $HOME/.aerospace.toml \
-  $HOME/.config/kitty/kitty.conf \
-  $HOME/.local/share/nvim \
-  && sudo rm -rf /usr/local/aws-cli /usr/local/bin/cps
-```
-
-**Step 3** - Remove system packages installed by CPS:
-
-Linux (apt):
-
-```bash
-sudo apt-get remove -y tmux openssl nmap ncat cmake gcc make ninja-build gettext zip unzip file ffmpeg htop
-```
-
-macOS (brew):
-
-```bash
-brew uninstall tmux openssl nmap ffmpeg htop
-brew uninstall --cask nikitabobko/tap/aerospace
+# Configs
+rm -f $HOME/.tmux.conf $HOME/.zshrc $HOME/.aerospace.toml $HOME/.config/kitty/kitty.conf $HOME/.config/kitty/current-theme.conf
+rm -rf $HOME/.local/share/nvim $HOME/.oh-my-zsh
+sudo rm -f /usr/local/bin/cps
+sudo rm -rf /usr/local/aws-cli
 ```

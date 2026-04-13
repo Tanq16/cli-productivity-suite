@@ -13,11 +13,6 @@ import (
 
 type SystemPackageInstaller struct{}
 
-func (s *SystemPackageInstaller) Check(tool *registry.Tool, _ platform.Platform, _ *github.Client, st *state.State) (current, latest string, err error) {
-	current = st.ToolVersion(tool.Name)
-	return current, "system-managed", nil
-}
-
 func (s *SystemPackageInstaller) Install(tool *registry.Tool, p platform.Platform, _ *github.Client, st *state.State) Result {
 	switch p.OS {
 	case platform.Linux:
@@ -45,6 +40,10 @@ func (s *SystemPackageInstaller) installApt(tool *registry.Tool, st *state.State
 }
 
 func (s *SystemPackageInstaller) installBrew(tool *registry.Tool, st *state.State) Result {
+	if len(tool.BrewPkgs) == 0 && len(tool.BrewCasks) == 0 {
+		return Result{Tool: tool.Name, Skipped: true}
+	}
+
 	if len(tool.BrewPkgs) > 0 {
 		args := append([]string{"install"}, tool.BrewPkgs...)
 		cmd := exec.Command("brew", args...)

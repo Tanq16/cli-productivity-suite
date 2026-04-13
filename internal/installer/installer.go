@@ -17,7 +17,6 @@ type Result struct {
 
 type Installer interface {
 	Install(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) Result
-	Check(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) (current, latest string, err error)
 }
 
 func Dispatch(kind registry.ToolKind) Installer {
@@ -36,6 +35,8 @@ func Dispatch(kind registry.ToolKind) Installer {
 		return &ConfigDeployInstaller{}
 	case registry.ShellPlugin:
 		return &ShellPluginInstaller{}
+	case registry.CustomScript:
+		return &CustomScriptInstaller{}
 	default:
 		return nil
 	}
