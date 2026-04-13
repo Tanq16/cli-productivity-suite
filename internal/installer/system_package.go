@@ -13,33 +13,7 @@ import (
 
 type SystemPackageInstaller struct{}
 
-func (s *SystemPackageInstaller) Install(tool *registry.Tool, p platform.Platform, _ *github.Client, st *state.State) Result {
-	switch p.OS {
-	case platform.Linux:
-		return s.installApt(tool, st)
-	case platform.Darwin:
-		return s.installBrew(tool, st)
-	default:
-		return Result{Tool: tool.Name, Err: fmt.Errorf("unsupported OS")}
-	}
-}
-
-func (s *SystemPackageInstaller) installApt(tool *registry.Tool, st *state.State) Result {
-	if len(tool.AptPkgs) == 0 {
-		return Result{Tool: tool.Name, Skipped: true}
-	}
-
-	args := append([]string{"apt-get", "install", "-y"}, tool.AptPkgs...)
-	cmd := exec.Command("sudo", args...)
-	if err := utils.RunCmd(cmd); err != nil {
-		return Result{Tool: tool.Name, Err: fmt.Errorf("apt install failed: %w", err)}
-	}
-
-	st.SetToolVersion(tool.Name, "system-managed")
-	return Result{Tool: tool.Name, Version: "system-managed"}
-}
-
-func (s *SystemPackageInstaller) installBrew(tool *registry.Tool, st *state.State) Result {
+func (s *SystemPackageInstaller) Install(tool *registry.Tool, _ platform.Platform, _ *github.Client, st *state.State) Result {
 	if len(tool.BrewPkgs) == 0 && len(tool.BrewCasks) == 0 {
 		return Result{Tool: tool.Name, Skipped: true}
 	}
@@ -61,6 +35,6 @@ func (s *SystemPackageInstaller) installBrew(tool *registry.Tool, st *state.Stat
 		}
 	}
 
-	st.SetToolVersion(tool.Name, "system-managed")
-	return Result{Tool: tool.Name, Version: "system-managed"}
+	st.SetToolVersion(tool.Name, "brew-managed")
+	return Result{Tool: tool.Name, Version: "brew-managed"}
 }

@@ -1,6 +1,8 @@
 # --- gcloud ---
-[ -f "$HOME/shell/gcloud-sdk/path.zsh.inc" ] && source "$HOME/shell/gcloud-sdk/path.zsh.inc"
-[ -f "$HOME/shell/gcloud-sdk/completion.zsh.inc" ] && source "$HOME/shell/gcloud-sdk/completion.zsh.inc"
+if [ -n "$HOMEBREW_PREFIX" ]; then
+  [ -f "$HOMEBREW_PREFIX/share/google-cloud-sdk/path.zsh.inc" ] && source "$HOMEBREW_PREFIX/share/google-cloud-sdk/path.zsh.inc"
+  [ -f "$HOMEBREW_PREFIX/share/google-cloud-sdk/completion.zsh.inc" ] && source "$HOMEBREW_PREFIX/share/google-cloud-sdk/completion.zsh.inc"
+fi
 
 # --- AWS CLI ---
 alias awsn='aws --no-cli-pager'

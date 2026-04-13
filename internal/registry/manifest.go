@@ -163,14 +163,12 @@ var AllTools = []Tool{
 	{
 		Name: "core-utils", Kind: SystemPackage, Category: System,
 		Description: "Core system utilities",
-		AptPkgs:     []string{"git", "wget", "curl", "zip", "unzip", "file"},
-		BrewPkgs:    []string{"git", "wget", "curl"},
+		BrewPkgs:    []string{"git", "wget", "curl", "zip", "unzip", "file"},
 	},
 	{
 		Name: "shell-base", Kind: SystemPackage, Category: System,
 		Description: "Shell and terminal essentials",
-		AptPkgs:     []string{"tmux", "zsh", "htop"},
-		BrewPkgs:    []string{"tmux", "htop"},
+		BrewPkgs:    []string{"tmux", "zsh", "htop"},
 	},
 
 	// ========== Language Runtimes (base only) ==========

@@ -60,7 +60,8 @@ func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, gh *github
 
 	url := fmt.Sprintf("https://github.com/neovim/neovim/releases/download/stable/nvim-%s-%s.tar.gz", osStr, archStr)
 
-	tmpDir, err := os.MkdirTemp("", "cps-neovim-*")
+	// Temp dir inside p.ShellDir() so os.Rename stays on the same filesystem (avoids EXDEV on Linux tmpfs /tmp).
+	tmpDir, err := os.MkdirTemp(p.ShellDir(), "cps-neovim-*")
 	if err != nil {
 		return Result{Tool: "neovim", Err: err}
 	}
@@ -154,7 +155,8 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 		return Result{Tool: "go-sdk", Err: fmt.Errorf("no Go download found for %s/%s", p.OS, p.Arch)}
 	}
 
-	tmpDir, err := os.MkdirTemp("", "cps-go-*")
+	// Temp dir inside p.ShellDir() so os.Rename stays on the same filesystem (avoids EXDEV on Linux tmpfs /tmp).
+	tmpDir, err := os.MkdirTemp(p.ShellDir(), "cps-go-*")
 	if err != nil {
 		return Result{Tool: "go-sdk", Err: err}
 	}

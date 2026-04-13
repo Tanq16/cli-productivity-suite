@@ -27,8 +27,6 @@ func Dispatch(kind registry.ToolKind) Installer {
 		return &DirectDownloadInstaller{}
 	case registry.SystemPackage:
 		return &SystemPackageInstaller{}
-	case registry.CloudCLI:
-		return &CloudCLIInstaller{}
 	case registry.LanguageRuntime:
 		return &LanguageRuntimeInstaller{}
 	case registry.ConfigFile:

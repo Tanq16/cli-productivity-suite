@@ -15,7 +15,7 @@ A single Go binary (`cps`) that sets up and manages a complete CLI development e
 |---|---|
 | [Oh My Zsh](https://ohmyz.sh/) | Shell framework — `cps init` will not run without it |
 | Git | Used to clone plugins and configs |
-| [Homebrew](https://brew.sh/) (macOS only) | System package installs on macOS |
+| [Homebrew](https://brew.sh/) | System package installs (both Linux and macOS) — `cps` installs all system/cloud CLI packages via brew |
 
 **Recommended:**
 
@@ -26,9 +26,12 @@ A single Go binary (`cps`) that sets up and manages a complete CLI development e
 
 ```bash
 ARCH=$(uname -m); [ "$ARCH" = "x86_64" ] && ARCH=amd64; [ "$ARCH" = "aarch64" ] && ARCH=arm64
-curl -sL "https://github.com/tanq16/cli-productivity-suite/releases/latest/download/cps-$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCH" -o cps
-chmod +x cps && sudo mv cps /usr/local/bin/
+mkdir -p "$HOME/.local/bin"
+curl -sL "https://github.com/tanq16/cli-productivity-suite/releases/latest/download/cps-$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCH" -o "$HOME/.local/bin/cps"
+chmod +x "$HOME/.local/bin/cps"
 ```
+
+If `~/.local/bin` isn't on your PATH yet (common on fresh macOS), run `cps init` via its full path — `~/.local/bin/cps init` — for the first invocation. The rc fragment that `init` deploys adds `~/.local/bin` to PATH for all future sessions.
 
 Or build from source:
 
@@ -41,7 +44,7 @@ make build   # produces ./cps
 
 ### `cps init`
 
-Sets up the base environment — core CLI tools (bat, fd, ripgrep, lsd, jq, yq, fzf, sd, gron, sq, zoxide, gh, anbu, danzo, ai-context), Neovim with NvChad, zsh plugins, tmux with TPM, and config files. Requires sudo on Linux for system packages.
+Sets up the base environment — core CLI tools (bat, fd, ripgrep, lsd, jq, yq, fzf, sd, gron, sq, zoxide, gh, anbu, danzo, ai-context), Neovim with NvChad, zsh plugins, tmux with TPM, and config files. System packages install via Homebrew on both Linux and macOS — no sudo required.
 
 ```bash
 cps init
@@ -80,7 +83,7 @@ Terminal cheat sheets — `cps`, `go`, `uv`, `fnm`, `rust`, `tmux`, `nvim`, `fzf
 
 ### `cps self-update`
 
-Updates the `cps` binary to the latest release. Requires sudo.
+Updates the `cps` binary in place (at whatever path it's running from).
 
 ### Flags
 
@@ -148,6 +151,8 @@ rm -rf $HOME/shell $HOME/.tmux $HOME/.config/nvim $HOME/.config/cps
 # Configs
 rm -f $HOME/.tmux.conf $HOME/.zshrc $HOME/.aerospace.toml $HOME/.config/kitty/kitty.conf $HOME/.config/kitty/current-theme.conf
 rm -rf $HOME/.local/share/nvim $HOME/.oh-my-zsh
-sudo rm -f /usr/local/bin/cps
-sudo rm -rf /usr/local/aws-cli
+rm -f $HOME/.local/bin/cps
+
+# Uninstall brew-managed system and cloud packages (optional)
+brew uninstall awscli azure-cli gcloud-cli
 ```

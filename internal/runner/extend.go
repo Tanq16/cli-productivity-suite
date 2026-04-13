@@ -125,28 +125,6 @@ func Extend(packName string, toolFilter []string, ghToken string) {
 		return
 	}
 
-	var sudoCancel func()
-	if packNeedsSudo(tools, p) {
-		cached := sudoCached()
-		utils.PrintRunning("authenticating sudo")
-		if err := EnsureSudo(); err != nil {
-			utils.PrintFatal("sudo authentication failed", err)
-		}
-		ctx, cancel := startSudoCtx()
-		sudoCancel = cancel
-		StartSudoRefresh(ctx)
-		if cached {
-			utils.ClearLines(1)
-		} else {
-			utils.ClearLines(2)
-		}
-
-		if p.OS == platform.Linux && packHasKind(tools, registry.SystemPackage) {
-			aptCmd := aptUpdateCmd()
-			utils.RunCmd(aptCmd)
-		}
-	}
-
 	var hadErrors bool
 	phaseName := fmt.Sprintf("Extension: %s", pack.Name)
 
@@ -199,10 +177,6 @@ func Extend(packName string, toolFilter []string, ghToken string) {
 		}
 	}
 
-	if sudoCancel != nil {
-		sudoCancel()
-	}
-
 	if err := st.Save(); err != nil {
 		utils.PrintError("failed to save state", err)
 	}
@@ -244,28 +218,6 @@ func ExtensionPackToolNames(packName string) []string {
 		names[i] = t.Name
 	}
 	return names
-}
-
-func packNeedsSudo(tools []registry.Tool, p platform.Platform) bool {
-	if p.OS != platform.Linux {
-		return false
-	}
-	for _, t := range tools {
-		switch t.Kind {
-		case registry.SystemPackage, registry.CloudCLI:
-			return true
-		}
-	}
-	return false
-}
-
-func packHasKind(tools []registry.Tool, kind registry.ToolKind) bool {
-	for _, t := range tools {
-		if t.Kind == kind {
-			return true
-		}
-	}
-	return false
 }
 
 func deployPackFragment(packName string, p platform.Platform) {

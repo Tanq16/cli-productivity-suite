@@ -450,18 +450,16 @@ var extensionPacks = []ExtensionPack{
 				Name: "dev-tools", Kind: SystemPackage, Category: ExtSystem, Extension: true,
 				Description: "Development build tools",
 				Platforms:   []string{"linux"},
-				AptPkgs:     []string{"cmake", "gcc", "make", "ninja-build", "gettext"},
+				BrewPkgs:    []string{"cmake", "gcc", "make", "ninja", "gettext"},
 			},
 			{
 				Name: "network-tools", Kind: SystemPackage, Category: ExtSystem, Extension: true,
 				Description: "Network utilities",
-				AptPkgs:     []string{"nmap", "ncat", "openssl"},
-				BrewPkgs:    []string{"openssl", "nmap"},
+				BrewPkgs:    []string{"nmap", "openssl"},
 			},
 			{
 				Name: "media-tools", Kind: SystemPackage, Category: ExtSystem, Extension: true,
 				Description: "Media and monitoring tools",
-				AptPkgs:     []string{"ffmpeg"},
 				BrewPkgs:    []string{"ffmpeg"},
 			},
 			{
@@ -478,16 +476,19 @@ var extensionPacks = []ExtensionPack{
 		Category:    ExtCloud,
 		Tools: []Tool{
 			{
-				Name: "aws-cli", Kind: CloudCLI, Category: ExtCloud, Extension: true,
+				Name: "aws-cli", Kind: SystemPackage, Category: ExtCloud, Extension: true,
 				Description: "AWS CLI v2",
+				BrewPkgs:    []string{"awscli"},
 			},
 			{
-				Name: "azure-cli", Kind: CloudCLI, Category: ExtCloud, Extension: true,
+				Name: "azure-cli", Kind: SystemPackage, Category: ExtCloud, Extension: true,
 				Description: "Azure CLI",
+				BrewPkgs:    []string{"azure-cli"},
 			},
 			{
-				Name: "gcloud-cli", Kind: CloudCLI, Category: ExtCloud, Extension: true,
+				Name: "gcloud-cli", Kind: SystemPackage, Category: ExtCloud, Extension: true,
 				Description: "Google Cloud CLI",
+				BrewCasks:   []string{"gcloud-cli"},
 			},
 		},
 	},

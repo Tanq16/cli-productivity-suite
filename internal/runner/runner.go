@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -41,6 +40,10 @@ func Init(ghToken string) {
 	if _, err := exec.LookPath("git"); err != nil {
 		utils.PrintFatal("git not found in PATH", err)
 	}
+	if _, err := exec.LookPath("brew"); err != nil {
+		msg := "Homebrew not found in PATH\nInstall it first: /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+		utils.PrintFatal(msg, err)
+	}
 	for _, dir := range []string{
 		p.ShellDir(),
 		p.ShellExecDir(),
@@ -59,24 +62,6 @@ func Init(ghToken string) {
 	var hadErrors bool
 
 	sysPkgs := filterBaseTools(filterPlatformTools(reg.ByKind(registry.SystemPackage), p))
-	var sudoCancel func()
-	if len(sysPkgs) > 0 && p.OS == platform.Linux {
-		cached := sudoCached()
-		utils.PrintRunning("(Running) Phase 1: Authenticating sudo")
-		if err := EnsureSudo(); err != nil {
-			utils.PrintFatal("sudo authentication failed", err)
-		}
-		ctx, cancel := startSudoCtx()
-		sudoCancel = cancel
-		StartSudoRefresh(ctx)
-		if cached {
-			utils.ClearLines(1)
-		} else {
-			utils.ClearLines(2)
-		}
-		aptCmd := aptUpdateCmd()
-		utils.RunCmd(aptCmd)
-	}
 
 	// Phase 2: System packages
 	if runPhase("Phase 2: System packages", sysPkgs, p, gh, st) {
@@ -105,10 +90,6 @@ func Init(ghToken string) {
 		hadErrors = true
 	}
 	st.Save()
-
-	if sudoCancel != nil {
-		sudoCancel()
-	}
 
 	// Phase 6: Shell plugins (base only, exclude extension tools)
 	disableOMZSlowPaste(p)
@@ -170,60 +151,29 @@ func SelfUpdate(appVersion string) {
 		utils.PrintFatal(fmt.Sprintf("no release asset found for %s", assetName), nil)
 	}
 
-	cached := sudoCached()
-	utils.PrintRunning("authenticating sudo")
-	if err := EnsureSudo(); err != nil {
-		utils.PrintFatal("sudo authentication failed", err)
+	destPath, err := os.Executable()
+	if err != nil {
+		utils.PrintFatal("failed to locate current cps binary", err)
 	}
-	sudoCtx, sudoCancel := startSudoCtx()
-	StartSudoRefresh(sudoCtx)
-	if cached {
-		utils.ClearLines(1)
-	} else {
-		utils.ClearLines(2)
+	if resolved, err := filepath.EvalSymlinks(destPath); err == nil {
+		destPath = resolved
 	}
 
 	utils.PrintRunning(fmt.Sprintf("downloading %s", release.TagName))
-	tmpDir, err := os.MkdirTemp("", "cps-self-update-*")
-	if err != nil {
-		utils.PrintFatal("failed to create temp dir", err)
-	}
-	defer os.RemoveAll(tmpDir)
-
-	tmpBinary := filepath.Join(tmpDir, "cps")
+	tmpBinary := destPath + ".new"
 	if err := installer.DownloadToFile(downloadURL, tmpBinary); err != nil {
 		utils.PrintFatal("download failed", err)
 	}
 	if err := os.Chmod(tmpBinary, 0755); err != nil {
+		os.Remove(tmpBinary)
 		utils.PrintFatal("chmod failed", err)
 	}
-
-	destPath, err := exec.LookPath("cps")
-	if err != nil {
-		destPath = "/usr/local/bin/cps"
-	}
-	rmCmd := exec.Command("sudo", "rm", "-f", destPath)
-	var rmStderr strings.Builder
-	rmCmd.Stderr = &rmStderr
-	if err := rmCmd.Run(); err != nil {
-		if detail := strings.TrimSpace(rmStderr.String()); detail != "" {
-			err = fmt.Errorf("%s: %w", detail, err)
-		}
-		utils.PrintFatal(fmt.Sprintf("failed to remove old binary at %s", destPath), err)
-	}
-	cpCmd := exec.Command("sudo", "cp", tmpBinary, destPath)
-	var stderr strings.Builder
-	cpCmd.Stderr = &stderr
-	if err := cpCmd.Run(); err != nil {
-		detail := strings.TrimSpace(stderr.String())
-		if detail != "" {
-			err = fmt.Errorf("%s: %w", detail, err)
-		}
+	if err := os.Rename(tmpBinary, destPath); err != nil {
+		os.Remove(tmpBinary)
 		utils.PrintFatal(fmt.Sprintf("failed to install binary at %s", destPath), err)
 	}
 	utils.ClearLines(1)
 
-	sudoCancel()
 	utils.PrintSuccess(fmt.Sprintf("updated cps: %s → %s", appVersion, release.TagName))
 }
 
@@ -357,18 +307,6 @@ func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *in
 }
 
 // --- Helpers ---
-
-func sudoCached() bool {
-	return exec.Command("sudo", "-n", "-v").Run() == nil
-}
-
-func startSudoCtx() (context.Context, context.CancelFunc) {
-	return context.WithCancel(context.Background())
-}
-
-func aptUpdateCmd() *exec.Cmd {
-	return exec.Command("sudo", "apt-get", "update", "-qq")
-}
 
 func toolForPlatform(tool registry.Tool, p platform.Platform) bool {
 	if len(tool.Platforms) == 0 {

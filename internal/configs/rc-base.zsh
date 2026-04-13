@@ -1,3 +1,13 @@
+# --- Homebrew ---
+export HOMEBREW_NO_AUTO_UPDATE=1
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
 # --- Oh My Zsh ---
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="spaceship"
@@ -5,7 +15,7 @@ plugins=(zsh-autosuggestions zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 
 # --- PATH ---
-export PATH="$HOME/shell/extensions:$HOME/shell/executables:/opt/homebrew/bin:$HOME/.local/bin:$PATH"
+export PATH="$HOME/shell/extensions:$HOME/shell/executables:$HOME/.local/bin:$PATH"
 
 # --- FZF ---
 [ -f "$HOME/shell/completions/fzf.zsh" ] && source "$HOME/shell/completions/fzf.zsh"

@@ -6,7 +6,6 @@ const (
 	GitHubRelease ToolKind = iota
 	DirectDownload
 	SystemPackage
-	CloudCLI
 	LanguageRuntime
 	ConfigFile
 	ShellPlugin
@@ -21,8 +20,6 @@ func (k ToolKind) String() string {
 		return "direct-download"
 	case SystemPackage:
 		return "system-package"
-	case CloudCLI:
-		return "cloud-cli"
 	case LanguageRuntime:
 		return "language-runtime"
 	case ConfigFile:
@@ -42,7 +39,6 @@ const (
 	Core ToolCategory = iota
 	Private
 	System
-	CloudCLICat
 	Runtime
 	Config
 	Shell
@@ -65,8 +61,6 @@ func (c ToolCategory) String() string {
 		return "private"
 	case System:
 		return "system"
-	case CloudCLICat:
-		return "cloud-cli"
 	case Runtime:
 		return "runtime"
 	case Config:
@@ -115,8 +109,7 @@ type Tool struct {
 	Repo        string // "owner/repo" for GitHub tools
 	Asset       AssetPattern
 	IsPrivate   bool
-	AptPkgs     []string // Linux apt packages
-	BrewPkgs    []string // macOS brew packages
+	BrewPkgs    []string // Homebrew packages (Linux + macOS)
 	BrewCasks   []string // macOS brew cask packages
 	Platforms   []string // "linux", "darwin", or both; empty means both
 	Description string
