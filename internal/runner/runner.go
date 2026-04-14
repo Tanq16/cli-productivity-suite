@@ -49,6 +49,7 @@ func Init(ghToken string) {
 		p.ShellExecDir(),
 		filepath.Join(p.ShellDir(), "rc"),
 		filepath.Join(p.ShellDir(), "rc", "custom"),
+		filepath.Join(p.ShellDir(), "env"),
 		filepath.Join(p.ShellDir(), "custom"),
 		filepath.Join(p.ConfigDir(), "extensions"),
 	} {
@@ -239,6 +240,7 @@ func runPostInstall(p platform.Platform) {
 		}
 	}
 
+	generateShellEnv(p, &errors, &lineCount)
 	generateCompletions(p, &errors, &lineCount)
 
 	utils.ClearLines(lineCount + 1) // sub-lines + running header
@@ -249,6 +251,31 @@ func runPostInstall(p platform.Platform) {
 		}
 	} else {
 		utils.PrintInfo("Phase 7: Post-install tasks")
+	}
+}
+
+func generateShellEnv(p platform.Platform, errors *[]jobResult, lineCount *int) {
+	envDir := filepath.Join(p.ShellDir(), "env")
+	if err := os.MkdirAll(envDir, 0755); err != nil {
+		*errors = append(*errors, jobResult{name: "shell-env", err: err})
+		return
+	}
+
+	brewBin, err := exec.LookPath("brew")
+	if err != nil {
+		return // brew not found, nothing to generate
+	}
+
+	utils.PrintIndentedRunning("shell-env: brew")
+	*lineCount++
+	cmd := exec.Command(brewBin, "shellenv")
+	out, err := cmd.Output()
+	if err != nil {
+		*errors = append(*errors, jobResult{name: "shell-env-brew", err: err})
+		return
+	}
+	if err := os.WriteFile(filepath.Join(envDir, "brew.zsh"), out, 0644); err != nil {
+		*errors = append(*errors, jobResult{name: "shell-env-brew", err: err})
 	}
 }
 

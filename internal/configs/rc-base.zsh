@@ -1,12 +1,6 @@
 # --- Homebrew ---
 export HOMEBREW_NO_AUTO_UPDATE=1
-if [ -x /opt/homebrew/bin/brew ]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
-  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-elif [ -x /usr/local/bin/brew ]; then
-  eval "$(/usr/local/bin/brew shellenv)"
-fi
+[ -f "$HOME/shell/env/brew.zsh" ] && source "$HOME/shell/env/brew.zsh"
 
 # --- Oh My Zsh ---
 export ZSH="$HOME/.oh-my-zsh"
