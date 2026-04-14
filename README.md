@@ -11,11 +11,22 @@ A single Go binary (`cps`) that sets up and manages a complete CLI development e
 
 ## Prerequisites
 
-| Requirement | Why |
+### Bootstrap (Linux only)
+
+macOS has these out of the box (git via Xcode CLT, zsh built-in, curl built-in). On Linux:
+
+```bash
+sudo apt install git curl zsh build-essential
+```
+
+### Install these (both platforms)
+
+| Requirement | One-line install |
 |---|---|
-| [Oh My Zsh](https://ohmyz.sh/) | Shell framework — `cps init` will not run without it |
-| Git | Used to clone plugins and configs |
-| [Homebrew](https://brew.sh/) | System package installs (both Linux and macOS) — `cps` installs all system/cloud CLI packages via brew |
+| [Oh My Zsh](https://ohmyz.sh/) | `sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"` |
+| [Homebrew](https://brew.sh/) | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
+
+Both are required — `cps init` won't run without them. CPS uses brew for all system and cloud CLI packages.
 
 **Recommended:**
 
@@ -144,15 +155,8 @@ CPS uses a modular fragment system instead of a monolithic `.zshrc`:
 
 ## Deep Removal
 
+Run the included script to wipe CPS, CPS-installed brew packages, and Oh My Zsh. Homebrew itself and `~/.zsh_history` are preserved so you can reinstall cleanly without rebuilding your shell history or re-bootstrapping brew.
+
 ```bash
-# CPS directories
-rm -rf $HOME/shell $HOME/.tmux $HOME/.config/nvim $HOME/.config/cps
-
-# Configs
-rm -f $HOME/.tmux.conf $HOME/.zshrc $HOME/.aerospace.toml $HOME/.config/kitty/kitty.conf $HOME/.config/kitty/current-theme.conf
-rm -rf $HOME/.local/share/nvim $HOME/.oh-my-zsh
-rm -f $HOME/.local/bin/cps
-
-# Uninstall brew-managed system and cloud packages (optional)
-brew uninstall awscli azure-cli gcloud-cli
+./deep-removal.sh
 ```

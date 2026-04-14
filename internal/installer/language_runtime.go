@@ -22,8 +22,6 @@ type LanguageRuntimeInstaller struct{}
 
 func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) Result {
 	switch tool.Name {
-	case "neovim":
-		return l.installNeovim(p, gh, st)
 	case "go-sdk":
 		return l.installGo(p, st)
 	case "uv":
@@ -39,67 +37,6 @@ func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platf
 	default:
 		return Result{Tool: tool.Name, Err: fmt.Errorf("unknown runtime: %s", tool.Name)}
 	}
-}
-
-func (l *LanguageRuntimeInstaller) installNeovim(p platform.Platform, gh *github.Client, st *state.State) Result {
-	var archStr string
-	switch p.Arch {
-	case platform.AMD64:
-		archStr = "x86_64"
-	case platform.ARM64:
-		archStr = "arm64"
-	}
-
-	var osStr string
-	switch p.OS {
-	case platform.Darwin:
-		osStr = "macos"
-	default:
-		osStr = "linux"
-	}
-
-	url := fmt.Sprintf("https://github.com/neovim/neovim/releases/download/stable/nvim-%s-%s.tar.gz", osStr, archStr)
-
-	// Temp dir inside p.ShellDir() so os.Rename stays on the same filesystem (avoids EXDEV on Linux tmpfs /tmp).
-	tmpDir, err := os.MkdirTemp(p.ShellDir(), "cps-neovim-*")
-	if err != nil {
-		return Result{Tool: "neovim", Err: err}
-	}
-	defer os.RemoveAll(tmpDir)
-
-	tarPath := filepath.Join(tmpDir, "nvim.tar.gz")
-	if err := DownloadToFile(url, tarPath); err != nil {
-		return Result{Tool: "neovim", Err: fmt.Errorf("download failed: %w", err)}
-	}
-
-	if p.OS == platform.Darwin {
-		xattrCmd := exec.Command("xattr", "-c", tarPath)
-		utils.RunCmd(xattrCmd)
-	}
-
-	if err := ExtractTarGz(tarPath, tmpDir); err != nil {
-		return Result{Tool: "neovim", Err: fmt.Errorf("extract failed: %w", err)}
-	}
-
-	extractedDir := filepath.Join(tmpDir, fmt.Sprintf("nvim-%s-%s", osStr, archStr))
-	nvimDir := filepath.Join(p.ShellDir(), "nvim")
-	os.RemoveAll(nvimDir)
-	if err := os.Rename(extractedDir, nvimDir); err != nil {
-		return Result{Tool: "neovim", Err: fmt.Errorf("move to %s failed: %w", nvimDir, err)}
-	}
-
-	symlinkPath := filepath.Join(p.ShellExecDir(), "nvim")
-	os.Remove(symlinkPath)
-	if err := os.Symlink(filepath.Join(nvimDir, "bin", "nvim"), symlinkPath); err != nil {
-		return Result{Tool: "neovim", Err: fmt.Errorf("symlink failed: %w", err)}
-	}
-
-	version := "stable"
-	if release, err := gh.LatestRelease("neovim/neovim"); err == nil {
-		version = release.TagName
-	}
-	st.SetToolVersion("neovim", version)
-	return Result{Tool: "neovim", Version: version}
 }
 
 func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.State) Result {

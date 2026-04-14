@@ -163,18 +163,19 @@ var AllTools = []Tool{
 	{
 		Name: "core-utils", Kind: SystemPackage, Category: System,
 		Description: "Core system utilities",
-		BrewPkgs:    []string{"git", "wget", "curl", "zip", "unzip", "file"},
+		BrewPkgs:    []string{"wget", "zip", "unzip", "file"},
 	},
 	{
 		Name: "shell-base", Kind: SystemPackage, Category: System,
 		Description: "Shell and terminal essentials",
-		BrewPkgs:    []string{"tmux", "zsh", "htop"},
+		BrewPkgs:    []string{"tmux", "htop"},
 	},
 
-	// ========== Language Runtimes (base only) ==========
+	// ========== Neovim (via brew) ==========
 	{
-		Name: "neovim", Kind: LanguageRuntime, Category: Runtime,
+		Name: "neovim", Kind: SystemPackage, Category: System,
 		Description: "Neovim text editor (0.11+ for NvChad)",
+		BrewPkgs:    []string{"neovim"},
 	},
 
 	// ========== Config Files ==========

@@ -84,27 +84,20 @@ func Init(ghToken string) {
 	}
 	st.Save()
 
-	// Phase 5: Neovim
-	neovim := filterByName(reg.ByKind(registry.LanguageRuntime), "neovim")
-	if runPhase("Phase 5: Neovim", neovim, p, gh, st) {
-		hadErrors = true
-	}
-	st.Save()
-
-	// Phase 6: Shell plugins (base only, exclude extension tools)
+	// Phase 5: Shell plugins (base only, exclude extension tools)
 	disableOMZSlowPaste(p)
-	if runPhase("Phase 6: Shell plugins", filterBaseTools(reg.ByKind(registry.ShellPlugin)), p, gh, st) {
+	if runPhase("Phase 5: Shell plugins", filterBaseTools(reg.ByKind(registry.ShellPlugin)), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	// Phase 7: Config files
-	if runPhase("Phase 7: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
+	// Phase 6: Config files
+	if runPhase("Phase 6: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	// Phase 8: Post-install tasks
+	// Phase 7: Post-install tasks
 	runPostInstall(p)
 
 	st.LastInit = time.Now()
@@ -222,7 +215,7 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 }
 
 func runPostInstall(p platform.Platform) {
-	utils.PrintRunning("(Running) Phase 8: Post-install tasks")
+	utils.PrintRunning("(Running) Phase 7: Post-install tasks")
 	var lineCount int
 	var errors []jobResult
 
@@ -237,8 +230,7 @@ func runPostInstall(p platform.Platform) {
 		}
 	}
 
-	nvimBin := filepath.Join(p.ShellExecDir(), "nvim")
-	if _, err := os.Stat(nvimBin); err == nil {
+	if nvimBin, err := exec.LookPath("nvim"); err == nil {
 		utils.PrintIndentedRunning("nvchad-setup: running")
 		lineCount++
 		nvimCmd := exec.Command(nvimBin, "--headless", "+MasonInstallAll", "+Lazy sync", "+qa")
@@ -251,12 +243,12 @@ func runPostInstall(p platform.Platform) {
 
 	utils.ClearLines(lineCount + 1) // sub-lines + running header
 	if len(errors) > 0 {
-		utils.PrintError("Phase 8: partially completed with errors", nil)
+		utils.PrintError("Phase 7: partially completed with errors", nil)
 		for _, e := range errors {
 			utils.PrintIndentedError(e.name, e.err)
 		}
 	} else {
-		utils.PrintInfo("Phase 8: Post-install tasks")
+		utils.PrintInfo("Phase 7: Post-install tasks")
 	}
 }
 
@@ -357,20 +349,6 @@ func filterBaseTools(tools []registry.Tool) []registry.Tool {
 	var result []registry.Tool
 	for _, t := range tools {
 		if !t.Extension {
-			result = append(result, t)
-		}
-	}
-	return result
-}
-
-func filterByName(tools []registry.Tool, names ...string) []registry.Tool {
-	nameSet := make(map[string]bool, len(names))
-	for _, n := range names {
-		nameSet[n] = true
-	}
-	var result []registry.Tool
-	for _, t := range tools {
-		if nameSet[t.Name] {
 			result = append(result, t)
 		}
 	}
