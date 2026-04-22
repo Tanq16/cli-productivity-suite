@@ -95,16 +95,6 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "titus", BinaryName: "titus", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
-				Repo: "praetorian-inc/titus", Description: "Security assessment tool",
-				Asset: AssetPattern{
-					OSPatterns:        map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:      map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings: []string{"windows", ".zip", ".jar", "browser-extension"},
-					ArchiveFormat:     "none",
-				},
-			},
-			{
 				Name: "nuclei-templates", Kind: ShellPlugin, Category: ExtSecurity, Extension: true,
 				Description: "Nuclei vulnerability templates",
 				CloneURL:    "https://github.com/projectdiscovery/nuclei-templates.git",
@@ -164,17 +154,6 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "aurelian", BinaryName: "aurelian", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
-				Repo: "praetorian-inc/aurelian", Description: "Cloud security tool",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"windows", "SHA256SUMS"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "aurelian",
-				},
-			},
-			{
 				Name: "trivy", BinaryName: "trivy", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
 				Repo: "aquasecurity/trivy", Description: "Vulnerability and misconfiguration scanner",
 				Asset: AssetPattern{
@@ -221,17 +200,6 @@ var extensionPacks = []ExtensionPack{
 					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
 					ArchiveFormat:       "tar.gz",
 					BinaryPathInArchive: "ffuf",
-				},
-			},
-			{
-				Name: "hadrian", BinaryName: "hadrian", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
-				Repo: "praetorian-inc/hadrian", Description: "Application security scanner",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"checksums", "windows"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "hadrian",
 				},
 			},
 			{
@@ -296,27 +264,6 @@ var extensionPacks = []ExtensionPack{
 		Description: "Miscellaneous utility tools",
 		Category:    ExtMisc,
 		Tools: []Tool{
-			{
-				Name: "julius", BinaryName: "julius", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
-				Repo: "praetorian-inc/julius", Description: "AI security testing tool",
-				Asset: AssetPattern{
-					OSPatterns:        map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:      map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings: []string{"checksums", ".exe"},
-					ArchiveFormat:     "none",
-				},
-			},
-			{
-				Name: "trajan", BinaryName: "trajan", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
-				Repo: "praetorian-inc/trajan", Description: "Security tool",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"checksums", ".zip", "windows"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "trajan",
-				},
-			},
 			{
 				Name: "gowitness", BinaryName: "gowitness", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
 				Repo: "sensepost/gowitness", Description: "Web screenshot tool",

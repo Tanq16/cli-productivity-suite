@@ -1,0 +1,179 @@
+name: praetorian
+description: Praetorian security tooling
+
+tools:
+  - name: titus
+    install: |
+      set -eo pipefail
+      DEST_DIR="$HOME/shell/extensions"
+      mkdir -p "$DEST_DIR"
+      case "$(uname -s)" in
+        Darwin) OS=darwin ;;
+        Linux) OS=linux ;;
+        *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+      esac
+      case "$(uname -m)" in
+        x86_64|amd64) ARCH=amd64 ;;
+        arm64|aarch64) ARCH=arm64 ;;
+        *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+      esac
+      TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+        https://github.com/praetorian-inc/titus/releases/latest | sed 's|.*/tag/||')
+      URL="https://github.com/praetorian-inc/titus/releases/download/${TAG}/titus-${OS}-${ARCH}"
+      TMP=$(mktemp -d)
+      trap 'rm -rf "$TMP"' EXIT
+      curl -fsSL "$URL" -o "$TMP/titus"
+      install -m 0755 "$TMP/titus" "$DEST_DIR/titus"
+    remove: |
+      rm -f "$HOME/shell/extensions/titus"
+
+  - name: julius
+    install: |
+      set -eo pipefail
+      DEST_DIR="$HOME/shell/extensions"
+      mkdir -p "$DEST_DIR"
+      case "$(uname -s)" in
+        Darwin) OS=darwin ;;
+        Linux) OS=linux ;;
+        *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+      esac
+      case "$(uname -m)" in
+        x86_64|amd64) ARCH=amd64 ;;
+        arm64|aarch64) ARCH=arm64 ;;
+        *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+      esac
+      TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+        https://github.com/praetorian-inc/julius/releases/latest | sed 's|.*/tag/||')
+      URL="https://github.com/praetorian-inc/julius/releases/download/${TAG}/julius-${OS}-${ARCH}"
+      TMP=$(mktemp -d)
+      trap 'rm -rf "$TMP"' EXIT
+      curl -fsSL "$URL" -o "$TMP/julius"
+      install -m 0755 "$TMP/julius" "$DEST_DIR/julius"
+    remove: |
+      rm -f "$HOME/shell/extensions/julius"
+
+  - name: aurelian
+    install: |
+      set -eo pipefail
+      DEST_DIR="$HOME/shell/extensions"
+      mkdir -p "$DEST_DIR"
+      case "$(uname -s)" in
+        Darwin) OS=darwin ;;
+        Linux) OS=linux ;;
+        *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+      esac
+      case "$(uname -m)" in
+        x86_64|amd64) ARCH=amd64 ;;
+        arm64|aarch64) ARCH=arm64 ;;
+        *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+      esac
+      TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+        https://github.com/praetorian-inc/aurelian/releases/latest | sed 's|.*/tag/||')
+      URL="https://github.com/praetorian-inc/aurelian/releases/download/${TAG}/aurelian-${OS}-${ARCH}.tar.gz"
+      TMP=$(mktemp -d)
+      trap 'rm -rf "$TMP"' EXIT
+      curl -fsSL "$URL" -o "$TMP/aurelian.tar.gz"
+      tar -xzf "$TMP/aurelian.tar.gz" -C "$TMP"
+      install -m 0755 "$TMP/aurelian" "$DEST_DIR/aurelian"
+    remove: |
+      rm -f "$HOME/shell/extensions/aurelian"
+
+  - name: hadrian
+    install: |
+      set -eo pipefail
+      DEST_DIR="$HOME/shell/extensions"
+      mkdir -p "$DEST_DIR"
+      case "$(uname -s)" in
+        Darwin) OS=darwin ;;
+        Linux) OS=linux ;;
+        *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+      esac
+      case "$(uname -m)" in
+        x86_64|amd64) ARCH=amd64 ;;
+        arm64|aarch64) ARCH=arm64 ;;
+        *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+      esac
+      TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+        https://github.com/praetorian-inc/hadrian/releases/latest | sed 's|.*/tag/||')
+      VERSION=${TAG#v}
+      URL="https://github.com/praetorian-inc/hadrian/releases/download/${TAG}/hadrian_${VERSION}_${OS}_${ARCH}.tar.gz"
+      TMP=$(mktemp -d)
+      trap 'rm -rf "$TMP"' EXIT
+      curl -fsSL "$URL" -o "$TMP/hadrian.tar.gz"
+      tar -xzf "$TMP/hadrian.tar.gz" -C "$TMP"
+      install -m 0755 "$TMP/hadrian" "$DEST_DIR/hadrian"
+    remove: |
+      rm -f "$HOME/shell/extensions/hadrian"
+
+  - name: trajan
+    install: |
+      set -eo pipefail
+      DEST_DIR="$HOME/shell/extensions"
+      mkdir -p "$DEST_DIR"
+      case "$(uname -s)" in
+        Darwin) OS=darwin ;;
+        Linux) OS=linux ;;
+        *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+      esac
+      case "$(uname -m)" in
+        x86_64|amd64) ARCH=amd64 ;;
+        arm64|aarch64) ARCH=arm64 ;;
+        *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+      esac
+      TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+        https://github.com/praetorian-inc/trajan/releases/latest | sed 's|.*/tag/||')
+      VERSION=${TAG#v}
+      URL="https://github.com/praetorian-inc/trajan/releases/download/${TAG}/trajan_${VERSION}_${OS}_${ARCH}.tar.gz"
+      TMP=$(mktemp -d)
+      trap 'rm -rf "$TMP"' EXIT
+      curl -fsSL "$URL" -o "$TMP/trajan.tar.gz"
+      tar -xzf "$TMP/trajan.tar.gz" -C "$TMP"
+      install -m 0755 "$TMP/trajan" "$DEST_DIR/trajan"
+    remove: |
+      rm -f "$HOME/shell/extensions/trajan"
+
+  - name: nerva
+    install: |
+      set -eo pipefail
+      DEST_DIR="$HOME/shell/extensions"
+      mkdir -p "$DEST_DIR"
+      case "$(uname -s)" in
+        Darwin) OS=darwin ;;
+        Linux) OS=linux ;;
+        *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+      esac
+      case "$(uname -m)" in
+        x86_64|amd64) ARCH=amd64 ;;
+        arm64|aarch64) ARCH=arm64 ;;
+        *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+      esac
+      TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+        https://github.com/praetorian-inc/nerva/releases/latest | sed 's|.*/tag/||')
+      URL="https://github.com/praetorian-inc/nerva/releases/download/${TAG}/nerva-${OS}-${ARCH}.tar.gz"
+      TMP=$(mktemp -d)
+      trap 'rm -rf "$TMP"' EXIT
+      curl -fsSL "$URL" -o "$TMP/nerva.tar.gz"
+      tar -xzf "$TMP/nerva.tar.gz" -C "$TMP"
+      install -m 0755 "$TMP/nerva" "$DEST_DIR/nerva"
+    remove: |
+      rm -f "$HOME/shell/extensions/nerva"
+
+  - name: augustus
+    install: |
+      set -eo pipefail
+      export GOROOT="$HOME/shell/go-sdk"
+      export GOPATH="$HOME/shell/go"
+      export PATH="$GOROOT/bin:$GOPATH/bin:$PATH"
+      go install github.com/praetorian-inc/augustus/cmd/augustus@latest
+    remove: |
+      rm -f "$HOME/shell/go/bin/augustus"
+
+  - name: vespasian
+    install: |
+      set -eo pipefail
+      export GOROOT="$HOME/shell/go-sdk"
+      export GOPATH="$HOME/shell/go"
+      export PATH="$GOROOT/bin:$GOPATH/bin:$PATH"
+      go install github.com/praetorian-inc/vespasian/cmd/vespasian@latest
+    remove: |
+      rm -f "$HOME/shell/go/bin/vespasian"

@@ -1,0 +1,66 @@
+name: additional-cloud-tools
+description: Extra cloud and IaC tooling (uv-managed Python CLIs and OpenTofu)
+
+tools:
+  - name: checkov
+    install: |
+      set -eo pipefail
+      export UV_TOOL_DIR="$HOME/shell/uv-tools"
+      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      "$HOME/shell/executables/uv" tool install --force checkov
+    remove: |
+      set -eo pipefail
+      export UV_TOOL_DIR="$HOME/shell/uv-tools"
+      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      "$HOME/shell/executables/uv" tool uninstall checkov
+
+  - name: prowler
+    install: |
+      set -eo pipefail
+      export UV_TOOL_DIR="$HOME/shell/uv-tools"
+      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      "$HOME/shell/executables/uv" tool install --force prowler
+    remove: |
+      set -eo pipefail
+      export UV_TOOL_DIR="$HOME/shell/uv-tools"
+      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      "$HOME/shell/executables/uv" tool uninstall prowler
+
+  - name: oci-cli
+    install: |
+      set -eo pipefail
+      export UV_TOOL_DIR="$HOME/shell/uv-tools"
+      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      "$HOME/shell/executables/uv" tool install --force oci-cli
+    remove: |
+      set -eo pipefail
+      export UV_TOOL_DIR="$HOME/shell/uv-tools"
+      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      "$HOME/shell/executables/uv" tool uninstall oci-cli
+
+  - name: tofu
+    install: |
+      set -eo pipefail
+      DEST_DIR="$HOME/shell/extensions"
+      mkdir -p "$DEST_DIR"
+      case "$(uname -s)" in
+        Darwin) OS=darwin ;;
+        Linux) OS=linux ;;
+        *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+      esac
+      case "$(uname -m)" in
+        x86_64|amd64) ARCH=amd64 ;;
+        arm64|aarch64) ARCH=arm64 ;;
+        *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+      esac
+      TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+        https://github.com/opentofu/opentofu/releases/latest | sed 's|.*/tag/||')
+      VERSION=${TAG#v}
+      URL="https://github.com/opentofu/opentofu/releases/download/${TAG}/tofu_${VERSION}_${OS}_${ARCH}.tar.gz"
+      TMP=$(mktemp -d)
+      trap 'rm -rf "$TMP"' EXIT
+      curl -fsSL "$URL" -o "$TMP/tofu.tar.gz"
+      tar -xzf "$TMP/tofu.tar.gz" -C "$TMP"
+      install -m 0755 "$TMP/tofu" "$DEST_DIR/tofu"
+    remove: |
+      rm -f "$HOME/shell/extensions/tofu"

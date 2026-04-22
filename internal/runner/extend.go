@@ -3,6 +3,7 @@ package runner
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -185,6 +186,98 @@ func Extend(packName string, toolFilter []string, ghToken string) {
 		utils.PrintWarn(fmt.Sprintf("extension pack %s finished with errors", pack.Name), nil)
 	} else {
 		utils.PrintSuccess(fmt.Sprintf("extension pack %s complete!", pack.Name))
+	}
+}
+
+func ExtendRemove(packName string, toolFilter []string) {
+	ensureCustomPacks()
+
+	if registry.BuiltinPackNames()[packName] {
+		utils.PrintFatal(fmt.Sprintf("--remove is only supported for custom extension packs; %q is built-in", packName), nil)
+	}
+
+	pack := registry.ExtensionPackByName(packName)
+	if pack == nil {
+		utils.PrintFatal(fmt.Sprintf("unknown custom extension pack: %s", packName), nil)
+	}
+
+	p, err := platform.Detect()
+	if err != nil {
+		utils.PrintFatal("platform detection failed", err)
+	}
+
+	st, err := state.Load(p.StatePath())
+	if err != nil {
+		utils.PrintFatal("failed to load state", err)
+	}
+
+	allTools := filterExtPackForPlatform(*pack)
+	if len(allTools) == 0 {
+		utils.PrintSuccess(fmt.Sprintf("extension pack %s: no tools for this platform", pack.Name))
+		return
+	}
+
+	if len(toolFilter) > 0 {
+		nameSet := make(map[string]bool, len(toolFilter))
+		for _, n := range toolFilter {
+			nameSet[n] = true
+		}
+		var filtered []registry.Tool
+		for _, t := range allTools {
+			if nameSet[t.Name] {
+				filtered = append(filtered, t)
+				delete(nameSet, t.Name)
+			}
+		}
+		if len(nameSet) > 0 {
+			var unknown []string
+			for name := range nameSet {
+				unknown = append(unknown, name)
+			}
+			utils.PrintFatal(fmt.Sprintf("tools not found in extension pack %s: %s", packName, strings.Join(unknown, ", ")), nil)
+		}
+		allTools = filtered
+	}
+
+	wholePackRemoval := len(toolFilter) == 0
+	var hadErrors bool
+
+	for _, t := range allTools {
+		if t.RemoveCmd == "" {
+			utils.PrintError(fmt.Sprintf("%s: no remove command defined in YAML", t.Name), nil)
+			hadErrors = true
+			continue
+		}
+		utils.PrintRunning("removing " + t.Name)
+		cmd := exec.Command("bash", "-c", t.RemoveCmd)
+		cmd.Env = os.Environ()
+		err := utils.RunCmd(cmd)
+		utils.ClearLines(1)
+		if err != nil {
+			utils.PrintError(fmt.Sprintf("%s: remove failed", t.Name), err)
+			hadErrors = true
+			continue
+		}
+		st.Remove(t.Name)
+		utils.PrintSuccess(fmt.Sprintf("%s: removed", t.Name))
+	}
+
+	if wholePackRemoval {
+		fragPath := filepath.Join(p.ShellDir(), "rc", "custom", packName+".zsh")
+		if err := os.Remove(fragPath); err != nil && !os.IsNotExist(err) {
+			utils.PrintError(fmt.Sprintf("failed to remove fragment %s", fragPath), err)
+			hadErrors = true
+		}
+	}
+
+	if err := st.Save(); err != nil {
+		utils.PrintError("failed to save state", err)
+	}
+
+	if hadErrors {
+		utils.PrintWarn(fmt.Sprintf("extension pack %s: removal finished with errors", pack.Name), nil)
+	} else {
+		utils.PrintSuccess(fmt.Sprintf("extension pack %s: removal complete", pack.Name))
 	}
 }
 

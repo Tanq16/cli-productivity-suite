@@ -1,0 +1,85 @@
+name: ai-tools
+description: AI coding agents and LLM CLIs
+
+tools:
+  - name: claude-code
+    install: |
+      curl -fsSL https://claude.ai/install.sh | bash
+    remove: |
+      rm -f "$HOME/.local/bin/claude"
+      rm -rf "$HOME/.local/share/claude"
+
+  - name: opencode
+    install: |
+      set -eo pipefail
+      export FNM_DIR="$HOME/shell/fnm"
+      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+        npm install -g opencode-ai@latest
+    remove: |
+      set -eo pipefail
+      export FNM_DIR="$HOME/shell/fnm"
+      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+        npm uninstall -g opencode-ai
+
+  - name: gemini
+    install: |
+      set -eo pipefail
+      export FNM_DIR="$HOME/shell/fnm"
+      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+        npm install -g @google/gemini-cli
+    remove: |
+      set -eo pipefail
+      export FNM_DIR="$HOME/shell/fnm"
+      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+        npm uninstall -g @google/gemini-cli
+
+  - name: codex
+    install: |
+      set -eo pipefail
+      export FNM_DIR="$HOME/shell/fnm"
+      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+        npm install -g @openai/codex
+    remove: |
+      set -eo pipefail
+      export FNM_DIR="$HOME/shell/fnm"
+      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+        npm uninstall -g @openai/codex
+
+  - name: crush
+    install: |
+      set -eo pipefail
+      export FNM_DIR="$HOME/shell/fnm"
+      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+        npm install -g @charmland/crush
+    remove: |
+      set -eo pipefail
+      export FNM_DIR="$HOME/shell/fnm"
+      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+        npm uninstall -g @charmland/crush
+
+  - name: aix
+    install: |
+      set -eo pipefail
+      DEST_DIR="$HOME/shell/extensions"
+      mkdir -p "$DEST_DIR"
+      case "$(uname -s)" in
+        Darwin) OS=macOS ;;
+        Linux) OS=linux ;;
+        *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+      esac
+      case "$(uname -m)" in
+        x86_64|amd64) ARCH=amd64 ;;
+        arm64|aarch64) ARCH=arm64 ;;
+        *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+      esac
+      TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+        https://github.com/projectdiscovery/aix/releases/latest | sed 's|.*/tag/||')
+      VERSION=${TAG#v}
+      URL="https://github.com/projectdiscovery/aix/releases/download/${TAG}/aix_${VERSION}_${OS}_${ARCH}.zip"
+      TMP=$(mktemp -d)
+      trap 'rm -rf "$TMP"' EXIT
+      curl -fsSL "$URL" -o "$TMP/aix.zip"
+      unzip -qo "$TMP/aix.zip" -d "$TMP"
+      install -m 0755 "$TMP/aix" "$DEST_DIR/aix"
+    remove: |
+      rm -f "$HOME/shell/extensions/aix"

@@ -27,6 +27,7 @@ type ShellBlock struct {
 type ToolDef struct {
 	Name    string `yaml:"name"`
 	Install string `yaml:"install"`
+	Remove  string `yaml:"remove"`
 }
 
 var (
@@ -127,6 +128,7 @@ func toExtensionPack(pf PackFile) registry.ExtensionPack {
 			Category:    registry.ExtCustom,
 			Extension:   true,
 			InstallCmd:  td.Install,
+			RemoveCmd:   td.Remove,
 			Description: "custom tool",
 		}
 	}

@@ -1,0 +1,35 @@
+name: database
+description: Interactive database CLIs
+
+tools:
+  - name: pgcli
+    install: |
+      set -eo pipefail
+      export UV_TOOL_DIR="$HOME/shell/uv-tools"
+      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      "$HOME/shell/executables/uv" tool install --force pgcli
+    remove: |
+      set -eo pipefail
+      export UV_TOOL_DIR="$HOME/shell/uv-tools"
+      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      "$HOME/shell/executables/uv" tool uninstall pgcli
+
+  - name: mycli
+    install: |
+      set -eo pipefail
+      export UV_TOOL_DIR="$HOME/shell/uv-tools"
+      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      "$HOME/shell/executables/uv" tool install --force mycli
+    remove: |
+      set -eo pipefail
+      export UV_TOOL_DIR="$HOME/shell/uv-tools"
+      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      "$HOME/shell/executables/uv" tool uninstall mycli
+
+  - name: usql
+    install: |
+      set -eo pipefail
+      brew tap xo/xo
+      brew install usql
+    remove: |
+      brew uninstall usql

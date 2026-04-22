@@ -80,10 +80,10 @@ cps extend security nuclei subfinder  # pick specific tools
 | core | Dev tools, network utils, media packages (cmake, nmap, ffmpeg, aerospace) |
 | runtimes | uv, fnm, bun, Go, Python (includes uv), Rust, Node.js LTS (includes fnm) |
 | cloud | AWS CLI, Azure CLI, gcloud CLI |
-| security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, gobuster, titus, nuclei-templates |
-| cloudsec | terraform, kubectl, kubelogin, grpcurl, cloudfox, aurelian, trivy, cloudlist |
-| appsec | katana, ffuf, hadrian, dalfox, reaper, poltergeist, wraith, gau |
-| misc | julius, trajan, gowitness, snitch, age |
+| security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, gobuster, nuclei-templates |
+| cloudsec | terraform, kubectl, kubelogin, grpcurl, cloudfox, trivy, cloudlist |
+| appsec | katana, ffuf, dalfox, reaper, poltergeist, wraith, gau |
+| misc | gowitness, snitch, age |
 | private | Personal tools (requires `--gh-token`) |
 
 Packs with shell integration (`runtimes`, `cloud`, `security`) deploy RC fragments automatically.

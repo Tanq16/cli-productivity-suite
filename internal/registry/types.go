@@ -119,4 +119,5 @@ type Tool struct {
 	CloneDest   string // for ShellPlugin: destination path (can use ~ for home)
 	PostClone   string // for ShellPlugin: identifier for post-clone hook logic
 	InstallCmd  string // for CustomScript: shell command run via bash -c
+	RemoveCmd   string // for CustomScript (custom packs only): shell command run via bash -c on --remove
 }
