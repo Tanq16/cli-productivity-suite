@@ -55,7 +55,7 @@ make build   # produces ./cps
 
 ### `cps init`
 
-Sets up the base environment — core CLI tools (bat, fd, ripgrep, lsd, jq, yq, fzf, sd, gron, sq, zoxide, gh, anbu, danzo, ai-context), Neovim with NvChad, zsh plugins, tmux with TPM, and config files. System packages install via Homebrew on both Linux and macOS — no sudo required.
+Sets up the base environment — core CLI tools (bat, fd, ripgrep, lsd, jq, yq, fzf, sd, gron, zoxide, gh, anbu, danzo, ai-context), Neovim with NvChad, zsh plugins, tmux with TPM, and config files. System packages install via Homebrew on both Linux and macOS — no sudo required.
 
 ```bash
 cps init

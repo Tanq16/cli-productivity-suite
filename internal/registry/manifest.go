@@ -95,16 +95,6 @@ var AllTools = []Tool{
 		},
 	},
 	{
-		Name: "sq", BinaryName: "sq", Kind: GitHubRelease, Category: Core,
-		Repo: "neilotoole/sq", Description: "Data wrangler",
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "tar.gz",
-			BinaryPathInArchive: "sq",
-		},
-	},
-	{
 		Name: "zoxide", BinaryName: "zoxide", Kind: GitHubRelease, Category: Core,
 		Repo: "ajeetdsouza/zoxide", Description: "Smarter cd command",
 		Asset: AssetPattern{
