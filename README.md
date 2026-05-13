@@ -11,9 +11,15 @@ A single Go binary (`cps`) that sets up and manages a complete CLI development e
 
 ## Prerequisites
 
-### Bootstrap (Linux only)
+### Bootstrap
 
-macOS has these out of the box (git via Xcode CLT, zsh built-in, curl built-in). On Linux:
+macOS ships zsh and curl out of the box; `git` comes from the Xcode Command Line Tools, so install those first if you haven't already:
+
+```bash
+xcode-select --install
+```
+
+On Linux:
 
 ```bash
 sudo apt install git curl zsh build-essential
