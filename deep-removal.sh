@@ -14,15 +14,20 @@ echo "  - cps binary (~/.local/bin/cps)"
 echo "  - CPS directories (~/shell — includes go-sdk, java-sdk, rust, fnm, py-default,"
 echo "    uv tools, all installed binaries; plus ~/.tmux, ~/.config/nvim, ~/.config/cps)"
 echo "  - Neovim caches/state (~/.local/share/nvim, ~/.local/state/nvim, ~/.cache/nvim)"
-echo "  - uv-managed Python interpreters (~/.local/share/uv)"
+echo "  - Legacy pre-v1.3 paths (~/.nvm, ~/google-cloud-sdk, ~/nuclei-templates)"
+echo "  - Legacy runtime caches (~/.local/share/uv, ~/.bun, ~/.npm, go-build cache)"
 echo "  - CPS-deployed configs (.zshrc, .tmux.conf, .aerospace.toml, kitty configs, starship.toml)"
 echo "  - Oh My Zsh + bundled themes/plugins (~/.oh-my-zsh)"
-echo "  - Brew packages installed by CPS (neovim, cloud CLIs, core/dev/network/media tools)"
+echo "  - Brew packages installed by CPS (neovim, nmap, openssl, ffmpeg, aws-cli,"
+echo "    azure-cli, gcloud-cli cask)"
 echo ""
 echo "Will preserve:"
 echo "  - ~/.zsh_history"
 echo "  - Homebrew itself"
 echo "  - System tools (git, curl, zsh from apt or macOS built-in)"
+echo "  - Broadly-useful brew formulas (wget, zip, unzip, file, tmux, htop)"
+echo "  - Linux dev toolchain (cmake, gcc, make, ninja, gettext)"
+echo "  - Aerospace (macOS tiling WM cask)"
 echo "  - Custom-extension state (clean those with: cps extend <pack> --remove)"
 echo ""
 read -rp "Continue? [y/N] " ans
@@ -46,8 +51,17 @@ rm -rf "$HOME/.local/share/nvim"
 rm -rf "$HOME/.local/state/nvim"
 rm -rf "$HOME/.cache/nvim"
 
-echo "==> removing legacy uv Python cache (pre-v2.x location)"
-rm -rf "$HOME/.local/share/uv"
+echo "==> removing legacy pre-v1.3 install locations"
+rm -rf "$HOME/.nvm"                  # superseded by fnm in ~/shell/fnm
+rm -rf "$HOME/google-cloud-sdk"      # gcloud, before brew cask
+rm -rf "$HOME/nuclei-templates"      # moved to ~/shell/nuclei-templates
+
+echo "==> removing legacy runtime caches outside ~/shell"
+rm -rf "$HOME/.local/share/uv"       # uv interpreters, before UV_PYTHON_INSTALL_DIR
+rm -rf "$HOME/.bun"                  # bun globals/cache, before BUN_INSTALL
+rm -rf "$HOME/.npm"                  # npm cache, before npm_config_cache
+rm -rf "$HOME/.cache/go-build"       # Linux: go build cache, before GOCACHE
+rm -rf "$HOME/Library/Caches/go-build"  # macOS: go build cache, before GOCACHE
 
 echo "==> removing CPS-deployed configs"
 rm -f "$HOME/.tmux.conf"
@@ -59,16 +73,17 @@ rm -f "$HOME/.config/starship.toml"
 
 if command -v brew >/dev/null 2>&1; then
   echo "==> uninstalling CPS-installed brew formulas"
+  # Kept (broadly useful, not CPS-specific): wget zip unzip file tmux htop
+  # Kept (Linux dev-tools group): cmake gcc make ninja gettext
   brew uninstall \
-    wget zip unzip file tmux htop neovim \
-    cmake gcc make ninja gettext \
+    neovim \
     nmap openssl ffmpeg \
     awscli azure-cli \
     2>/dev/null || true
 
   echo "==> uninstalling CPS-installed brew casks"
+  # Kept (broadly useful, not CPS-specific): nikitabobko/tap/aerospace
   brew uninstall --cask --force gcloud-cli 2>/dev/null || true
-  brew uninstall --cask --force nikitabobko/tap/aerospace 2>/dev/null || true
 else
   echo "==> brew not found, skipping brew package uninstall"
 fi
