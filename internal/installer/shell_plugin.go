@@ -43,8 +43,6 @@ func (s *ShellPluginInstaller) Install(tool *registry.Tool, p platform.Platform,
 
 func (s *ShellPluginInstaller) runPostClone(tool *registry.Tool, p platform.Platform, st *state.State) Result {
 	switch tool.PostClone {
-	case "spaceship":
-		return s.postCloneSpaceship(tool, p)
 	case "nvchad":
 		return s.postCloneNvChad(tool, p)
 	case "tpm":
@@ -53,19 +51,6 @@ func (s *ShellPluginInstaller) runPostClone(tool *registry.Tool, p platform.Plat
 	default:
 		return Result{Tool: tool.Name, Version: "git-managed"}
 	}
-}
-
-func (s *ShellPluginInstaller) postCloneSpaceship(tool *registry.Tool, p platform.Platform) Result {
-	dest := expandHome(tool.CloneDest, p.HomeDir)
-	linkSrc := filepath.Join(dest, "spaceship.zsh-theme")
-	linkDst := filepath.Join(p.HomeDir, ".oh-my-zsh", "custom", "themes", "spaceship.zsh-theme")
-
-	os.Remove(linkDst)
-	if err := os.Symlink(linkSrc, linkDst); err != nil {
-		return Result{Tool: tool.Name, Err: fmt.Errorf("symlink failed: %w", err)}
-	}
-
-	return Result{Tool: tool.Name, Version: "git-managed"}
 }
 
 func (s *ShellPluginInstaller) postCloneNvChad(tool *registry.Tool, p platform.Platform) Result {

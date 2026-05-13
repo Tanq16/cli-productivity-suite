@@ -52,6 +52,10 @@ func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Pl
 		content = configs.RcLoader()
 		destPath = filepath.Join(p.HomeDir, ".zshrc")
 
+	case "starship-config":
+		content = configs.StarshipToml()
+		destPath = filepath.Join(p.HomeDir, ".config", "starship.toml")
+
 	default:
 		return nil, "", fmt.Errorf("unknown config: %s", tool.Name)
 	}

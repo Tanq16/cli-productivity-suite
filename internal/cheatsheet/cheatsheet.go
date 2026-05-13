@@ -12,6 +12,7 @@ type Sheet struct {
 var sheets = []Sheet{
 	cpsSheet,
 	goSheet,
+	javaSheet,
 	uvSheet,
 	fnmSheet,
 	rustSheet,

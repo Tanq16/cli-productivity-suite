@@ -4,12 +4,15 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 
 # --- Oh My Zsh ---
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="spaceship"
+ZSH_THEME=""
 plugins=(zsh-autosuggestions zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 
 # --- PATH ---
 export PATH="$HOME/shell/extensions:$HOME/shell/executables:$HOME/.local/bin:$PATH"
+
+# --- Starship prompt ---
+command -v starship &>/dev/null && eval "$(starship init zsh)"
 
 # --- FZF ---
 [ -f "$HOME/shell/completions/fzf.zsh" ] && source "$HOME/shell/completions/fzf.zsh"
@@ -28,7 +31,6 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # --- Environment ---
 export BAT_PAGER=''
-export SPACESHIP_TIME_SHOW=true
 export HISTCONTROL=ignoreboth
 export LESS_TERMCAP_mb=$'\e[1;32m'
 export LESS_TERMCAP_md=$'\e[1;32m'

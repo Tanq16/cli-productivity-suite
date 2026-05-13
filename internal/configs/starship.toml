@@ -1,0 +1,65 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Spaceship-style multi-line layout: info on one line, prompt char on next
+add_newline = false
+
+format = """
+$time\
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$package\
+$nodejs\
+$python\
+$rust\
+$golang\
+$java\
+$ruby\
+$kubernetes\
+$aws\
+$gcloud\
+$cmd_duration\
+$jobs\
+$line_break\
+$character"""
+
+[time]
+disabled = false
+time_format = '%R'
+style = 'bold yellow'
+format = '[$time]($style) '
+
+[username]
+show_always = false
+style_user = 'bold yellow'
+format = '[$user]($style)@'
+
+[hostname]
+ssh_only = true
+style = 'bold green'
+format = '[$hostname]($style) '
+
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+style = 'bold cyan'
+format = 'in [$path]($style) '
+
+[git_branch]
+symbol = ' '
+style = 'bold purple'
+format = 'on [$symbol$branch]($style) '
+
+[git_status]
+style = 'red'
+format = '[$all_status$ahead_behind]($style) '
+
+[cmd_duration]
+min_time = 2000
+format = 'took [$duration](bold yellow) '
+
+[character]
+success_symbol = '[➜](bold green)'
+error_symbol = '[➜](bold red)'

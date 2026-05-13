@@ -7,11 +7,13 @@ tools:
       set -eo pipefail
       export UV_TOOL_DIR="$HOME/shell/uv-tools"
       export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
       "$HOME/shell/executables/uv" tool install --force pgcli
     remove: |
       set -eo pipefail
       export UV_TOOL_DIR="$HOME/shell/uv-tools"
       export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
       "$HOME/shell/executables/uv" tool uninstall pgcli
 
   - name: mycli
@@ -19,11 +21,13 @@ tools:
       set -eo pipefail
       export UV_TOOL_DIR="$HOME/shell/uv-tools"
       export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
       "$HOME/shell/executables/uv" tool install --force mycli
     remove: |
       set -eo pipefail
       export UV_TOOL_DIR="$HOME/shell/uv-tools"
       export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
+      export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
       "$HOME/shell/executables/uv" tool uninstall mycli
 
   - name: sq

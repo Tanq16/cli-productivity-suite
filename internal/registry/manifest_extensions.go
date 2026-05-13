@@ -468,6 +468,10 @@ var extensionPacks = []ExtensionPack{
 				Description: "Go programming language SDK",
 			},
 			{
+				Name: "java-sdk", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Description: "Eclipse Temurin JDK (latest LTS)",
+			},
+			{
 				Name: "python", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
 				Description: "Python via uv + py-default venv",
 			},

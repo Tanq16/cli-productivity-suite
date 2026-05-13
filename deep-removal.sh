@@ -11,15 +11,19 @@ echo "CPS deep removal"
 echo ""
 echo "Will remove:"
 echo "  - cps binary (~/.local/bin/cps)"
-echo "  - CPS directories (~/shell, ~/.tmux, ~/.config/nvim, ~/.config/cps, ~/.local/share/nvim)"
-echo "  - CPS-deployed configs (.zshrc, .tmux.conf, .aerospace.toml, kitty configs)"
-echo "  - Oh My Zsh (~/.oh-my-zsh)"
+echo "  - CPS directories (~/shell — includes go-sdk, java-sdk, rust, fnm, py-default,"
+echo "    uv tools, all installed binaries; plus ~/.tmux, ~/.config/nvim, ~/.config/cps)"
+echo "  - Neovim caches/state (~/.local/share/nvim, ~/.local/state/nvim, ~/.cache/nvim)"
+echo "  - uv-managed Python interpreters (~/.local/share/uv)"
+echo "  - CPS-deployed configs (.zshrc, .tmux.conf, .aerospace.toml, kitty configs, starship.toml)"
+echo "  - Oh My Zsh + bundled themes/plugins (~/.oh-my-zsh)"
 echo "  - Brew packages installed by CPS (neovim, cloud CLIs, core/dev/network/media tools)"
 echo ""
 echo "Will preserve:"
 echo "  - ~/.zsh_history"
 echo "  - Homebrew itself"
 echo "  - System tools (git, curl, zsh from apt or macOS built-in)"
+echo "  - Custom-extension state (clean those with: cps extend <pack> --remove)"
 echo ""
 read -rp "Continue? [y/N] " ans
 case "$ans" in
@@ -36,7 +40,14 @@ rm -rf "$HOME/shell"
 rm -rf "$HOME/.tmux"
 rm -rf "$HOME/.config/nvim"
 rm -rf "$HOME/.config/cps"
+
+echo "==> removing Neovim caches and state"
 rm -rf "$HOME/.local/share/nvim"
+rm -rf "$HOME/.local/state/nvim"
+rm -rf "$HOME/.cache/nvim"
+
+echo "==> removing legacy uv Python cache (pre-v2.x location)"
+rm -rf "$HOME/.local/share/uv"
 
 echo "==> removing CPS-deployed configs"
 rm -f "$HOME/.tmux.conf"
@@ -44,10 +55,11 @@ rm -f "$HOME/.zshrc"
 rm -f "$HOME/.aerospace.toml"
 rm -f "$HOME/.config/kitty/kitty.conf"
 rm -f "$HOME/.config/kitty/current-theme.conf"
+rm -f "$HOME/.config/starship.toml"
 
 if command -v brew >/dev/null 2>&1; then
   echo "==> uninstalling CPS-installed brew formulas"
-  brew uninstall --ignore-dependencies \
+  brew uninstall \
     wget zip unzip file tmux htop neovim \
     cmake gcc make ninja gettext \
     nmap openssl ffmpeg \

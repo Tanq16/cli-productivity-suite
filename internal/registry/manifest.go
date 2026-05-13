@@ -116,6 +116,17 @@ var AllTools = []Tool{
 			BinaryPathInArchive: "*/sd",
 		},
 	},
+	{
+		Name: "starship", BinaryName: "starship", Kind: GitHubRelease, Category: Core,
+		Repo: "starship/starship", Description: "Minimal, fast, cross-shell prompt",
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
+			ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "aarch64"},
+			ExcludeSubstrings:   []string{"gnu", "freebsd", "musleabihf", "i686"},
+			ArchiveFormat:       "tar.gz",
+			BinaryPathInArchive: "starship",
+		},
+	},
 
 	// ========== Own Public Tools (Tanq16) ==========
 	{
@@ -190,15 +201,12 @@ var AllTools = []Tool{
 		Name: "rcfile", Kind: ConfigFile, Category: Config,
 		Description: "Zsh RC file (complete .zshrc)",
 	},
+	{
+		Name: "starship-config", Kind: ConfigFile, Category: Config,
+		Description: "Starship prompt configuration",
+	},
 
 	// ========== Shell Plugins ==========
-	{
-		Name: "spaceship-prompt", Kind: ShellPlugin, Category: Shell,
-		Description: "Spaceship ZSH theme",
-		CloneURL:    "https://github.com/spaceship-prompt/spaceship-prompt.git",
-		CloneDest:   "~/.oh-my-zsh/custom/themes/spaceship-prompt",
-		PostClone:   "spaceship",
-	},
 	{
 		Name: "zsh-autosuggestions", Kind: ShellPlugin, Category: Shell,
 		Description: "ZSH autosuggestions plugin",

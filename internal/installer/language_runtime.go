@@ -24,6 +24,8 @@ func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platf
 	switch tool.Name {
 	case "go-sdk":
 		return l.installGo(p, st)
+	case "java-sdk":
+		return l.installJava(p, st)
 	case "uv":
 		return l.installUVOnly(p, gh, st)
 	case "python":
@@ -116,6 +118,105 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 
 	st.SetToolVersion("go-sdk", version)
 	return Result{Tool: "go-sdk", Version: version}
+}
+
+func (l *LanguageRuntimeInstaller) installJava(p platform.Platform, st *state.State) Result {
+	var osStr, archStr string
+	switch p.OS {
+	case platform.Darwin:
+		osStr = "mac"
+	default:
+		osStr = "linux"
+	}
+	switch p.Arch {
+	case platform.AMD64:
+		archStr = "x64"
+	case platform.ARM64:
+		archStr = "aarch64"
+	}
+
+	resp, err := httpGet("https://api.adoptium.net/v3/info/available_releases")
+	if err != nil {
+		return Result{Tool: "java-sdk", Err: err}
+	}
+	var info struct {
+		MostRecentLTS int `json:"most_recent_lts"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
+		resp.Body.Close()
+		return Result{Tool: "java-sdk", Err: err}
+	}
+	resp.Body.Close()
+	if info.MostRecentLTS == 0 {
+		return Result{Tool: "java-sdk", Err: fmt.Errorf("no LTS version returned from Adoptium")}
+	}
+
+	assetURL := fmt.Sprintf("https://api.adoptium.net/v3/assets/latest/%d/hotspot?architecture=%s&image_type=jdk&os=%s&vendor=eclipse",
+		info.MostRecentLTS, archStr, osStr)
+	assetResp, err := httpGet(assetURL)
+	if err != nil {
+		return Result{Tool: "java-sdk", Err: err}
+	}
+	var assets []struct {
+		Binary struct {
+			Package struct {
+				Link string `json:"link"`
+			} `json:"package"`
+		} `json:"binary"`
+		ReleaseName string `json:"release_name"`
+	}
+	if err := json.NewDecoder(assetResp.Body).Decode(&assets); err != nil {
+		assetResp.Body.Close()
+		return Result{Tool: "java-sdk", Err: err}
+	}
+	assetResp.Body.Close()
+	if len(assets) == 0 || assets[0].Binary.Package.Link == "" {
+		return Result{Tool: "java-sdk", Err: fmt.Errorf("no Adoptium asset for %s/%s JDK %d", osStr, archStr, info.MostRecentLTS)}
+	}
+	downloadURL := assets[0].Binary.Package.Link
+	version := assets[0].ReleaseName
+
+	tmpDir, err := os.MkdirTemp(p.ShellDir(), "cps-java-*")
+	if err != nil {
+		return Result{Tool: "java-sdk", Err: err}
+	}
+	defer os.RemoveAll(tmpDir)
+
+	tarPath := filepath.Join(tmpDir, "jdk.tar.gz")
+	if err := DownloadToFile(downloadURL, tarPath); err != nil {
+		return Result{Tool: "java-sdk", Err: err}
+	}
+
+	if err := ExtractTarGz(tarPath, tmpDir); err != nil {
+		return Result{Tool: "java-sdk", Err: fmt.Errorf("extract JDK failed: %w", err)}
+	}
+
+	entries, err := os.ReadDir(tmpDir)
+	if err != nil {
+		return Result{Tool: "java-sdk", Err: err}
+	}
+	var jdkRoot string
+	for _, e := range entries {
+		if e.IsDir() && strings.HasPrefix(e.Name(), "jdk") {
+			jdkRoot = filepath.Join(tmpDir, e.Name())
+			break
+		}
+	}
+	if jdkRoot == "" {
+		return Result{Tool: "java-sdk", Err: fmt.Errorf("extracted JDK directory not found in %s", tmpDir)}
+	}
+	if p.OS == platform.Darwin {
+		jdkRoot = filepath.Join(jdkRoot, "Contents", "Home")
+	}
+
+	javaDir := filepath.Join(p.ShellDir(), "java-sdk")
+	os.RemoveAll(javaDir)
+	if err := os.Rename(jdkRoot, javaDir); err != nil {
+		return Result{Tool: "java-sdk", Err: fmt.Errorf("move JDK failed: %w", err)}
+	}
+
+	st.SetToolVersion("java-sdk", version)
+	return Result{Tool: "java-sdk", Version: version}
 }
 
 func (l *LanguageRuntimeInstaller) installRust(p platform.Platform, st *state.State) Result {
@@ -304,6 +405,9 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, gh *github
 	}
 
 	venvPath := filepath.Join(p.ShellDir(), "py-default")
+	uvPythonDir := filepath.Join(p.ShellDir(), "uv-python")
+	uvEnv := append(os.Environ(), "UV_PYTHON_INSTALL_DIR="+uvPythonDir)
+
 	oldPythonPath := filepath.Join(venvPath, "bin", "python")
 	var oldFullVersion string
 	if out, err := exec.Command(oldPythonPath, "--version").Output(); err == nil {
@@ -314,6 +418,7 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, gh *github
 	}
 
 	cmd := exec.Command(uvPath, "python", "install", version)
+	cmd.Env = uvEnv
 	if err := utils.RunCmd(cmd); err != nil {
 		return Result{Tool: "python", Err: fmt.Errorf("uv python install failed: %w", err)}
 	}
@@ -325,6 +430,7 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, gh *github
 	}
 
 	venvCmd := exec.Command(uvPath, "venv", "--python", version, "--clear", venvPath)
+	venvCmd.Env = uvEnv
 	if err := utils.RunCmd(venvCmd); err != nil {
 		return Result{Tool: "python", Err: fmt.Errorf("uv venv create failed: %w", err)}
 	}
@@ -349,6 +455,7 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, gh *github
 
 	if oldFullVersion != "" && oldFullVersion != newFullVersion {
 		uninstallCmd := exec.Command(uvPath, "python", "uninstall", "--quiet", oldFullVersion)
+		uninstallCmd.Env = uvEnv
 		utils.RunCmd(uninstallCmd)
 	}
 

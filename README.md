@@ -55,7 +55,7 @@ make build   # produces ./cps
 
 ### `cps init`
 
-Sets up the base environment — core CLI tools (bat, fd, ripgrep, lsd, jq, yq, fzf, sd, gron, zoxide, gh, anbu, danzo, ai-context), Neovim with NvChad, zsh plugins, tmux with TPM, and config files. System packages install via Homebrew on both Linux and macOS — no sudo required.
+Sets up the base environment — core CLI tools (bat, fd, ripgrep, lsd, jq, yq, fzf, sd, gron, zoxide, gh, anbu, danzo, ai-context), the [Starship](https://starship.rs/) prompt with a preconfigured `starship.toml`, Neovim with NvChad, zsh plugins (autosuggestions, syntax-highlighting), tmux with TPM, and config files. System packages install via Homebrew on both Linux and macOS — no sudo required.
 
 ```bash
 cps init
@@ -78,7 +78,7 @@ cps extend security nuclei subfinder  # pick specific tools
 | Pack | Contents |
 |---|---|
 | core | Dev tools, network utils, media packages (cmake, nmap, ffmpeg, aerospace) |
-| runtimes | uv, fnm, bun, Go, Python (includes uv), Rust, Node.js LTS (includes fnm) |
+| runtimes | uv, fnm, bun, Go, Java (Temurin LTS), Python (includes uv), Rust, Node.js LTS (includes fnm) |
 | cloud | AWS CLI, Azure CLI, gcloud CLI |
 | security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, gobuster, nuclei-templates |
 | cloudsec | terraform, kubectl, kubelogin, grpcurl, cloudfox, trivy, cloudlist |
@@ -90,7 +90,7 @@ Packs with shell integration (`runtimes`, `cloud`, `security`) deploy RC fragmen
 
 ### `cps cheat <topic>`
 
-Terminal cheat sheets — `cps`, `go`, `uv`, `fnm`, `rust`, `tmux`, `nvim`, `fzf`, `regex`.
+Terminal cheat sheets — `cps`, `go`, `java`, `uv`, `fnm`, `rust`, `tmux`, `nvim`, `fzf`, `regex`.
 
 ### `cps self-update`
 
