@@ -70,35 +70,20 @@ func Init(ghToken string) {
 	}
 	st.Save()
 
-	// Phase 3: Core GitHub releases
-	coreGH := filterGitHubCore(reg.ByKind(registry.GitHubRelease), false)
-	coreGH = filterPlatformTools(coreGH, p)
-	if runPhase("Phase 3: Core GitHub releases", coreGH, p, gh, st) {
-		hadErrors = true
-	}
-	st.Save()
-
-	// Phase 4: Own core tools
-	ownCore := filterOwnCore(reg.ByKind(registry.GitHubRelease))
-	if runPhase("Phase 4: Own core tools", ownCore, p, gh, st) {
-		hadErrors = true
-	}
-	st.Save()
-
-	// Phase 5: Shell plugins (base only, exclude extension tools)
+	// Phase 3: Shell plugins (base only, exclude extension tools)
 	disableOMZSlowPaste(p)
-	if runPhase("Phase 5: Shell plugins", filterBaseTools(reg.ByKind(registry.ShellPlugin)), p, gh, st) {
+	if runPhase("Phase 3: Shell plugins", filterBaseTools(reg.ByKind(registry.ShellPlugin)), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	// Phase 6: Config files
-	if runPhase("Phase 6: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
+	// Phase 4: Config files
+	if runPhase("Phase 4: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	// Phase 7: Post-install tasks
+	// Phase 5: Post-install tasks
 	runPostInstall(p)
 
 	st.LastInit = time.Now()
@@ -216,7 +201,7 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 }
 
 func runPostInstall(p platform.Platform) {
-	utils.PrintRunning("(Running) Phase 7: Post-install tasks")
+	utils.PrintRunning("(Running) Phase 5: Post-install tasks")
 	var lineCount int
 	var errors []jobResult
 
@@ -245,12 +230,12 @@ func runPostInstall(p platform.Platform) {
 
 	utils.ClearLines(lineCount + 1) // sub-lines + running header
 	if len(errors) > 0 {
-		utils.PrintError("Phase 7: partially completed with errors", nil)
+		utils.PrintError("Phase 5: partially completed with errors", nil)
 		for _, e := range errors {
 			utils.PrintIndentedError(e.name, e.err)
 		}
 	} else {
-		utils.PrintInfo("Phase 7: Post-install tasks")
+		utils.PrintInfo("Phase 5: Post-install tasks")
 	}
 }
 
@@ -339,29 +324,6 @@ func toolForPlatform(tool registry.Tool, p platform.Platform) bool {
 	return false
 }
 
-func filterGitHubCore(tools []registry.Tool, includeOwn bool) []registry.Tool {
-	var result []registry.Tool
-	for _, t := range tools {
-		if t.Category == registry.Core && !t.IsPrivate {
-			if !includeOwn && isOwnTool(t.Repo) {
-				continue
-			}
-			result = append(result, t)
-		}
-	}
-	return result
-}
-
-func filterOwnCore(tools []registry.Tool) []registry.Tool {
-	var result []registry.Tool
-	for _, t := range tools {
-		if t.Category == registry.Core && isOwnTool(t.Repo) {
-			result = append(result, t)
-		}
-	}
-	return result
-}
-
 func filterPlatformTools(tools []registry.Tool, p platform.Platform) []registry.Tool {
 	var result []registry.Tool
 	for _, t := range tools {
@@ -380,10 +342,6 @@ func filterBaseTools(tools []registry.Tool) []registry.Tool {
 		}
 	}
 	return result
-}
-
-func isOwnTool(repo string) bool {
-	return strings.HasPrefix(repo, "Tanq16/")
 }
 
 func disableOMZSlowPaste(p platform.Platform) {

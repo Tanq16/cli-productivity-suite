@@ -61,14 +61,15 @@ make build   # produces ./cps
 
 ### `cps init`
 
-Sets up the base environment — core CLI tools (bat, fd, ripgrep, lsd, jq, yq, fzf, sd, gron, zoxide, gh, anbu, danzo, ai-context), the [Starship](https://starship.rs/) prompt with a preconfigured `starship.toml`, Neovim with NvChad, zsh plugins (autosuggestions, syntax-highlighting), tmux with TPM, and config files. System packages install via Homebrew on both Linux and macOS — no sudo required.
+Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`, `file`, `tmux`, `htop`, `neovim`), Neovim with NvChad, zsh plugins (autosuggestions, syntax-highlighting), tmux with TPM, and CPS-managed config files (`.zshrc`, `.tmux.conf`, kitty configs). No CLI binaries are installed here — those live in the `essentials` pack so they can be updated individually. No sudo required.
 
 ```bash
 cps init
+cps extend essentials
 cps extend core
 ```
 
-These two commands are the standard way to set up this suite. `init` handles the base shell environment and `core` adds dev tools, network utilities, and media packages. Everything else via `cps extend` is optional — install what you need.
+These three commands are the standard way to set up the suite. `init` handles the base shell environment, `essentials` adds the everyday CLI binaries (bat, fd, ripgrep, fzf, starship, etc.) and deploys the starship prompt config, and `core` adds dev tools, network utilities, and media packages. Everything else via `cps extend` is optional — install what you need.
 
 ### `cps extend <pack> [tools...]`
 
@@ -83,6 +84,7 @@ cps extend security nuclei subfinder  # pick specific tools
 
 | Pack | Contents |
 |---|---|
+| essentials | Everyday CLI binaries (bat, fd, ripgrep, lsd, jq, yq, fzf, gh, gron, zoxide, sd, starship, anbu, danzo, ai-context) + starship.toml |
 | core | Dev tools, network utils, media packages (cmake, nmap, ffmpeg, aerospace) |
 | runtimes | uv, fnm, bun, Go, Java (Temurin LTS), Python (includes uv), Rust, Node.js LTS (includes fnm) |
 | cloud | AWS CLI, Azure CLI, gcloud CLI |
@@ -138,6 +140,20 @@ The `shell` block controls what gets added to your shell environment via a gener
 - **`source`** — files conditionally sourced (only if they exist)
 
 All three fields are optional. If the entire `shell` block is omitted, no fragment is generated.
+
+The repo's `custom-extensions/` directory ships ready-made reference packs (`ai-tools`, `additional-cloud-tools`, `database`, `praetorian`) — copy any of them to `~/.config/cps/extensions/` to use as-is, or treat them as templates for your own. Or pull all of them in one shot with `cps download-known-extensions` (below).
+
+### `cps download-known-extensions`
+
+Fetches the reference custom-extension YAMLs maintained in the CPS repo (`ai-tools`, `additional-cloud-tools`, `database`, `praetorian`) and writes them to `~/.config/cps/extensions/`. After running, they show up in `cps extend list` and you can install any of them with `cps extend <pack>` (or `cps extend <pack> <tool>` for a single tool).
+
+```bash
+cps download-known-extensions
+cps extend list                  # ai-tools, database, etc. now visible
+cps extend ai-tools claude-code  # install just claude-code from ai-tools
+```
+
+Overwrites existing files of the same name — if you've customized one of the reference packs locally, rename it before re-running.
 
 ## Shell Integration
 

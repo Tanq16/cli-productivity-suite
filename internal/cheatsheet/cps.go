@@ -14,6 +14,7 @@ func buildCPSSheet() string {
 	b.WriteString(headingStyle.Render("Core Commands") + "\n")
 	b.WriteString(cmdStyle.Render("  cps init") + "                        Base shell environment setup\n")
 	b.WriteString(cmdStyle.Render("  cps self-update") + "                 Update cps binary itself\n")
+	b.WriteString(cmdStyle.Render("  cps download-known-extensions") + "   Fetch reference custom-extension YAMLs from the repo\n")
 	b.WriteString(divider + "\n")
 
 	// --- Extend ---
@@ -21,7 +22,7 @@ func buildCPSSheet() string {
 	b.WriteString(cmdStyle.Render("  cps extend list") + "                 List available packs\n")
 	b.WriteString(cmdStyle.Render("  cps extend <pack>") + "               Install entire extension pack\n")
 	b.WriteString(cmdStyle.Render("  cps extend <pack> <tool> ...") + "    Install specific tools from a pack\n")
-	b.WriteString(noteStyle.Render("  Packs: core, cloud, runtimes, security, cloudsec, appsec, misc, private") + "\n")
+	b.WriteString(noteStyle.Render("  Packs: essentials, core, cloud, runtimes, security, cloudsec, appsec, misc, private") + "\n")
 	b.WriteString(divider + "\n")
 
 	// --- RC Fragments ---

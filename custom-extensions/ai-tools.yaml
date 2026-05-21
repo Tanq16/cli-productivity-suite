@@ -4,8 +4,45 @@ description: AI coding agents and LLM CLIs
 tools:
   - name: claude-code
     install: |
-      curl -fsSL https://claude.ai/install.sh | bash
+      set -eo pipefail
+      DEST_DIR="$HOME/shell/extensions"
+      mkdir -p "$DEST_DIR"
+      case "$(uname -s)" in
+        Darwin) OS=darwin ;;
+        Linux) OS=linux ;;
+        *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+      esac
+      case "$(uname -m)" in
+        x86_64|amd64) ARCH=x64 ;;
+        arm64|aarch64) ARCH=arm64 ;;
+        *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+      esac
+      # Rosetta 2: if running x64 zsh on Apple Silicon, fetch the native arm64 build
+      if [ "$OS" = "darwin" ] && [ "$ARCH" = "x64" ] && \
+         [ "$(sysctl -n sysctl.proc_translated 2>/dev/null || echo 0)" = "1" ]; then
+        ARCH=arm64
+      fi
+      PLATFORM="${OS}-${ARCH}"
+      BASE="https://downloads.claude.ai/claude-code-releases"
+      VERSION=$(curl -fsSL "$BASE/latest")
+      MANIFEST=$(curl -fsSL "$BASE/$VERSION/manifest.json")
+      SHA=$(echo "$MANIFEST" | tr -d '\n\r\t' | \
+        sed -n 's/.*"'"$PLATFORM"'"[^}]*"checksum"[[:space:]]*:[[:space:]]*"\([a-f0-9]\{64\}\)".*/\1/p')
+      [ -n "$SHA" ] || { echo "no checksum for $PLATFORM in claude-code manifest" >&2; exit 1; }
+      TMP=$(mktemp -d)
+      trap 'rm -rf "$TMP"' EXIT
+      curl -fsSL "$BASE/$VERSION/$PLATFORM/claude" -o "$TMP/claude"
+      if [ "$OS" = "darwin" ]; then
+        ACTUAL=$(shasum -a 256 "$TMP/claude" | cut -d' ' -f1)
+      else
+        ACTUAL=$(sha256sum "$TMP/claude" | cut -d' ' -f1)
+      fi
+      [ "$ACTUAL" = "$SHA" ] || { echo "claude-code sha256 mismatch" >&2; exit 1; }
+      install -m 0755 "$TMP/claude" "$DEST_DIR/claude"
+      [ "$OS" = "darwin" ] && xattr -d com.apple.quarantine "$DEST_DIR/claude" 2>/dev/null || true
     remove: |
+      rm -f "$HOME/shell/extensions/claude"
+      # Legacy: if previously installed via the official curl|bash bootstrap
       rm -f "$HOME/.local/bin/claude"
       rm -rf "$HOME/.local/share/claude"
 
@@ -21,17 +58,44 @@ tools:
       "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
         npm uninstall -g opencode-ai
 
-  - name: gemini
+  - name: antigravity
     install: |
       set -eo pipefail
-      export FNM_DIR="$HOME/shell/fnm"
-      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
-        npm install -g @google/gemini-cli
+      DEST_DIR="$HOME/shell/extensions"
+      mkdir -p "$DEST_DIR"
+      case "$(uname -s)" in
+        Darwin) OS=darwin ;;
+        Linux) OS=linux ;;
+        *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+      esac
+      case "$(uname -m)" in
+        x86_64|amd64) ARCH=amd64 ;;
+        arm64|aarch64) ARCH=arm64 ;;
+        *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+      esac
+      MANIFEST_URL="https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/${OS}_${ARCH}.json"
+      MANIFEST=$(curl -fsSL "$MANIFEST_URL")
+      URL=$(echo "$MANIFEST" | sed -n 's/.*"url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+      SHA=$(echo "$MANIFEST" | sed -n 's/.*"sha512"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+      [ -n "$URL" ] && [ -n "$SHA" ] || { echo "failed to parse antigravity manifest" >&2; exit 1; }
+      TMP=$(mktemp -d)
+      trap 'rm -rf "$TMP"' EXIT
+      curl -fsSL "$URL" -o "$TMP/agy.tar.gz"
+      if [ "$OS" = "darwin" ]; then
+        ACTUAL=$(shasum -a 512 "$TMP/agy.tar.gz" | cut -d' ' -f1)
+      else
+        ACTUAL=$(sha512sum "$TMP/agy.tar.gz" | cut -d' ' -f1)
+      fi
+      [ "$ACTUAL" = "$SHA" ] || { echo "antigravity sha512 mismatch" >&2; exit 1; }
+      tar -xzf "$TMP/agy.tar.gz" -C "$TMP" antigravity
+      install -m 0755 "$TMP/antigravity" "$DEST_DIR/agy"
+      # Strip macOS Gatekeeper quarantine so the binary can run without prompt
+      [ "$OS" = "darwin" ] && xattr -d com.apple.quarantine "$DEST_DIR/agy" 2>/dev/null || true
     remove: |
-      set -eo pipefail
-      export FNM_DIR="$HOME/shell/fnm"
-      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
-        npm uninstall -g @google/gemini-cli
+      rm -f "$HOME/shell/extensions/agy"
+      rm -rf "$HOME/.cache/antigravity"
+      rm -rf "$HOME/.config/antigravity"
+      rm -rf "$HOME/.local/share/antigravity"
 
   - name: codex
     install: |

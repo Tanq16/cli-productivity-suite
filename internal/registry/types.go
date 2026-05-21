@@ -42,6 +42,7 @@ const (
 	Runtime
 	Config
 	Shell
+	ExtEssentials
 	ExtSecurity
 	ExtCloudSec
 	ExtAppSec
@@ -67,6 +68,8 @@ func (c ToolCategory) String() string {
 		return "config"
 	case Shell:
 		return "shell"
+	case ExtEssentials:
+		return "ext-essentials"
 	case ExtSecurity:
 		return "ext-security"
 	case ExtCloudSec:
