@@ -10,7 +10,8 @@ plugins=(zsh-autosuggestions zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 
 # --- PATH ---
-export PATH="$HOME/shell/extensions:$HOME/shell/executables:$HOME/.local/bin:$PATH"
+# custom-bin first so user-dropped binaries win over CPS-managed ones on name collision
+export PATH="$HOME/shell/custom-bin:$HOME/shell/extensions:$HOME/shell/executables:$HOME/.local/bin:$PATH"
 
 # --- Starship prompt ---
 command -v starship &>/dev/null && eval "$(starship init zsh)"

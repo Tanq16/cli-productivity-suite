@@ -175,11 +175,27 @@ CPS uses a modular fragment system instead of a monolithic `.zshrc`:
 
 `~/.zshrc` is a thin loader that sources all fragments in order.
 
+### Adding your own stuff (no extension pack needed)
+
+Three drop-zones, three buckets — you never need to write a YAML pack for personal tweaks:
+
+| You want to add… | Drop it here | Notes |
+|---|---|---|
+| Aliases, exports, functions, custom sourcing | `~/shell/rc/custom/anything.zsh` | Loaded automatically by `~/.zshrc` after CPS fragments — so it can override CPS-set values |
+| Your own binaries / scripts | `~/shell/custom-bin/` | Prepended to PATH **ahead of** CPS-managed dirs, so your binary wins if a name collides with a CPS one |
+| A reusable, idempotent install bundle you want `cps extend` to manage | `~/.config/cps/extensions/<name>.yaml` | See [Custom Extension Packs](#custom-extension-packs) above |
+
+Both `~/shell/rc/custom/` and `~/shell/custom-bin/` are created by `cps init` and are **never touched** by subsequent `cps init` / `cps extend` runs.
+
+`deep-removal.sh` wipes the whole `~/shell/` tree, so anything you drop there is removed by it — if you want long-term-survival storage, keep it elsewhere.
+
 ## Notes
 
 - Core tools install to `~/shell/executables/`, extensions to `~/shell/extensions/` — both on PATH
+- User-owned binaries live in `~/shell/custom-bin/` (also on PATH, prepended ahead of the CPS-managed dirs)
 - State tracked in `~/.config/cps/state.json` — runs are idempotent, already-current tools are skipped
 - If `gh` CLI is authenticated, CPS uses its token automatically — no need for `--gh-token`
+- `00-base.zsh` exports `HOMEBREW_NO_AUTO_UPDATE=1` so `brew install` stays fast and deterministic. If you want brew to auto-update on every invocation, drop `unset HOMEBREW_NO_AUTO_UPDATE` into a file under `~/shell/rc/custom/`
 
 ## Deep Removal
 
