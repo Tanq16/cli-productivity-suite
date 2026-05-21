@@ -71,7 +71,6 @@ func Init(ghToken string) {
 	st.Save()
 
 	// Phase 3: Shell plugins (base only, exclude extension tools)
-	disableOMZSlowPaste(p)
 	if runPhase("Phase 3: Shell plugins", filterBaseTools(reg.ByKind(registry.ShellPlugin)), p, gh, st) {
 		hadErrors = true
 	}
@@ -168,8 +167,9 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 	for _, t := range tools {
 		inst := installer.Dispatch(t.Kind)
 		if inst == nil {
-			utils.PrintIndentedError(t.Name+": no installer for kind: "+t.Kind.String(), nil)
-			errors = append(errors, jobResult{name: t.Name, err: fmt.Errorf("no installer for kind: %s", t.Kind)})
+			kindErr := fmt.Errorf("no installer for kind: %s", t.Kind)
+			utils.PrintIndentedError(t.Name, kindErr)
+			errors = append(errors, jobResult{name: t.Name, err: kindErr})
 			lineCount++
 			continue
 		}
@@ -254,8 +254,13 @@ func generateShellEnv(p platform.Platform, errors *[]jobResult, lineCount *int) 
 	utils.PrintIndentedRunning("shell-env: brew")
 	*lineCount++
 	cmd := exec.Command(brewBin, "shellenv")
+	var stderr strings.Builder
+	cmd.Stderr = &stderr
 	out, err := cmd.Output()
 	if err != nil {
+		if detail := strings.TrimSpace(stderr.String()); detail != "" {
+			err = fmt.Errorf("%s: %w", detail, err)
+		}
 		*errors = append(*errors, jobResult{name: "shell-env-brew", err: err})
 		return
 	}
@@ -344,33 +349,3 @@ func filterBaseTools(tools []registry.Tool) []registry.Tool {
 	return result
 }
 
-func disableOMZSlowPaste(p platform.Platform) {
-	miscPath := filepath.Join(p.HomeDir, ".oh-my-zsh", "lib", "misc.zsh")
-	data, err := os.ReadFile(miscPath)
-	if err != nil {
-		return
-	}
-	content := string(data)
-	lines := strings.Split(content, "\n")
-	targets := []string{
-		"autoload -Uz bracketed-paste-magic",
-		"zle -N bracketed-paste bracketed-paste-magic",
-		"autoload -Uz url-quote-magic",
-		"zle -N self-insert url-quote-magic",
-	}
-	for i, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		if strings.HasPrefix(trimmed, "#") {
-			continue
-		}
-		for _, target := range targets {
-			if strings.Contains(line, target) {
-				lines[i] = "#" + line
-				break
-			}
-		}
-	}
-	if err := os.WriteFile(miscPath, []byte(strings.Join(lines, "\n")), 0644); err != nil {
-		utils.PrintWarn("failed to disable OMZ slow-paste", err)
-	}
-}

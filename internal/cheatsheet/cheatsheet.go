@@ -15,10 +15,12 @@ var sheets = []Sheet{
 	javaSheet,
 	uvSheet,
 	fnmSheet,
+	bunSheet,
 	rustSheet,
 	tmuxSheet,
 	nvimSheet,
 	fzfSheet,
+	jqSheet,
 	regexSheet,
 }
 

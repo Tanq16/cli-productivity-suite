@@ -111,9 +111,8 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 	}
 
 	goDir := filepath.Join(p.ShellDir(), "go-sdk")
-	os.RemoveAll(goDir)
-	if err := os.Rename(filepath.Join(tmpDir, "go"), goDir); err != nil {
-		return Result{Tool: "go-sdk", Err: fmt.Errorf("move Go SDK failed: %w", err)}
+	if err := stageAndSwap(filepath.Join(tmpDir, "go"), goDir); err != nil {
+		return Result{Tool: "go-sdk", Err: fmt.Errorf("install Go SDK failed: %w", err)}
 	}
 
 	st.SetToolVersion("go-sdk", version)
@@ -176,6 +175,7 @@ func (l *LanguageRuntimeInstaller) installJava(p platform.Platform, st *state.St
 	downloadURL := assets[0].Binary.Package.Link
 	version := assets[0].ReleaseName
 
+	// Temp dir inside p.ShellDir() so rename stays on the same filesystem (avoids EXDEV on Linux tmpfs /tmp).
 	tmpDir, err := os.MkdirTemp(p.ShellDir(), "cps-java-*")
 	if err != nil {
 		return Result{Tool: "java-sdk", Err: err}
@@ -210,9 +210,8 @@ func (l *LanguageRuntimeInstaller) installJava(p platform.Platform, st *state.St
 	}
 
 	javaDir := filepath.Join(p.ShellDir(), "java-sdk")
-	os.RemoveAll(javaDir)
-	if err := os.Rename(jdkRoot, javaDir); err != nil {
-		return Result{Tool: "java-sdk", Err: fmt.Errorf("move JDK failed: %w", err)}
+	if err := stageAndSwap(jdkRoot, javaDir); err != nil {
+		return Result{Tool: "java-sdk", Err: fmt.Errorf("install JDK failed: %w", err)}
 	}
 
 	st.SetToolVersion("java-sdk", version)
@@ -436,11 +435,25 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, gh *github
 	}
 
 	if len(frozen) > 0 {
-		pipNew := filepath.Join(venvPath, "bin", "pip")
-		installCmd := exec.Command(pipNew, "install", "--quiet", "-r", "/dev/stdin")
-		installCmd.Stdin = strings.NewReader(string(frozen))
-		if err := utils.RunCmd(installCmd); err != nil {
-			return Result{Tool: "python", Err: fmt.Errorf("pip package restore failed: %w", err)}
+		// Drop "pkg @ file://..." entries; the source path may not exist post-recreate.
+		var keep []string
+		for _, line := range strings.Split(string(frozen), "\n") {
+			trimmed := strings.TrimSpace(line)
+			if trimmed == "" || strings.HasPrefix(trimmed, "#") {
+				continue
+			}
+			if strings.Contains(trimmed, "@ file://") || strings.Contains(trimmed, "@file://") {
+				continue
+			}
+			keep = append(keep, trimmed)
+		}
+		if len(keep) > 0 {
+			pipNew := filepath.Join(venvPath, "bin", "pip")
+			installCmd := exec.Command(pipNew, "install", "--quiet", "-r", "/dev/stdin")
+			installCmd.Stdin = strings.NewReader(strings.Join(keep, "\n"))
+			if err := utils.RunCmd(installCmd); err != nil {
+				return Result{Tool: "python", Err: fmt.Errorf("pip package restore failed: %w", err)}
+			}
 		}
 	}
 
@@ -568,8 +581,14 @@ func (l *LanguageRuntimeInstaller) installNode(p platform.Platform, gh *github.C
 		}
 		if json.Unmarshal(frozen, &pkgList) == nil {
 			var pkgs []string
-			for name := range pkgList.Dependencies {
-				if name != "npm" && name != "corepack" {
+			for name, info := range pkgList.Dependencies {
+				if name == "npm" || name == "corepack" {
+					continue
+				}
+				// Preserve pinned versions so upgrade-via-cps doesn't silently bump pinned tooling.
+				if info.Version != "" {
+					pkgs = append(pkgs, name+"@"+info.Version)
+				} else {
 					pkgs = append(pkgs, name)
 				}
 			}

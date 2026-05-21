@@ -5,6 +5,7 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 # --- Oh My Zsh ---
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME=""
+DISABLE_MAGIC_FUNCTIONS=true   # disable OMZ's bracketed-paste-magic / url-quote-magic (slow paste)
 plugins=(zsh-autosuggestions zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 

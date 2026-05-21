@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/tanq16/cli-productivity-suite/internal/registry"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 type PackFile struct {

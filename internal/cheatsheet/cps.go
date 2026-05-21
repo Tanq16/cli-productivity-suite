@@ -37,7 +37,7 @@ func buildCPSSheet() string {
 
 	// --- Other ---
 	b.WriteString(headingStyle.Render("Other") + "\n")
-	b.WriteString(cmdStyle.Render("  cps cheat <topic>") + "               Cheat sheets (go, uv, fnm, rust, tmux, nvim, fzf, regex)\n")
+	b.WriteString(cmdStyle.Render("  cps cheat <topic>") + "               Cheat sheets (go, java, uv, fnm, bun, rust, tmux, nvim, fzf, jq, regex)\n")
 	b.WriteString(cmdStyle.Render("  --gh-token <token>") + "              GitHub PAT for private repos\n")
 	b.WriteString(cmdStyle.Render("  --debug") + "                         Verbose debug logging\n")
 	b.WriteString(cmdStyle.Render("  --for-ai") + "                        AI-friendly output (no color)\n")

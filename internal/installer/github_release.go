@@ -23,9 +23,16 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 		return Result{Tool: tool.Name, Err: fmt.Errorf("failed to fetch release: %w", err)}
 	}
 
+	destDir := p.ShellExecDir()
+	if tool.Extension {
+		destDir = p.ShellExtDir()
+	}
+
 	currentVersion := st.ToolVersion(tool.Name)
 	if currentVersion == release.TagName {
-		return Result{Tool: tool.Name, Version: release.TagName, Skipped: true}
+		if _, statErr := os.Stat(filepath.Join(destDir, tool.BinaryName)); statErr == nil {
+			return Result{Tool: tool.Name, Version: release.TagName, Skipped: true}
+		}
 	}
 
 	asset, err := github.MatchAsset(release, tool.Asset, p.OS.String(), p.Arch.String())
@@ -49,10 +56,6 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 		return Result{Tool: tool.Name, Err: fmt.Errorf("download failed: %w", err)}
 	}
 
-	destDir := p.ShellExecDir()
-	if tool.Extension {
-		destDir = p.ShellExtDir()
-	}
 	if err := os.MkdirAll(destDir, 0755); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}

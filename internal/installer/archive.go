@@ -41,6 +41,24 @@ func FindBinary(dir, pattern string) (string, error) {
 	return "", fmt.Errorf("binary not found matching pattern %s in %s", pattern, dir)
 }
 
+func stageAndSwap(srcDir, destDir string) error {
+	oldDir := destDir + ".old"
+	os.RemoveAll(oldDir)
+	if _, err := os.Stat(destDir); err == nil {
+		if err := os.Rename(destDir, oldDir); err != nil {
+			return fmt.Errorf("backup existing %s: %w", destDir, err)
+		}
+	}
+	if err := os.Rename(srcDir, destDir); err != nil {
+		if _, statErr := os.Stat(oldDir); statErr == nil {
+			os.Rename(oldDir, destDir)
+		}
+		return fmt.Errorf("install %s: %w", destDir, err)
+	}
+	os.RemoveAll(oldDir)
+	return nil
+}
+
 func AtomicInstallBinary(srcPath, destPath string) error {
 	data, err := os.ReadFile(srcPath)
 	if err != nil {

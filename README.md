@@ -2,7 +2,9 @@
   <img src=".github/assets/logo.png" alt="CLI Productivity Suite Logo" width="200">
   <h1>CLI Productivity Suite</h1>
 
-  <a href="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml"><img alt="Build Workflow" src="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml/badge.svg"></a>&nbsp;<a href="https://github.com/tanq16/cli-productivity-suite/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/tanq16/cli-productivity-suite"></a>
+  <a href="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml"><img alt="Build Workflow" src="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml/badge.svg"></a>&nbsp;<a href="https://github.com/tanq16/cli-productivity-suite/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/tanq16/cli-productivity-suite"></a><br><br>
+
+  <a href="#prerequisites">Prerequisites</a> &bull; <a href="#install">Install</a> &bull; <a href="#usage">Usage</a> &bull; <a href="#custom-extension-packs">Custom Extensions</a> &bull; <a href="#shell-integration">Shell Integration</a> &bull; <a href="#deep-removal">Deep Removal</a>
 </div>
 
 ---
@@ -59,17 +61,21 @@ make build   # produces ./cps
 
 ## Usage
 
+### Standard setup — run these three commands in order
+
+```bash
+cps init                  # base shell env, OMZ plugins, configs, neovim, tmux
+cps extend essentials     # everyday CLI binaries (bat, fd, ripgrep, fzf, starship, ...)
+cps extend core           # dev/network/media brew packages (cmake, nmap, ffmpeg, aerospace)
+```
+
+> **Order matters.** `init` deploys `~/.zshrc` and rc fragments that reference binaries (`lsd`, `fd`, `bat`, `fzf`, `starship`, etc.) which the `essentials` pack provides. The shell still works without `essentials`, but aliases like `tree`/`l`/`la` and the starship prompt won't resolve until it's installed. Always follow `init` with `cps extend essentials`.
+
 ### `cps init`
 
 Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`, `file`, `tmux`, `htop`, `neovim`), Neovim with NvChad, zsh plugins (autosuggestions, syntax-highlighting), tmux with TPM, and CPS-managed config files (`.zshrc`, `.tmux.conf`, kitty configs). No CLI binaries are installed here — those live in the `essentials` pack so they can be updated individually. No sudo required.
 
-```bash
-cps init
-cps extend essentials
-cps extend core
-```
-
-These three commands are the standard way to set up the suite. `init` handles the base shell environment, `essentials` adds the everyday CLI binaries (bat, fd, ripgrep, fzf, starship, etc.) and deploys the starship prompt config, and `core` adds dev tools, network utilities, and media packages. Everything else via `cps extend` is optional — install what you need.
+Everything else via `cps extend` is optional — install what you need.
 
 ### `cps extend <pack> [tools...]`
 
@@ -98,7 +104,7 @@ Packs with shell integration (`runtimes`, `cloud`, `security`) deploy RC fragmen
 
 ### `cps cheat <topic>`
 
-Terminal cheat sheets — `cps`, `go`, `java`, `uv`, `fnm`, `rust`, `tmux`, `nvim`, `fzf`, `regex`.
+Terminal cheat sheets — `cps`, `go`, `java`, `uv`, `fnm`, `bun`, `rust`, `tmux`, `nvim`, `fzf`, `jq`, `regex`.
 
 ### `cps self-update`
 

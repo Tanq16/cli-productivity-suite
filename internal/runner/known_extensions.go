@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
 	"github.com/tanq16/cli-productivity-suite/utils"
@@ -32,7 +31,6 @@ func DownloadKnownExtensions() {
 		utils.PrintFatal(fmt.Sprintf("failed to create %s", extDir), err)
 	}
 
-	client := &http.Client{Timeout: 30 * time.Second}
 	var hadErrors bool
 
 	for _, name := range knownExtensions {
@@ -40,10 +38,10 @@ func DownloadKnownExtensions() {
 		dest := filepath.Join(extDir, name+".yaml")
 
 		utils.PrintRunning("fetching " + name + ".yaml")
-		err := downloadKnownYAML(client, url, dest)
+		err := downloadKnownYAML(utils.HTTPClient, url, dest)
 		utils.ClearLines(1)
 		if err != nil {
-			utils.PrintError(fmt.Sprintf("%s.yaml: %s", name, err), nil)
+			utils.PrintError(name+".yaml: download failed", err)
 			hadErrors = true
 			continue
 		}

@@ -6,7 +6,9 @@ import (
 	"github.com/tanq16/cli-productivity-suite/internal/runner"
 )
 
-var extendRemoveFlag bool
+var extendFlags struct {
+	remove bool
+}
 
 var extendCmd = &cobra.Command{
 	Use:   "extend <pack-name> [tools...]",
@@ -25,7 +27,7 @@ var extendCmd = &cobra.Command{
 			runner.ExtendList()
 			return
 		}
-		if extendRemoveFlag {
+		if extendFlags.remove {
 			runner.ExtendRemove(args[0], args[1:])
 			return
 		}
@@ -34,5 +36,5 @@ var extendCmd = &cobra.Command{
 }
 
 func init() {
-	extendCmd.Flags().BoolVar(&extendRemoveFlag, "remove", false, "Remove tool(s) from a custom extension pack (custom packs only)")
+	extendCmd.Flags().BoolVar(&extendFlags.remove, "remove", false, "Remove tool(s) from a custom extension pack (custom packs only)")
 }
