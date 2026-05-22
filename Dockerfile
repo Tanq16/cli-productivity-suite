@@ -44,7 +44,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ARG USERNAME=cps
 ARG USER_UID=1000
 ARG USER_GID=1000
-RUN groupadd -g ${USER_GID} ${USERNAME} \
+# Ubuntu 24.10+ base images ship a default 'ubuntu' user at UID/GID 1000;
+# remove it so we can claim that UID for the cps user (matches host UID on
+# most Linux dev machines, so bind-mounted volumes Just Work).
+RUN userdel -r ubuntu 2>/dev/null || true \
+    && groupdel ubuntu 2>/dev/null || true \
+    && groupadd -g ${USER_GID} ${USERNAME} \
     && useradd -m -u ${USER_UID} -g ${USER_GID} -s /usr/bin/zsh ${USERNAME} \
     && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
     && chmod 0440 /etc/sudoers.d/${USERNAME}
