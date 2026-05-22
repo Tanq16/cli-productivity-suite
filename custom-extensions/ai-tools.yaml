@@ -50,12 +50,12 @@ tools:
     install: |
       set -eo pipefail
       export FNM_DIR="$HOME/shell/fnm"
-      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+      fnm exec --using=lts-latest -- \
         npm install -g opencode-ai@latest
     remove: |
       set -eo pipefail
       export FNM_DIR="$HOME/shell/fnm"
-      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+      fnm exec --using=lts-latest -- \
         npm uninstall -g opencode-ai
 
   - name: antigravity
@@ -101,24 +101,24 @@ tools:
     install: |
       set -eo pipefail
       export FNM_DIR="$HOME/shell/fnm"
-      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+      fnm exec --using=lts-latest -- \
         npm install -g @openai/codex
     remove: |
       set -eo pipefail
       export FNM_DIR="$HOME/shell/fnm"
-      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+      fnm exec --using=lts-latest -- \
         npm uninstall -g @openai/codex
 
   - name: crush
     install: |
       set -eo pipefail
       export FNM_DIR="$HOME/shell/fnm"
-      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+      fnm exec --using=lts-latest -- \
         npm install -g @charmland/crush
     remove: |
       set -eo pipefail
       export FNM_DIR="$HOME/shell/fnm"
-      "$HOME/shell/extensions/fnm" exec --using=lts-latest -- \
+      fnm exec --using=lts-latest -- \
         npm uninstall -g @charmland/crush
 
   - name: aix

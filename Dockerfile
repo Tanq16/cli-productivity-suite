@@ -95,11 +95,7 @@ RUN cps extend praetorian && sleep 20
 # Phase 4 — public-repo tools from the 'private' pack. The truly-private ones
 # (toon, nblm, cybernest, lincli — marked IsPrivate: true in the manifest) are
 # skipped since they need --gh-token.
-RUN cps extend private nits && sleep 20
-RUN cps extend private raikiri && sleep 20
-RUN cps extend private gcli && sleep 20
-RUN cps extend private box && sleep 20
-RUN cps extend private claudex
+RUN cps extend private nits raikiri gcli box claudex
 
 # Sandbox stays alive; user exec's in:  docker exec -it <name> zsh -l
 CMD ["sleep", "infinity"]

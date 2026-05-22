@@ -8,13 +8,13 @@ tools:
       export UV_TOOL_DIR="$HOME/shell/uv-tools"
       export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
       export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
-      "$HOME/shell/executables/uv" tool install --force checkov
+      uv tool install --force checkov
     remove: |
       set -eo pipefail
       export UV_TOOL_DIR="$HOME/shell/uv-tools"
       export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
       export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
-      "$HOME/shell/executables/uv" tool uninstall checkov
+      uv tool uninstall checkov
 
   - name: prowler
     install: |
@@ -22,13 +22,13 @@ tools:
       export UV_TOOL_DIR="$HOME/shell/uv-tools"
       export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
       export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
-      "$HOME/shell/executables/uv" tool install --force prowler
+      uv tool install --force prowler
     remove: |
       set -eo pipefail
       export UV_TOOL_DIR="$HOME/shell/uv-tools"
       export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
       export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
-      "$HOME/shell/executables/uv" tool uninstall prowler
+      uv tool uninstall prowler
 
   - name: oci-cli
     install: |
@@ -36,13 +36,13 @@ tools:
       export UV_TOOL_DIR="$HOME/shell/uv-tools"
       export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
       export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
-      "$HOME/shell/executables/uv" tool install --force oci-cli
+      uv tool install --force oci-cli
     remove: |
       set -eo pipefail
       export UV_TOOL_DIR="$HOME/shell/uv-tools"
       export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
       export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
-      "$HOME/shell/executables/uv" tool uninstall oci-cli
+      uv tool uninstall oci-cli
 
   - name: tofu
     install: |

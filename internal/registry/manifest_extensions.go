@@ -532,20 +532,18 @@ var extensionPacks = []ExtensionPack{
 				Name: "danzo", BinaryName: "danzo", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
 				Repo: "Tanq16/danzo", Description: "Danzo tool",
 				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat:       "zip",
-					BinaryPathInArchive: "danzo",
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
 				},
 			},
 			{
 				Name: "ai-context", BinaryName: "ai-context", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
 				Repo: "Tanq16/ai-context", Description: "AI context builder",
 				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat:       "zip",
-					BinaryPathInArchive: "ai-context",
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
 				},
 			},
 			{

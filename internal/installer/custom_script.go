@@ -2,7 +2,6 @@ package installer
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 
 	"github.com/tanq16/cli-productivity-suite/internal/github"
@@ -20,7 +19,7 @@ func (c *CustomScriptInstaller) Install(tool *registry.Tool, p platform.Platform
 	}
 
 	cmd := exec.Command("bash", "-c", tool.InstallCmd)
-	cmd.Env = os.Environ()
+	cmd.Env = p.CustomScriptEnv()
 	if err := utils.RunCmd(cmd); err != nil {
 		return Result{Tool: tool.Name, Err: fmt.Errorf("custom install failed: %w", err)}
 	}

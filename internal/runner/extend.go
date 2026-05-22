@@ -250,7 +250,7 @@ func ExtendRemove(packName string, toolFilter []string) {
 		}
 		utils.PrintRunning("removing " + t.Name)
 		cmd := exec.Command("bash", "-c", t.RemoveCmd)
-		cmd.Env = os.Environ()
+		cmd.Env = p.CustomScriptEnv()
 		err := utils.RunCmd(cmd)
 		utils.ClearLines(1)
 		if err != nil {
