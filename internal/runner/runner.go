@@ -32,11 +32,6 @@ func Init(ghToken string) {
 
 	// Phase 1: Prerequisites
 	utils.PrintRunning("(Running) Phase 1: Checking prerequisites")
-	omzDir := filepath.Join(p.HomeDir, ".oh-my-zsh")
-	if _, err := os.Stat(omzDir); os.IsNotExist(err) {
-		msg := fmt.Sprintf("Oh My Zsh not found at %s\nInstall it first: sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\"", omzDir)
-		utils.PrintFatal(msg, nil)
-	}
 	if _, err := exec.LookPath("git"); err != nil {
 		utils.PrintFatal("git not found in PATH", err)
 	}
@@ -50,8 +45,10 @@ func Init(ghToken string) {
 		filepath.Join(p.ShellDir(), "rc"),
 		filepath.Join(p.ShellDir(), "rc", "custom"),
 		filepath.Join(p.ShellDir(), "env"),
+		filepath.Join(p.ShellDir(), "plugins"),
 		filepath.Join(p.ShellDir(), "custom-bin"),
 		filepath.Join(p.ConfigDir(), "extensions"),
+		filepath.Join(p.HomeDir, ".cache", "zsh"),
 	} {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			utils.PrintFatal(fmt.Sprintf("failed to create %s", dir), err)

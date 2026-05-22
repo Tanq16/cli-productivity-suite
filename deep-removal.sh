@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-# Deep removal of CPS + CPS-installed brew packages + Oh My Zsh.
+# Deep removal of CPS + CPS-installed brew packages.
 # Homebrew itself is preserved. ~/.zsh_history is preserved.
 #
 # After running this, you can start fresh by:
-#   1. Reinstalling Oh My Zsh (Homebrew stays)
-#   2. Reinstalling the cps binary
-#   3. Running `cps init`
+#   1. Reinstalling the cps binary (Homebrew stays)
+#   2. Running `cps init`
 
 echo "CPS deep removal"
 echo ""
@@ -17,7 +16,7 @@ echo "  - Neovim caches/state (~/.local/share/nvim, ~/.local/state/nvim, ~/.cach
 echo "  - Legacy pre-v1.3 paths (~/.nvm, ~/google-cloud-sdk, ~/nuclei-templates)"
 echo "  - Legacy runtime caches (~/.local/share/uv, ~/.bun, ~/.npm, go-build cache)"
 echo "  - CPS-deployed configs (.zshrc, .tmux.conf, .aerospace.toml, kitty configs, starship.toml)"
-echo "  - Oh My Zsh + bundled themes/plugins (~/.oh-my-zsh)"
+echo "  - zsh completion cache (~/.cache/zsh)"
 echo "  - Brew packages installed by CPS (neovim, nmap, openssl, ffmpeg, aws-cli,"
 echo "    azure-cli, gcloud-cli cask)"
 echo ""
@@ -88,16 +87,17 @@ else
   echo "==> brew not found, skipping brew package uninstall"
 fi
 
-echo "==> removing Oh My Zsh"
+echo "==> removing legacy Oh My Zsh install (if present from pre-v1.x CPS)"
 rm -rf "$HOME/.oh-my-zsh"
+
+echo "==> removing zsh completion cache"
+rm -rf "$HOME/.cache/zsh"
 
 echo ""
 echo "done."
 echo "preserved: ~/.zsh_history, Homebrew itself"
 echo ""
 echo "to start fresh:"
-echo "  1. reinstall Oh My Zsh:"
-echo "     sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
-echo "  2. reinstall cps:"
+echo "  1. reinstall cps:"
 echo "     see https://github.com/tanq16/cli-productivity-suite#install"
-echo "  3. cps init"
+echo "  2. cps init"

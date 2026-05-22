@@ -1,0 +1,9 @@
+.git
+.github
+.vscode
+.idea
+.DS_Store
+*.log
+cps
+cps-*
+dist/

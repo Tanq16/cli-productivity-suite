@@ -4,7 +4,7 @@
 
   <a href="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml"><img alt="Build Workflow" src="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml/badge.svg"></a>&nbsp;<a href="https://github.com/tanq16/cli-productivity-suite/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/tanq16/cli-productivity-suite"></a><br><br>
 
-  <a href="#prerequisites">Prerequisites</a> &bull; <a href="#install">Install</a> &bull; <a href="#usage">Usage</a> &bull; <a href="#custom-extension-packs">Custom Extensions</a> &bull; <a href="#shell-integration">Shell Integration</a> &bull; <a href="#deep-removal">Deep Removal</a>
+  <a href="#prerequisites">Prerequisites</a> &bull; <a href="#install">Install</a> &bull; <a href="#usage">Usage</a> &bull; <a href="#custom-extension-packs">Custom Extensions</a> &bull; <a href="#shell-integration">Shell Integration</a> &bull; <a href="#sandbox-container">Sandbox Container</a> &bull; <a href="#deep-removal">Deep Removal</a>
 </div>
 
 ---
@@ -27,14 +27,13 @@ On Linux:
 sudo apt install git curl zsh build-essential
 ```
 
-### Install these (both platforms)
+### Install this (both platforms)
 
 | Requirement | One-line install |
 |---|---|
-| [Oh My Zsh](https://ohmyz.sh/) | `sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"` |
 | [Homebrew](https://brew.sh/) | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
 
-Both are required — `cps init` won't run without them. CPS uses brew for all system and cloud CLI packages.
+Homebrew is required — `cps init` won't run without it. CPS uses brew for all system and cloud CLI packages. CPS does **not** use Oh My Zsh; the two zsh plugins it installs (`zsh-autosuggestions`, `zsh-syntax-highlighting`) are sourced directly from `~/shell/plugins/`.
 
 **Recommended:**
 
@@ -64,7 +63,7 @@ make build   # produces ./cps
 ### Standard setup — run these three commands in order
 
 ```bash
-cps init                  # base shell env, OMZ plugins, configs, neovim, tmux
+cps init                  # base shell env, zsh plugins, configs, neovim, tmux
 cps extend essentials     # everyday CLI binaries (bat, fd, ripgrep, fzf, starship, ...)
 cps extend core           # dev/network/media brew packages (cmake, nmap, ffmpeg, aerospace)
 ```
@@ -196,6 +195,46 @@ Both `~/shell/rc/custom/` and `~/shell/custom-bin/` are created by `cps init` an
 - State tracked in `~/.config/cps/state.json` — runs are idempotent, already-current tools are skipped
 - If `gh` CLI is authenticated, CPS uses its token automatically — no need for `--gh-token`
 - `00-base.zsh` exports `HOMEBREW_NO_AUTO_UPDATE=1` so `brew install` stays fast and deterministic. If you want brew to auto-update on every invocation, drop `unset HOMEBREW_NO_AUTO_UPDATE` into a file under `~/shell/rc/custom/`
+
+## Sandbox Container
+
+A prebuilt Ubuntu container with the full CPS environment baked in — every built-in extension pack (except `private`), brew on Linuxbrew, a non-root `cps` user with sudo, and zsh + tmux + neovim ready to go. Useful when you need a CPS-style workspace on a machine where you can't (or don't want to) install CPS directly.
+
+```bash
+docker run -d --name cps-sandbox tanq16/cps-sandbox:latest
+docker exec -it cps-sandbox zsh -l
+```
+
+The image runs `sleep infinity` as its default command, so it stays alive and you `docker exec` in whenever you need it. `docker exec -it <name> zsh -l` always gives you the full configured shell (rc fragments sourced, PATH wired up, starship prompt, plugins loaded). Inside the shell, `tt` starts a tmux session, `t` re-attaches.
+
+Build locally:
+
+```bash
+docker build -t cps-sandbox .
+docker run -d --name cps-sandbox cps-sandbox
+docker exec -it cps-sandbox zsh -l
+```
+
+The image is multi-arch (`linux/amd64` + `linux/arm64`) and large (multi-GB) — it carries full language runtimes, cloud CLIs, security tooling, every reference custom-extension pack (`ai-tools`, `additional-cloud-tools`, `database`, `praetorian`), and the public-repo tools from the `private` pack (`nits`, `raikiri`, `gcli`, `box`, `claudex`). The four truly-private tools (`toon`, `nblm`, `cybernest`, `lincli`) are skipped since they need an auth token.
+
+### A ready environment for AI agents
+
+The prebuilt image is intentionally a **drop-in toolkit for AI coding agents** — Claude Code, Codex, opencode, Crush, antigravity, and friends. Spin up the container once and a single non-root user already has:
+
+- **The agent CLIs themselves** — `claude-code`, `codex`, `opencode`, `crush`, `antigravity`, `aix` (the `ai-tools` reference pack is pre-installed)
+- **Language runtimes the agent will reach for** — Go, Node (via fnm), Bun, Python (via uv), Rust, Java (Temurin LTS), all on PATH with no further setup
+- **Everyday CLI building blocks** — bat, fd, ripgrep, lsd, jq, yq, fzf, gh, zoxide, gron, sd, starship, plus tmux + neovim
+- **Cloud + security tooling** — aws/azure/gcloud CLIs, kubectl, terraform, trivy, nuclei, httpx, dnsx, subfinder, ffuf, katana, and the rest of the security/cloudsec/appsec packs
+- **Sandbox isolation** — everything runs as the non-root `cps` user inside a disposable container; `sudo` is available for ad-hoc package installs without polluting your host
+
+```bash
+docker run -d --name agent-sandbox tanq16/cps-sandbox:latest
+docker exec -it agent-sandbox zsh -l
+# inside the container:
+claude-code   # or codex, opencode, crush, ...
+```
+
+This is the use case the image is tuned for: an agent (or a human delegating to one) lands in a shell where every tool it's likely to invoke — for code, search, package management, cloud ops, scanning, or recon — is already on PATH. No `brew install` round-trips, no runtime bootstrapping, no "let me set up your environment first." For ephemeral runs, add `--rm` to `docker run`; for sessions you want to come back to, keep the container around and re-`exec` in.
 
 ## Deep Removal
 

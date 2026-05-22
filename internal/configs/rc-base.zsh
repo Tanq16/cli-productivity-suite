@@ -2,12 +2,23 @@
 export HOMEBREW_NO_AUTO_UPDATE=1
 [ -f "$HOME/shell/env/brew.zsh" ] && source "$HOME/shell/env/brew.zsh"
 
-# --- Oh My Zsh ---
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME=""
-DISABLE_MAGIC_FUNCTIONS=true   # disable OMZ's bracketed-paste-magic / url-quote-magic (slow paste)
-plugins=(zsh-autosuggestions zsh-syntax-highlighting)
-source $ZSH/oh-my-zsh.sh
+# --- Zsh plugins (sourced directly, no framework) ---
+ZSH_PLUGINS="$HOME/shell/plugins"
+[ -f "$ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh" ] && source "$ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh"
+
+# --- History ---
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000
+SAVEHIST=10000
+setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE SHARE_HISTORY INC_APPEND_HISTORY
+
+# --- Completion ---
+[ -d "$HOME/.cache/zsh" ] || mkdir -p "$HOME/.cache/zsh"
+autoload -Uz compinit
+compinit -d "$HOME/.cache/zsh/zcompdump"
+
+# syntax-highlighting must be sourced LAST per upstream README
+[ -f "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && source "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 # --- PATH ---
 # custom-bin first so user-dropped binaries win over CPS-managed ones on name collision

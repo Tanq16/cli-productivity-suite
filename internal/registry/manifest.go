@@ -48,13 +48,13 @@ var AllTools = []Tool{
 		Name: "zsh-autosuggestions", Kind: ShellPlugin, Category: Shell,
 		Description: "ZSH autosuggestions plugin",
 		CloneURL:    "https://github.com/zsh-users/zsh-autosuggestions.git",
-		CloneDest:   "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions",
+		CloneDest:   "~/shell/plugins/zsh-autosuggestions",
 	},
 	{
 		Name: "zsh-syntax-highlighting", Kind: ShellPlugin, Category: Shell,
 		Description: "ZSH syntax highlighting plugin",
 		CloneURL:    "https://github.com/zsh-users/zsh-syntax-highlighting.git",
-		CloneDest:   "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting",
+		CloneDest:   "~/shell/plugins/zsh-syntax-highlighting",
 	},
 	{
 		Name: "tpm", Kind: ShellPlugin, Category: Shell,
