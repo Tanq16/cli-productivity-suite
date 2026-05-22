@@ -76,6 +76,8 @@ Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`
 
 Everything else via `cps extend` is optional — install what you need.
 
+> **Pack ordering for runtime-backed extensions.** Some custom-extension packs invoke runtimes that `cps extend runtimes` provides — `ai-tools` (claude-code, codex, opencode, crush, aix) uses `fnm`; `database` (pgcli, mycli) and `additional-cloud-tools` (checkov, prowler, oci-cli) use `uv`. Install `cps extend runtimes` (or at least its `uv` / `fnm` tools) before those packs, otherwise the install scripts fail with "command not found."
+
 ### `cps extend <pack> [tools...]`
 
 Install extension packs or pick specific tools from a pack.

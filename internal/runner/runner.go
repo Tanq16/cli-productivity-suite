@@ -282,10 +282,10 @@ func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *in
 	}
 
 	defs := []compDef{
-		{"fzf", "fzf", p.ShellExecDir(), []string{"--zsh"}, "fzf.zsh"},
+		{"fzf", "fzf", p.ShellExtDir(), []string{"--zsh"}, "fzf.zsh"},
 		{"uv", "uv", p.ShellExtDir(), []string{"generate-shell-completion", "zsh"}, "uv.zsh"},
 		{"fnm", "fnm", p.ShellExtDir(), []string{"completions", "--shell", "zsh"}, "fnm.zsh"},
-		{"zoxide", "zoxide", p.ShellExecDir(), []string{"init", "zsh"}, "zoxide.zsh"},
+		{"zoxide", "zoxide", p.ShellExtDir(), []string{"init", "zsh"}, "zoxide.zsh"},
 	}
 
 	for _, d := range defs {

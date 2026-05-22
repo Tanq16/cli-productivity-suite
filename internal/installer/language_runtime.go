@@ -36,6 +36,8 @@ func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platf
 		return l.installFnmOnly(p, gh, st)
 	case "node":
 		return l.installNode(p, gh, st)
+	case "bun":
+		return l.installBun(p, gh, st)
 	default:
 		return Result{Tool: tool.Name, Err: fmt.Errorf("unknown runtime: %s", tool.Name)}
 	}
@@ -397,6 +399,7 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, gh *github
 	if err != nil {
 		return Result{Tool: "python", Err: err}
 	}
+	st.SetToolVersion("uv", uvTag)
 
 	version, err := l.latestPythonCycle()
 	if err != nil {
@@ -527,6 +530,78 @@ func (l *LanguageRuntimeInstaller) downloadFnm(p platform.Platform, gh *github.C
 	return destPath, release.TagName, nil
 }
 
+func (l *LanguageRuntimeInstaller) bunAssetName(p platform.Platform) string {
+	osStr := "linux"
+	if p.OS == platform.Darwin {
+		osStr = "darwin"
+	}
+	arch := "x64"
+	if p.Arch == platform.ARM64 {
+		arch = "aarch64"
+	}
+	return fmt.Sprintf("bun-%s-%s.zip", osStr, arch)
+}
+
+func (l *LanguageRuntimeInstaller) installBun(p platform.Platform, gh *github.Client, st *state.State) Result {
+	release, err := gh.LatestRelease("oven-sh/bun")
+	if err != nil {
+		return Result{Tool: "bun", Err: fmt.Errorf("failed to fetch bun release: %w", err)}
+	}
+
+	assetName := l.bunAssetName(p)
+	var downloadURL string
+	for _, a := range release.Assets {
+		if a.Name == assetName {
+			downloadURL = a.BrowserDownloadURL
+			break
+		}
+	}
+	if downloadURL == "" {
+		return Result{Tool: "bun", Err: fmt.Errorf("no bun asset found for %s/%s", p.OS, p.Arch)}
+	}
+
+	tmpDir, err := os.MkdirTemp("", "cps-bun-*")
+	if err != nil {
+		return Result{Tool: "bun", Err: err}
+	}
+	defer os.RemoveAll(tmpDir)
+
+	zipPath := filepath.Join(tmpDir, "bun.zip")
+	if err := DownloadToFile(downloadURL, zipPath); err != nil {
+		return Result{Tool: "bun", Err: fmt.Errorf("download bun failed: %w", err)}
+	}
+	if err := ExtractZip(zipPath, tmpDir); err != nil {
+		return Result{Tool: "bun", Err: fmt.Errorf("extract bun failed: %w", err)}
+	}
+
+	bunExtracted, err := FindBinary(tmpDir, "*/bun")
+	if err != nil {
+		return Result{Tool: "bun", Err: fmt.Errorf("bun binary not found in archive: %w", err)}
+	}
+
+	// Install at $BUN_INSTALL/bin/bun (rc-runtimes sets BUN_INSTALL=$HOME/shell/bun)
+	// so bun's own `bun upgrade` writes to the same path CPS manages — no drift.
+	bunBinDir := filepath.Join(p.ShellDir(), "bun", "bin")
+	if err := os.MkdirAll(bunBinDir, 0755); err != nil {
+		return Result{Tool: "bun", Err: err}
+	}
+	destPath := filepath.Join(bunBinDir, "bun")
+	if err := AtomicInstallBinary(bunExtracted, destPath); err != nil {
+		return Result{Tool: "bun", Err: fmt.Errorf("install bun binary failed: %w", err)}
+	}
+
+	// Symlink into the standard extensions dir too, so any caller that expects
+	// the cps extension-binary layout (cps subprocesses, scripts, etc.) finds bun.
+	linkPath := filepath.Join(p.ShellExtDir(), "bun")
+	_ = os.Remove(linkPath)
+	if err := os.Symlink(destPath, linkPath); err != nil {
+		return Result{Tool: "bun", Err: fmt.Errorf("symlink bun failed: %w", err)}
+	}
+
+	st.SetToolVersion("bun", release.TagName)
+	return Result{Tool: "bun", Version: release.TagName}
+}
+
 func (l *LanguageRuntimeInstaller) installFnmOnly(p platform.Platform, gh *github.Client, st *state.State) Result {
 	_, tagName, err := l.downloadFnm(p, gh)
 	if err != nil {
@@ -541,6 +616,7 @@ func (l *LanguageRuntimeInstaller) installNode(p platform.Platform, gh *github.C
 	if err != nil {
 		return Result{Tool: "node", Err: err}
 	}
+	st.SetToolVersion("fnm", fnmTag)
 
 	fnmDir := filepath.Join(p.ShellDir(), "fnm")
 	if err := os.MkdirAll(fnmDir, 0755); err != nil {
