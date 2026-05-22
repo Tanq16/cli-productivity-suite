@@ -100,10 +100,6 @@ func (p Platform) StatePath() string {
 	return filepath.Join(p.HomeDir, ".config", "cps", "state.json")
 }
 
-// CustomScriptEnv returns os.Environ() with the CPS-managed bin dirs prepended
-// to PATH. Custom-extension install/remove scripts run via bash -c inherit this
-// env so YAML authors can call cps-installed tools (uv, fnm, bat, ...) by name
-// instead of hardcoding internal layout like ~/shell/extensions/uv.
 func (p Platform) CustomScriptEnv() []string {
 	env := os.Environ()
 	prefix := strings.Join([]string{

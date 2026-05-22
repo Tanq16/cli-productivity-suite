@@ -4,44 +4,20 @@ description: Extra cloud and IaC tooling (uv-managed Python CLIs and OpenTofu)
 tools:
   - name: checkov
     install: |
-      set -eo pipefail
-      export UV_TOOL_DIR="$HOME/shell/uv-tools"
-      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
-      export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
       uv tool install --force checkov
     remove: |
-      set -eo pipefail
-      export UV_TOOL_DIR="$HOME/shell/uv-tools"
-      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
-      export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
       uv tool uninstall checkov
 
   - name: prowler
     install: |
-      set -eo pipefail
-      export UV_TOOL_DIR="$HOME/shell/uv-tools"
-      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
-      export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
       uv tool install --force prowler
     remove: |
-      set -eo pipefail
-      export UV_TOOL_DIR="$HOME/shell/uv-tools"
-      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
-      export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
       uv tool uninstall prowler
 
   - name: oci-cli
     install: |
-      set -eo pipefail
-      export UV_TOOL_DIR="$HOME/shell/uv-tools"
-      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
-      export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
       uv tool install --force oci-cli
     remove: |
-      set -eo pipefail
-      export UV_TOOL_DIR="$HOME/shell/uv-tools"
-      export UV_TOOL_BIN_DIR="$HOME/shell/uv-tool-executables"
-      export UV_PYTHON_INSTALL_DIR="$HOME/shell/uv-python"
       uv tool uninstall oci-cli
 
   - name: tofu

@@ -72,10 +72,11 @@ ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/${
 # Phase 1 — base shell env, neovim/nvchad, tmux/TPM, plugin clones, rc fragments.
 RUN cps init
 
-# Phase 2 — built-in extension packs.
-# Each pack is its own layer so a single-pack regression doesn't force a full
-# rebuild. Sleeps stay under GitHub's unauthenticated REST rate limit (60/hr),
-# which all the GitHubRelease tools hit during install.
+# Use login zsh for all subsequent RUN steps so ~/.zshrc sources the cps rc
+# fragments — env vars (UV_TOOL_DIR, BUN_INSTALL, FNM_DIR, ...) get set the
+# same way an interactive shell would, and cps subprocesses inherit them.
+SHELL ["/usr/bin/zsh", "-l", "-c"]
+
 RUN cps extend essentials && sleep 20
 RUN cps extend core && sleep 20
 RUN cps extend runtimes && sleep 20

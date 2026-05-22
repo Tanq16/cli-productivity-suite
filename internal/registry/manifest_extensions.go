@@ -618,8 +618,15 @@ var extensionPacks = []ExtensionPack{
 				Description: "Node version manager (binary only)",
 			},
 			{
-				Name: "bun", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
-				Description: "JavaScript runtime (installs to $BUN_INSTALL/bin/bun)",
+				Name: "bun", BinaryName: "bun", Kind: GitHubRelease, Category: ExtRuntimes, Extension: true,
+				Repo: "oven-sh/bun", Description: "JavaScript runtime",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "x64", "arm64": "aarch64"},
+					ExcludeSubstrings:   []string{"profile", "baseline", "musl"},
+					ArchiveFormat:       "zip",
+					BinaryPathInArchive: "*/bun",
+				},
 			},
 			{
 				Name: "go-sdk", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
