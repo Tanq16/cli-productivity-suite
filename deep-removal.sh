@@ -16,7 +16,6 @@ echo "  - Neovim caches/state (~/.local/share/nvim, ~/.local/state/nvim, ~/.cach
 echo "  - Legacy pre-v1.3 paths (~/.nvm, ~/google-cloud-sdk, ~/nuclei-templates)"
 echo "  - Legacy runtime caches (~/.local/share/uv, ~/.bun, ~/.npm, go-build cache)"
 echo "  - CPS-deployed configs (.zshrc, .tmux.conf, .aerospace.toml, kitty configs, starship.toml)"
-echo "  - zsh completion cache (~/.cache/zsh)"
 echo "  - Brew packages installed by CPS (neovim, nmap, openssl, ffmpeg, aws-cli,"
 echo "    azure-cli, gcloud-cli cask)"
 echo ""
@@ -65,6 +64,7 @@ rm -rf "$HOME/Library/Caches/go-build"  # macOS: go build cache, before GOCACHE
 echo "==> removing CPS-deployed configs"
 rm -f "$HOME/.tmux.conf"
 rm -f "$HOME/.zshrc"
+rm -f "$HOME/.zprofile"
 rm -f "$HOME/.aerospace.toml"
 rm -f "$HOME/.config/kitty/kitty.conf"
 rm -f "$HOME/.config/kitty/current-theme.conf"
@@ -89,9 +89,6 @@ fi
 
 echo "==> removing legacy Oh My Zsh install (if present from pre-v1.x CPS)"
 rm -rf "$HOME/.oh-my-zsh"
-
-echo "==> removing zsh completion cache"
-rm -rf "$HOME/.cache/zsh"
 
 echo ""
 echo "done."

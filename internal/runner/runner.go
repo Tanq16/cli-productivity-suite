@@ -48,7 +48,6 @@ func Init(ghToken string) {
 		filepath.Join(p.ShellDir(), "plugins"),
 		filepath.Join(p.ShellDir(), "custom-bin"),
 		filepath.Join(p.ConfigDir(), "extensions"),
-		filepath.Join(p.HomeDir, ".cache", "zsh"),
 	} {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			utils.PrintFatal(fmt.Sprintf("failed to create %s", dir), err)
@@ -286,6 +285,7 @@ func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *in
 		{"uv", "uv", p.ShellExtDir(), []string{"generate-shell-completion", "zsh"}, "uv.zsh"},
 		{"fnm", "fnm", p.ShellExtDir(), []string{"completions", "--shell", "zsh"}, "fnm.zsh"},
 		{"zoxide", "zoxide", p.ShellExtDir(), []string{"init", "zsh"}, "zoxide.zsh"},
+		{"starship", "starship", p.ShellExtDir(), []string{"init", "zsh"}, "starship.zsh"},
 	}
 
 	for _, d := range defs {

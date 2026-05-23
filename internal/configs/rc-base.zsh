@@ -13,9 +13,8 @@ SAVEHIST=10000
 setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE SHARE_HISTORY INC_APPEND_HISTORY
 
 # --- Completion ---
-[ -d "$HOME/.cache/zsh" ] || mkdir -p "$HOME/.cache/zsh"
 autoload -Uz compinit
-compinit -d "$HOME/.cache/zsh/zcompdump"
+compinit
 
 # syntax-highlighting must be sourced LAST per upstream README
 [ -f "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && source "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
@@ -25,7 +24,7 @@ compinit -d "$HOME/.cache/zsh/zcompdump"
 export PATH="$HOME/shell/custom-bin:$HOME/shell/extensions:$HOME/shell/executables:$HOME/.local/bin:$PATH"
 
 # --- Starship prompt ---
-command -v starship &>/dev/null && eval "$(starship init zsh)"
+[ -f "$HOME/shell/completions/starship.zsh" ] && source "$HOME/shell/completions/starship.zsh"
 
 # --- FZF ---
 [ -f "$HOME/shell/completions/fzf.zsh" ] && source "$HOME/shell/completions/fzf.zsh"

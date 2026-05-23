@@ -177,3 +177,9 @@ tools:
       go install github.com/praetorian-inc/vespasian/cmd/vespasian@latest
     remove: |
       rm -f "$HOME/shell/go/bin/vespasian"
+
+  - name: praetorian-cli
+    install: |
+      uv tool install --force praetorian-cli
+    remove: |
+      uv tool uninstall praetorian-cli

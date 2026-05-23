@@ -1,3 +1,5 @@
 # CPS managed — sources shell configuration fragments
+[ -n "$_CPS_RC_LOADED" ] && return
+export _CPS_RC_LOADED=1
 for f in "$HOME/shell/rc/"*.zsh(N); do source "$f"; done
 for f in "$HOME/shell/rc/custom/"*.zsh(N); do source "$f"; done
