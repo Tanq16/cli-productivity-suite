@@ -64,15 +64,13 @@ ENV PATH=/home/${USERNAME}/.local/bin:$PATH
 # Linuxbrew. NONINTERACTIVE skips the "press enter to continue" prompt; sudo
 # NOPASSWD lets the install script grab /home/linuxbrew without a TTY.
 RUN NONINTERACTIVE=1 /bin/bash -c \
-      "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
-    && /home/linuxbrew/.linuxbrew/bin/brew --version >/dev/null \
-    && /home/linuxbrew/.linuxbrew/bin/brew shellenv >/dev/null
+      "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Brew on PATH for the remaining RUN steps (cps init/extend invokes brew).
 ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/${USERNAME}/.local/bin:$PATH
 
 # Phase 1 — base shell env, neovim/nvchad, tmux/TPM, plugin clones, rc fragments.
-RUN cps init
+RUN cps init && brew shellenv > /home/${USERNAME}/shell/env/brew.zsh
 
 # Use login zsh for all subsequent RUN steps so ~/.zshrc sources the cps rc
 # fragments — env vars (UV_TOOL_DIR, BUN_INSTALL, FNM_DIR, ...) get set the
