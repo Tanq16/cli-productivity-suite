@@ -249,29 +249,16 @@ func generateShellEnv(p platform.Platform, errors *[]jobResult, lineCount *int) 
 
 	utils.PrintIndentedRunning("shell-env: brew")
 	*lineCount++
-	runShellenv := func() ([]byte, error) {
-		cmd := exec.Command(brewBin, "shellenv")
-		var stderr strings.Builder
-		cmd.Stderr = &stderr
-		out, err := cmd.Output()
-		if err != nil {
-			if detail := strings.TrimSpace(stderr.String()); detail != "" {
-				err = fmt.Errorf("%s: %w", detail, err)
-			}
-		}
-		return out, err
-	}
-	out, err := runShellenv()
+	cmd := exec.Command(brewBin, "shellenv")
+	var stderr strings.Builder
+	cmd.Stderr = &stderr
+	out, err := cmd.Output()
 	if err != nil {
+		if detail := strings.TrimSpace(stderr.String()); detail != "" {
+			err = fmt.Errorf("%s: %w", detail, err)
+		}
 		*errors = append(*errors, jobResult{name: "shell-env-brew", err: err})
 		return
-	}
-	if len(strings.TrimSpace(string(out))) == 0 {
-		out, err = runShellenv()
-		if err != nil {
-			*errors = append(*errors, jobResult{name: "shell-env-brew", err: err})
-			return
-		}
 	}
 	if err := os.WriteFile(filepath.Join(envDir, "brew.zsh"), out, 0644); err != nil {
 		*errors = append(*errors, jobResult{name: "shell-env-brew", err: err})

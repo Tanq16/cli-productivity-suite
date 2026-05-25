@@ -64,7 +64,9 @@ ENV PATH=/home/${USERNAME}/.local/bin:$PATH
 # Linuxbrew. NONINTERACTIVE skips the "press enter to continue" prompt; sudo
 # NOPASSWD lets the install script grab /home/linuxbrew without a TTY.
 RUN NONINTERACTIVE=1 /bin/bash -c \
-      "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
+    && /home/linuxbrew/.linuxbrew/bin/brew --version >/dev/null \
+    && /home/linuxbrew/.linuxbrew/bin/brew shellenv >/dev/null
 
 # Brew on PATH for the remaining RUN steps (cps init/extend invokes brew).
 ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/${USERNAME}/.local/bin:$PATH
