@@ -250,6 +250,16 @@ func generateShellEnv(p platform.Platform, errors *[]jobResult, lineCount *int) 
 	utils.PrintIndentedRunning("shell-env: brew")
 	*lineCount++
 	cmd := exec.Command(brewBin, "shellenv")
+	// brew shellenv returns empty if its own bin is at the front of PATH —
+	// prepend $HOME so the subprocess sees a non-brew-prefixed PATH.
+	env := os.Environ()
+	for i, kv := range env {
+		if strings.HasPrefix(kv, "PATH=") {
+			env[i] = "PATH=" + p.HomeDir + ":" + kv[len("PATH="):]
+			break
+		}
+	}
+	cmd.Env = env
 	var stderr strings.Builder
 	cmd.Stderr = &stderr
 	out, err := cmd.Output()
