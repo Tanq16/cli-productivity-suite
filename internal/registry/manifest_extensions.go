@@ -206,11 +206,11 @@ var extensionPacks = []ExtensionPack{
 				Name: "dalfox", BinaryName: "dalfox", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
 				Repo: "hahwul/dalfox", Description: "XSS scanner",
 				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"windows", ".zip"},
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
+					ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "aarch64"},
+					ExcludeSubstrings:   []string{"windows", ".zip", ".sha256", "checksum", ".xml"},
 					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "dalfox*",
+					BinaryPathInArchive: "*/dalfox",
 				},
 			},
 			{

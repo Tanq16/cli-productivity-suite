@@ -80,7 +80,7 @@ RUN cps extend praetorian && sleep 20
 # Truly-private tools (toon, nblm, cybernest, lincli) need --gh-token; skipped here.
 RUN cps extend private nits raikiri gcli box claudex
 
-RUN rm -rf \
+RUN sudo rm -rf \
       "$HOME/.cache/Homebrew" \
       "$HOME/.cache/uv" \
       "$HOME/.cache/npm" \
