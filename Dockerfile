@@ -57,35 +57,54 @@ RUN NONINTERACTIVE=1 /bin/bash -c \
 
 ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/${USERNAME}/.local/bin:$PATH
 
-RUN cps init
+# Per-RUN cleanup keeps caches from being baked into the layer (Docker layers can't truly delete).
+RUN cps init \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache
 
 # Login zsh so ~/.zprofile sources cps rc fragments → env vars available to cps subprocesses.
 SHELL ["/usr/bin/zsh", "-l", "-c"]
 
-RUN cps extend essentials && sleep 20
-RUN cps extend core && sleep 20
-RUN cps extend runtimes && sleep 20
-RUN cps extend cloud && sleep 20
-RUN cps extend security && sleep 20
-RUN cps extend cloudsec && sleep 20
-RUN cps extend appsec && sleep 20
-RUN cps extend misc && sleep 20
+RUN cps extend essentials \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
+ && sleep 20
+RUN cps extend core \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
+ && sleep 20
+RUN cps extend runtimes \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
+ && sleep 20
+RUN cps extend cloud \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
+ && sleep 20
+RUN cps extend security \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
+ && sleep 20
+RUN cps extend cloudsec \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
+ && sleep 20
+RUN cps extend appsec \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
+ && sleep 20
+RUN cps extend misc \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
+ && sleep 20
 
 RUN cps download-known-extensions && sleep 20
-RUN cps extend ai-tools && sleep 20
-RUN cps extend additional-cloud-tools && sleep 20
-RUN cps extend database && sleep 20
-RUN cps extend praetorian && sleep 20
+RUN cps extend ai-tools \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
+ && sleep 20
+RUN cps extend additional-cloud-tools \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
+ && sleep 20
+RUN cps extend database \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
+ && sleep 20
+RUN cps extend praetorian \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
+ && sleep 20
 
 # Truly-private tools (toon, nblm, cybernest, lincli) need --gh-token; skipped here.
-RUN cps extend private nits raikiri gcli box claudex
-
-RUN sudo rm -rf \
-      "$HOME/.cache/Homebrew" \
-      "$HOME/.cache/uv" \
-      "$HOME/.cache/npm" \
-      "$HOME/.cache/go-build" \
-      "$HOME/shell/npm-cache" \
-      "$HOME/shell/go/cache"
+RUN cps extend private nits raikiri gcli box claudex \
+ && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache
 
 CMD ["sleep", "infinity"]
