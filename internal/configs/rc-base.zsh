@@ -11,6 +11,7 @@ HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000
 SAVEHIST=10000
 setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE SHARE_HISTORY INC_APPEND_HISTORY
+setopt INTERACTIVE_COMMENTS
 
 # --- Completion ---
 # zsh/complist must load before compinit to register the menu-select widget
@@ -18,6 +19,24 @@ zmodload zsh/complist
 autoload -Uz compinit
 compinit
 zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+# --- Keybindings ---
+# Ctrl+Left/Right and Option+Left/Right jump one word; pairs with
+# zsh-autosuggestions' ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS so
+# forward-word accepts one word of the suggestion at a time.
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;3C' forward-word
+bindkey '^[[1;3D' backward-word
+
+# Up/Down arrow walks history filtered by what's already typed
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search
 
 # syntax-highlighting must be sourced LAST per upstream README
 [ -f "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && source "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
@@ -46,6 +65,7 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # --- Environment ---
 setopt AUTO_CD
+setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
 export BAT_PAGER=''
 export HISTCONTROL=ignoreboth
 export LESS_TERMCAP_mb=$'\e[1;32m'
