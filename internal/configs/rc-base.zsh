@@ -13,8 +13,11 @@ SAVEHIST=10000
 setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE SHARE_HISTORY INC_APPEND_HISTORY
 
 # --- Completion ---
+# zsh/complist must load before compinit to register the menu-select widget
+zmodload zsh/complist
 autoload -Uz compinit
 compinit
+zstyle ':completion:*' menu select
 
 # syntax-highlighting must be sourced LAST per upstream README
 [ -f "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && source "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
@@ -42,6 +45,7 @@ export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude node_m
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # --- Environment ---
+setopt AUTO_CD
 export BAT_PAGER=''
 export HISTCONTROL=ignoreboth
 export LESS_TERMCAP_mb=$'\e[1;32m'
