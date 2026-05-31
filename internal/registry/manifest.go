@@ -1,7 +1,6 @@
 package registry
 
 var AllTools = []Tool{
-	// ========== System Packages (base) ==========
 	{
 		Name: "core-utils", Kind: SystemPackage, Category: System,
 		Description: "Core system utilities",
@@ -13,14 +12,12 @@ var AllTools = []Tool{
 		BrewPkgs:    []string{"tmux", "htop"},
 	},
 
-	// ========== Neovim (via brew) ==========
 	{
 		Name: "neovim", Kind: SystemPackage, Category: System,
 		Description: "Neovim text editor (0.11+ for NvChad)",
 		BrewPkgs:    []string{"neovim"},
 	},
 
-	// ========== Config Files ==========
 	{
 		Name: "tmux-config", Kind: ConfigFile, Category: Config,
 		Description: "Tmux configuration",
@@ -43,7 +40,6 @@ var AllTools = []Tool{
 		Description: "Zsh RC file (complete .zshrc)",
 	},
 
-	// ========== Shell Plugins ==========
 	{
 		Name: "zsh-autosuggestions", Kind: ShellPlugin, Category: Shell,
 		Description: "ZSH autosuggestions plugin",

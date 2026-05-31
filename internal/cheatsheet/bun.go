@@ -10,7 +10,6 @@ func buildBunSheet() string {
 	b.WriteString(noteStyle.Render("  CPS paths: BUN_INSTALL=~/shell/bun  (binary + global packages)") + "\n")
 	b.WriteString(noteStyle.Render("  Bun is a runtime + package manager + bundler + test runner") + "\n\n")
 
-	// --- Package Management ---
 	b.WriteString(headingStyle.Render("Package Management") + "\n")
 	b.WriteString(cmdStyle.Render("  bun init") + "                        Scaffold a new project (package.json + tsconfig)\n")
 	b.WriteString(cmdStyle.Render("  bun install") + "                     Install project dependencies (uses bun.lockb)\n")
@@ -24,7 +23,6 @@ func buildBunSheet() string {
 	b.WriteString(cmdStyle.Render("  bun pm cache rm") + "                 Clear the global module cache\n")
 	b.WriteString(divider + "\n")
 
-	// --- Running Scripts & Files ---
 	b.WriteString(headingStyle.Render("Running Scripts & Files") + "\n")
 	b.WriteString(cmdStyle.Render("  bun run <script>") + "                Run a package.json script\n")
 	b.WriteString(cmdStyle.Render("  bun <file.ts>") + "                   Execute a TS/JS file directly (no compile step)\n")
@@ -34,7 +32,6 @@ func buildBunSheet() string {
 	b.WriteString(cmdStyle.Render("  bunx <pkg>") + "                      Alias for 'bun x'\n")
 	b.WriteString(divider + "\n")
 
-	// --- Test Runner ---
 	b.WriteString(headingStyle.Render("Test Runner (Jest-compatible API)") + "\n")
 	b.WriteString(cmdStyle.Render("  bun test") + "                        Run all tests (*.test.ts, *.spec.ts, etc.)\n")
 	b.WriteString(cmdStyle.Render("  bun test <pattern>") + "              Filter by file pattern\n")
@@ -43,7 +40,6 @@ func buildBunSheet() string {
 	b.WriteString(cmdStyle.Render("  bun test -t \"<name>\"") + "            Only run tests whose name matches\n")
 	b.WriteString(divider + "\n")
 
-	// --- Bundler ---
 	b.WriteString(headingStyle.Render("Bundler") + "\n")
 	b.WriteString(cmdStyle.Render("  bun build <entry>") + "               Bundle to stdout\n")
 	b.WriteString(cmdStyle.Render("  bun build <entry> --outdir <dir>") + " Bundle to a directory\n")
@@ -52,14 +48,12 @@ func buildBunSheet() string {
 	b.WriteString(cmdStyle.Render("  bun build --compile <entry>") + "     Produce a standalone executable\n")
 	b.WriteString(divider + "\n")
 
-	// --- Misc ---
 	b.WriteString(headingStyle.Render("Misc") + "\n")
 	b.WriteString(cmdStyle.Render("  bun upgrade") + "                     Update bun itself to the latest release\n")
 	b.WriteString(cmdStyle.Render("  bun --version") + "                   Show installed bun version\n")
 	b.WriteString(cmdStyle.Render("  bun repl") + "                        Start an interactive REPL\n")
 	b.WriteString(divider + "\n")
 
-	// --- Key Concepts ---
 	b.WriteString(headingStyle.Render("Key Concepts") + "\n")
 	b.WriteString("  • " + cmdStyle.Render("bun") + " runs .ts/.tsx/.jsx natively — no tsc/ts-node needed\n")
 	b.WriteString("  • " + cmdStyle.Render("bun install") + " is a drop-in for npm/yarn/pnpm; reads package.json, writes bun.lockb\n")

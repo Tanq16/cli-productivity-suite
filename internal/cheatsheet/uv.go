@@ -20,13 +20,11 @@ func buildUVSheet() string {
 
 	b.WriteString(titleStyle.Render("UV Cheat Sheet") + "\n")
 
-	// --- Python Version Management ---
 	b.WriteString(headingStyle.Render("Python Version Management") + "\n")
 	b.WriteString(cmdStyle.Render("  uv python install 3.13") + "          Install a Python version\n")
 	b.WriteString(cmdStyle.Render("  uv python list [--only-installed]") + "  List available/installed versions\n")
 	b.WriteString(divider + "\n")
 
-	// --- Global (Default) Venv ---
 	b.WriteString(headingStyle.Render("Global (Default) Venv — ~/shell/py-default") + "\n")
 	b.WriteString(noteStyle.Render("  CPS sets VIRTUAL_ENV=$HOME/shell/py-default in .zshrc") + "\n")
 	b.WriteString(noteStyle.Render("  Commands below use this venv when not inside a project.") + "\n\n")
@@ -36,7 +34,6 @@ func buildUVSheet() string {
 	b.WriteString(noteStyle.Render("  Also: uv pip show, freeze, uninstall") + "\n")
 	b.WriteString(divider + "\n")
 
-	// --- Project Venvs ---
 	b.WriteString(headingStyle.Render("Project Venvs — Local .venv + pyproject.toml") + "\n")
 	b.WriteString(noteStyle.Render("  uv project commands auto-discover pyproject.toml in cwd.") + "\n")
 	b.WriteString(noteStyle.Render("  They create/use .venv/ in the project dir, NOT py-default.") + "\n")
@@ -48,7 +45,6 @@ func buildUVSheet() string {
 	b.WriteString(cmdStyle.Render("  uv run <cmd>") + "                    Run command in project venv\n")
 	b.WriteString(divider + "\n")
 
-	// --- Tool Install ---
 	b.WriteString(headingStyle.Render("Tool Install — Isolated CLI Tools") + "\n")
 	b.WriteString(noteStyle.Render("  Each tool gets its own isolated venv (~/shell/uv-tools/<name>/).") + "\n")
 	b.WriteString(noteStyle.Render("  CLI entry points are symlinked to ~/shell/uv-tool-executables/.") + "\n")
@@ -61,13 +57,11 @@ func buildUVSheet() string {
 	b.WriteString(cmdStyle.Render("  uv tool list") + "                    List installed tools\n")
 	b.WriteString(divider + "\n")
 
-	// --- One-Off Script Runs ---
 	b.WriteString(headingStyle.Render("One-Off Execution") + "\n")
 	b.WriteString(cmdStyle.Render("  uv run --with <pkg> script.py") + "   Run script with temp dependency\n")
 	b.WriteString(cmdStyle.Render("  uvx <pkg>") + "                       Run a CLI tool without installing\n")
 	b.WriteString(divider + "\n")
 
-	// --- Key Concepts ---
 	b.WriteString(headingStyle.Render("Key Concepts") + "\n")
 	b.WriteString("  • " + cmdStyle.Render("VIRTUAL_ENV") + " env var  →  controls where bare " + cmdStyle.Render("python/pip") + " resolve\n")
 	b.WriteString("  • " + cmdStyle.Render("uv pip ...") + "           →  respects VIRTUAL_ENV (uses py-default)\n")

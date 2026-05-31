@@ -9,9 +9,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// RunCmd executes a command with captured stdout/stderr.
-// On success, output is discarded (logged in debug mode).
-// On error, captured stderr is included in the returned error.
 func RunCmd(cmd *exec.Cmd) error {
 	var buf bytes.Buffer
 	cmd.Stdout = &buf

@@ -30,7 +30,6 @@ func Init(ghToken string) {
 	gh := github.NewClient(ghToken)
 	reg := registry.New()
 
-	// Phase 1: Prerequisites
 	utils.PrintRunning("(Running) Phase 1: Checking prerequisites")
 	if _, err := exec.LookPath("git"); err != nil {
 		utils.PrintFatal("git not found in PATH", err)
@@ -60,25 +59,21 @@ func Init(ghToken string) {
 
 	sysPkgs := filterBaseTools(filterPlatformTools(reg.ByKind(registry.SystemPackage), p))
 
-	// Phase 2: System packages
 	if runPhase("Phase 2: System packages", sysPkgs, p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	// Phase 3: Shell plugins (base only, exclude extension tools)
 	if runPhase("Phase 3: Shell plugins", filterBaseTools(reg.ByKind(registry.ShellPlugin)), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	// Phase 4: Config files
 	if runPhase("Phase 4: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	// Phase 5: Post-install tasks
 	runPostInstall(p)
 
 	st.LastInit = time.Now()
@@ -322,8 +317,6 @@ func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *in
 	}
 }
 
-// --- Helpers ---
-
 func toolForPlatform(tool registry.Tool, p platform.Platform) bool {
 	if len(tool.Platforms) == 0 {
 		return true
@@ -355,4 +348,3 @@ func filterBaseTools(tools []registry.Tool) []registry.Tool {
 	}
 	return result
 }
-

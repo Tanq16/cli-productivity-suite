@@ -8,7 +8,6 @@ func buildRegexSheet() string {
 
 	b.WriteString(titleStyle.Render("String Processing Cheat Sheet — grep, ripgrep, awk") + "\n")
 
-	// --- Ripgrep ---
 	b.WriteString(headingStyle.Render("Ripgrep (rg)") + "\n")
 	b.WriteString(cmdStyle.Render("  rg <pattern>") + "                    Search recursively\n")
 	b.WriteString(cmdStyle.Render("  rg -i <pattern>") + "                 Case insensitive\n")
@@ -29,7 +28,6 @@ func buildRegexSheet() string {
 	b.WriteString(cmdStyle.Render("  rg --files") + "                      List files rg would search\n")
 	b.WriteString(divider + "\n")
 
-	// --- Grep ---
 	b.WriteString(headingStyle.Render("Grep — When rg Isn't Available") + "\n")
 	b.WriteString(noteStyle.Render("  rg replaces grep for daily use. Grep for remote boxes or PCRE.") + "\n\n")
 	b.WriteString(cmdStyle.Render("  grep -P <pattern> <file>") + "        Perl regex (backrefs \\1, lookbehind)\n")
@@ -37,7 +35,6 @@ func buildRegexSheet() string {
 	b.WriteString(cmdStyle.Render("  <cmd> | grep <pattern>") + "          Stdin filtering in pipes\n")
 	b.WriteString(divider + "\n")
 
-	// --- Regex Syntax ---
 	b.WriteString(headingStyle.Render("Regex Quick Reference") + "\n")
 	b.WriteString(cmdStyle.Render("  .") + "    Any char        " + cmdStyle.Render("*") + "    Zero or more    " + cmdStyle.Render("+") + "    One or more\n")
 	b.WriteString(cmdStyle.Render("  ?") + "    Zero or one     " + cmdStyle.Render("^") + "    Start of line   " + cmdStyle.Render("$") + "    End of line\n")
@@ -47,7 +44,6 @@ func buildRegexSheet() string {
 	b.WriteString(cmdStyle.Render("  (a|b)") + " Alternation     " + cmdStyle.Render("(?:)") + "  Non-capturing   " + cmdStyle.Render("(?=)") + "  Lookahead\n")
 	b.WriteString(divider + "\n")
 
-	// --- Awk ---
 	b.WriteString(headingStyle.Render("Awk") + "\n")
 	b.WriteString(noteStyle.Render("  awk '<pattern> { <action> }' — runs action on matching lines") + "\n\n")
 	b.WriteString(cmdStyle.Render("  awk '{print}' file") + "              Print all lines\n")
@@ -65,7 +61,6 @@ func buildRegexSheet() string {
 	b.WriteString(cmdStyle.Render("  awk '{gsub(/old/,\"new\"); print}'") + "  Find and replace\n")
 	b.WriteString(divider + "\n")
 
-	// --- Awk Variables ---
 	b.WriteString(headingStyle.Render("Awk Built-in Variables") + "\n")
 	b.WriteString(cmdStyle.Render("  $0") + "        Entire line             ")
 	b.WriteString(cmdStyle.Render("  $1..$n") + "    Field n\n")

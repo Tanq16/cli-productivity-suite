@@ -10,7 +10,6 @@ func buildTmuxSheet() string {
 	b.WriteString(noteStyle.Render("  CPS config: mouse on, emacs copy-mode, catppuccin theme, status top") + "\n")
 	b.WriteString(noteStyle.Render("  Windows/panes start at 1, auto-rename on, history 99999 lines") + "\n\n")
 
-	// --- Shell Aliases ---
 	b.WriteString(headingStyle.Render("Shell Aliases") + "\n")
 	b.WriteString(cmdStyle.Render("  tt") + "                              New session named \"default\"\n")
 	b.WriteString(cmdStyle.Render("  t") + "                               Attach to \"default\" session\n")
@@ -19,7 +18,6 @@ func buildTmuxSheet() string {
 	b.WriteString(cmdStyle.Render("  tls") + "                             List sessions\n")
 	b.WriteString(divider + "\n")
 
-	// --- Custom Keybindings (no prefix) ---
 	b.WriteString(headingStyle.Render("Window & Pane Navigation (No Prefix)") + "\n")
 	b.WriteString(cmdStyle.Render("  Alt+=") + "                           Next window\n")
 	b.WriteString(cmdStyle.Render("  Alt+-") + "                           Previous window\n")
@@ -29,7 +27,6 @@ func buildTmuxSheet() string {
 	b.WriteString(cmdStyle.Render("  Alt+v") + "                           Paste buffer\n")
 	b.WriteString(divider + "\n")
 
-	// --- Copy Mode (emacs) ---
 	b.WriteString(headingStyle.Render("Copy Mode (Emacs) — Mouse & Keyboard") + "\n")
 	b.WriteString(noteStyle.Render("  Scroll up with mouse to enter copy mode automatically.") + "\n")
 	b.WriteString(noteStyle.Render("  Mouse drag selects text, releasing auto-copies it.") + "\n\n")
@@ -54,7 +51,6 @@ func buildTmuxSheet() string {
 	b.WriteString(noteStyle.Render("  4. Alt+w to copy the selection") + "\n")
 	b.WriteString(divider + "\n")
 
-	// --- Prefix Commands ---
 	b.WriteString(headingStyle.Render("Prefix Commands (C-b)") + "\n")
 	b.WriteString(noteStyle.Render("  Rarely needed — most ops have direct bindings above.") + "\n\n")
 	b.WriteString(cmdStyle.Render("  C-b c") + "                           Create new window\n")

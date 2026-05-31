@@ -10,14 +10,12 @@ func buildCPSSheet() string {
 	b.WriteString(noteStyle.Render("  Tools: ~/shell/executables/      Extensions: ~/shell/extensions/") + "\n")
 	b.WriteString(noteStyle.Render("  RC fragments: ~/shell/rc/        User binaries: ~/shell/custom-bin/") + "\n\n")
 
-	// --- Core Commands ---
 	b.WriteString(headingStyle.Render("Core Commands") + "\n")
 	b.WriteString(cmdStyle.Render("  cps init") + "                        Base shell environment setup\n")
 	b.WriteString(cmdStyle.Render("  cps self-update") + "                 Update cps binary itself\n")
 	b.WriteString(cmdStyle.Render("  cps download-known-extensions") + "   Fetch reference custom-extension YAMLs from the repo\n")
 	b.WriteString(divider + "\n")
 
-	// --- Extend ---
 	b.WriteString(headingStyle.Render("Extend — Extension Packs") + "\n")
 	b.WriteString(cmdStyle.Render("  cps extend list") + "                 List available packs\n")
 	b.WriteString(cmdStyle.Render("  cps extend <pack>") + "               Install entire extension pack\n")
@@ -25,7 +23,6 @@ func buildCPSSheet() string {
 	b.WriteString(noteStyle.Render("  Packs: essentials, core, cloud, runtimes, security, cloudsec, appsec, misc, private") + "\n")
 	b.WriteString(divider + "\n")
 
-	// --- RC Fragments ---
 	b.WriteString(headingStyle.Render("Shell Integration — RC Fragments") + "\n")
 	b.WriteString(noteStyle.Render("  ~/.zshrc sources ~/shell/rc/*.zsh and ~/shell/rc/custom/*.zsh") + "\n")
 	b.WriteString(noteStyle.Render("  00-base.zsh        deployed by cps init") + "\n")
@@ -35,14 +32,12 @@ func buildCPSSheet() string {
 	b.WriteString(noteStyle.Render("  custom/*.zsh       user-managed fragments") + "\n")
 	b.WriteString(divider + "\n")
 
-	// --- User Customization ---
 	b.WriteString(headingStyle.Render("Adding Your Own Stuff (no extension pack needed)") + "\n")
 	b.WriteString(noteStyle.Render("  Aliases / exports / funcs   →  drop a *.zsh file in ~/shell/rc/custom/") + "\n")
 	b.WriteString(noteStyle.Render("  Your own binaries           →  drop them in ~/shell/custom-bin/ (on PATH)") + "\n")
 	b.WriteString(noteStyle.Render("  Reusable install bundles    →  add a YAML to ~/.config/cps/extensions/") + "\n")
 	b.WriteString(divider + "\n")
 
-	// --- Other ---
 	b.WriteString(headingStyle.Render("Other") + "\n")
 	b.WriteString(cmdStyle.Render("  cps cheat <topic>") + "               Cheat sheets (go, java, uv, fnm, bun, rust, tmux, nvim, fzf, jq, regex)\n")
 	b.WriteString(cmdStyle.Render("  --gh-token <token>") + "              GitHub PAT for private repos\n")

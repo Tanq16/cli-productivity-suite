@@ -10,7 +10,6 @@ func buildJavaSheet() string {
 	b.WriteString(noteStyle.Render("  CPS paths: JAVA_HOME=~/shell/java-sdk  (Eclipse Temurin LTS)") + "\n")
 	b.WriteString(noteStyle.Render("  $JAVA_HOME/bin is on PATH — java, javac, jar, jshell, jlink, etc.") + "\n\n")
 
-	// --- Compile & Run ---
 	b.WriteString(headingStyle.Render("Compile & Run") + "\n")
 	b.WriteString(cmdStyle.Render("  javac Foo.java") + "                  Compile to Foo.class\n")
 	b.WriteString(cmdStyle.Render("  java Foo") + "                        Run class (no .class suffix)\n")
@@ -19,7 +18,6 @@ func buildJavaSheet() string {
 	b.WriteString(cmdStyle.Render("  java -cp lib/*:. Foo") + "            Run with classpath\n")
 	b.WriteString(divider + "\n")
 
-	// --- REPL & Scripting ---
 	b.WriteString(headingStyle.Render("REPL & Scripting") + "\n")
 	b.WriteString(cmdStyle.Render("  jshell") + "                          Interactive Java REPL\n")
 	b.WriteString(cmdStyle.Render("  jshell script.jsh") + "               Run a jshell script\n")
@@ -27,7 +25,6 @@ func buildJavaSheet() string {
 	b.WriteString(cmdStyle.Render("  /exit") + "                           Leave jshell\n")
 	b.WriteString(divider + "\n")
 
-	// --- Packaging ---
 	b.WriteString(headingStyle.Render("Packaging") + "\n")
 	b.WriteString(cmdStyle.Render("  jar cf app.jar -C classes/ .") + "    Create JAR from classes/\n")
 	b.WriteString(cmdStyle.Render("  jar cfe app.jar Main -C classes/ .") + "  Create + set Main-Class\n")
@@ -37,7 +34,6 @@ func buildJavaSheet() string {
 	b.WriteString(noteStyle.Render("    jlink builds a minimal custom JRE image") + "\n")
 	b.WriteString(divider + "\n")
 
-	// --- Inspection & Diagnostics ---
 	b.WriteString(headingStyle.Render("Inspection & Diagnostics") + "\n")
 	b.WriteString(cmdStyle.Render("  javap -p -c Foo.class") + "           Disassemble bytecode\n")
 	b.WriteString(cmdStyle.Render("  jdeps app.jar") + "                   Show class dependencies\n")
@@ -47,7 +43,6 @@ func buildJavaSheet() string {
 	b.WriteString(cmdStyle.Render("  jcmd <pid> GC.heap_dump dump.hprof") + "  Heap dump for analysis\n")
 	b.WriteString(divider + "\n")
 
-	// --- JVM Flags ---
 	b.WriteString(headingStyle.Render("Common JVM Flags") + "\n")
 	b.WriteString(cmdStyle.Render("  -Xms512m -Xmx2g") + "                 Initial / max heap\n")
 	b.WriteString(cmdStyle.Render("  -XX:+UseZGC") + "                     Use ZGC (low-pause)\n")
@@ -56,7 +51,6 @@ func buildJavaSheet() string {
 	b.WriteString(cmdStyle.Render("  -ea") + "                             Enable assertions\n")
 	b.WriteString(divider + "\n")
 
-	// --- Build Tools ---
 	b.WriteString(headingStyle.Render("Build Tools (install separately)") + "\n")
 	b.WriteString(cmdStyle.Render("  brew install maven") + "              Maven (pom.xml)\n")
 	b.WriteString(cmdStyle.Render("  brew install gradle") + "             Gradle (build.gradle[.kts])\n")

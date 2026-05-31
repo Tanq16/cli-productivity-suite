@@ -1,6 +1,5 @@
 package registry
 
-// ExtensionPack defines a named collection of extension tools.
 type ExtensionPack struct {
 	Name        string
 	Description string
@@ -130,7 +129,7 @@ var extensionPacks = []ExtensionPack{
 			{
 				Name: "terraform", BinaryName: "terraform", Kind: DirectDownload, Category: ExtCloudSec, Extension: true,
 				Repo: "hashicorp/terraform", Description: "Infrastructure as code",
-				URL:  "https://releases.hashicorp.com/terraform/{version_bare}/terraform_{version_bare}_{os}_{arch}.zip",
+				URL: "https://releases.hashicorp.com/terraform/{version_bare}/terraform_{version_bare}_{os}_{arch}.zip",
 				Asset: AssetPattern{
 					ArchiveFormat:       "zip",
 					BinaryPathInArchive: "terraform",
@@ -387,7 +386,6 @@ var extensionPacks = []ExtensionPack{
 			},
 		},
 	},
-	// ========== Essentials (CLI binaries + prompt config) ==========
 	{
 		Name:        "essentials",
 		Description: "Core CLI binaries and starship prompt config",
@@ -552,7 +550,6 @@ var extensionPacks = []ExtensionPack{
 			},
 		},
 	},
-	// ========== Infrastructure Extension Packs ==========
 	{
 		Name:        "core",
 		Description: "Dev tools, network utils, and media packages",
@@ -654,12 +651,10 @@ var extensionPacks = []ExtensionPack{
 
 var customPacks []ExtensionPack
 
-// LoadCustomPacks registers dynamically loaded custom extension packs.
 func LoadCustomPacks(packs []ExtensionPack) {
 	customPacks = packs
 }
 
-// BuiltinPackNames returns the set of built-in extension pack names.
 func BuiltinPackNames() map[string]bool {
 	names := make(map[string]bool, len(extensionPacks))
 	for _, p := range extensionPacks {
@@ -668,12 +663,10 @@ func BuiltinPackNames() map[string]bool {
 	return names
 }
 
-// AllExtensionPacks returns built-in and custom extension packs.
 func AllExtensionPacks() []ExtensionPack {
 	return append(extensionPacks, customPacks...)
 }
 
-// ExtensionPackByName returns the pack with the given name, or nil.
 func ExtensionPackByName(name string) *ExtensionPack {
 	for i := range extensionPacks {
 		if extensionPacks[i].Name == name {
@@ -688,7 +681,6 @@ func ExtensionPackByName(name string) *ExtensionPack {
 	return nil
 }
 
-// AllExtensionTools returns every tool across all extension packs.
 func AllExtensionTools() []Tool {
 	var all []Tool
 	for _, pack := range AllExtensionPacks() {

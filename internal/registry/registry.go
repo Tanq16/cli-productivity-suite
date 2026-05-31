@@ -1,8 +1,8 @@
 package registry
 
 type Registry struct {
-	tools   []Tool
-	byName  map[string]*Tool
+	tools  []Tool
+	byName map[string]*Tool
 }
 
 func New() *Registry {

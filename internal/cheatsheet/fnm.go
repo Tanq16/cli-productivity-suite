@@ -10,7 +10,6 @@ func buildFnmSheet() string {
 	b.WriteString(noteStyle.Render("  CPS paths: FNM_DIR=~/shell/fnm") + "\n")
 	b.WriteString(noteStyle.Render("  Node versions and global packages live under FNM_DIR") + "\n\n")
 
-	// --- Version Management ---
 	b.WriteString(headingStyle.Render("Version Management") + "\n")
 	b.WriteString(cmdStyle.Render("  fnm install --lts") + "               Install latest LTS version\n")
 	b.WriteString(cmdStyle.Render("  fnm install <version>") + "           Install a specific version\n")
@@ -22,7 +21,6 @@ func buildFnmSheet() string {
 	b.WriteString(cmdStyle.Render("  fnm uninstall <version>") + "         Remove a version\n")
 	b.WriteString(divider + "\n")
 
-	// --- Per-Project Versions ---
 	b.WriteString(headingStyle.Render("Per-Project Versions") + "\n")
 	b.WriteString(noteStyle.Render("  fnm auto-detects .node-version or .nvmrc in the project dir.") + "\n")
 	b.WriteString(noteStyle.Render("  eval \"$(fnm env)\" in .zshrc enables auto-switching.") + "\n\n")
@@ -30,7 +28,6 @@ func buildFnmSheet() string {
 	b.WriteString(cmdStyle.Render("  fnm use") + "                         Switch to project's pinned version\n")
 	b.WriteString(divider + "\n")
 
-	// --- npm Basics ---
 	b.WriteString(headingStyle.Render("npm — Package Management") + "\n")
 	b.WriteString(cmdStyle.Render("  npm init -y") + "                     Create package.json\n")
 	b.WriteString(cmdStyle.Render("  npm install") + "                     Install project dependencies\n")
@@ -41,13 +38,11 @@ func buildFnmSheet() string {
 	b.WriteString(cmdStyle.Render("  npm update") + "                      Update project dependencies\n")
 	b.WriteString(divider + "\n")
 
-	// --- npx ---
 	b.WriteString(headingStyle.Render("npx — Run Without Installing") + "\n")
 	b.WriteString(cmdStyle.Render("  npx <pkg>") + "                       Run a package directly\n")
 	b.WriteString(cmdStyle.Render("  npx <pkg>@<version>") + "             Run a specific version\n")
 	b.WriteString(divider + "\n")
 
-	// --- Key Concepts ---
 	b.WriteString(headingStyle.Render("Key Concepts") + "\n")
 	b.WriteString("  • " + cmdStyle.Render("fnm") + " manages Node versions — each version is isolated under FNM_DIR\n")
 	b.WriteString("  • " + cmdStyle.Render("npm install -g") + "  →  global packages are per-Node-version\n")
