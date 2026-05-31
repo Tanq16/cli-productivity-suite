@@ -25,9 +25,6 @@ arch=$(uname -m)
 [ "$(id -u)" = "1000" ] || fail "uid: expected 1000, got $(id -u)"
 sudo -n true 2>/dev/null || fail "sudo: NOPASSWD not configured"
 
-# --- rc loading (set by .zprofile/.zshrc loader) ---
-[ -n "$_CPS_RC_LOADED" ] || fail "_CPS_RC_LOADED unset — rc fragments did not load (run \`zsh -l\`)"
-
 # --- directories ---
 for d in \
     shell/executables shell/extensions shell/custom-bin shell/plugins \

@@ -61,7 +61,15 @@ ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/${
 RUN cps init \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache
 
-# Login zsh so ~/.zprofile sources cps rc fragments → env vars available to cps subprocesses.
+# Bake .zprofile so subsequent `zsh -l -c` RUN steps source cps rc fragments.
+# Early-returns for interactive logins so `docker exec -it ... zsh -l` doesn't double-source
+# (.zshrc handles interactive shells). Not deployed on hosts — purely a Docker build helper.
+RUN cat > ~/.zprofile <<'EOF'
+[[ -o interactive ]] && return
+for f in "$HOME/shell/rc/"*.zsh(N); do source "$f"; done
+for f in "$HOME/shell/rc/custom/"*.zsh(N); do source "$f"; done
+EOF
+
 SHELL ["/usr/bin/zsh", "-l", "-c"]
 
 RUN cps extend essentials \

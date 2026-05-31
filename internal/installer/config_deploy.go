@@ -80,10 +80,6 @@ func (c *ConfigDeployInstaller) Install(tool *registry.Tool, p platform.Platform
 	}
 
 	if tool.Name == "rcfile" {
-		zprofilePath := filepath.Join(p.HomeDir, ".zprofile")
-		if err := os.WriteFile(zprofilePath, content, 0644); err != nil {
-			return Result{Tool: tool.Name, Err: fmt.Errorf("write .zprofile: %w", err)}
-		}
 		baseFragPath := filepath.Join(p.ShellDir(), "rc", "00-base.zsh")
 		if err := os.MkdirAll(filepath.Dir(baseFragPath), 0755); err != nil {
 			return Result{Tool: tool.Name, Err: fmt.Errorf("create rc dir: %w", err)}
