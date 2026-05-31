@@ -1,7 +1,7 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 # Spaceship-style multi-line layout: info on one line, prompt char on next
-add_newline = false
+add_newline = true
 
 format = """
 $time\
