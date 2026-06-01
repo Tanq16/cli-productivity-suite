@@ -24,30 +24,25 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
 # --- Keybindings ---
-# Ctrl+Left/Right and Option+Left/Right jump one word; pairs with
-# zsh-autosuggestions' ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS so
-# forward-word accepts one word of the suggestion at a time.
 bindkey '^[[1;5C' forward-word
 bindkey '^[[1;5D' backward-word
 bindkey '^[[1;3C' forward-word
 bindkey '^[[1;3D' backward-word
 
-# Up/Down arrow walks history filtered by what's already typed
 autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
 zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
 bindkey '^[[A' up-line-or-beginning-search
 bindkey '^[[B' down-line-or-beginning-search
 
-# Ctrl+W stops at / - . instead of treating them as word chars
+# Make Ctrl+W stop at / - . by removing them from WORDCHARS
 WORDCHARS=${WORDCHARS//[\/\-.]}
 
-# Ctrl+X Ctrl+E opens the current command line in $EDITOR
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^X^E' edit-command-line
 
-# Disable legacy terminal flow control (frees Ctrl+S for keybinds)
+# Frees Ctrl+S — terminal driver swallows it as XOFF without both of these
 setopt NO_FLOW_CONTROL
 stty -ixon
 
@@ -111,5 +106,8 @@ alias dockernonerm='for i in $(docker images -f dangling=true -q); do docker ima
 [ -f "$HOME/shell/completions/zoxide.zsh" ] && source "$HOME/shell/completions/zoxide.zsh"
 
 # --- Cursor ---
-keymap-for-cursor-shape() { echo -ne '\e[5 q' }
-zle-line-init() { keymap-for-cursor-shape }
+# Both hooks needed: precmd resets after an app changed it, preexec primes the next app
+_cps_set_cursor_beam() { echo -ne '\e[5 q' }
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _cps_set_cursor_beam
+add-zsh-hook preexec _cps_set_cursor_beam
