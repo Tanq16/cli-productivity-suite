@@ -12,6 +12,7 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE SHARE_HISTORY INC_APPEND_HISTORY
 setopt INTERACTIVE_COMMENTS
+setopt HIST_VERIFY HIST_REDUCE_BLANKS
 
 # --- Completion ---
 # zsh/complist must load before compinit to register the menu-select widget
@@ -37,6 +38,18 @@ zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
 bindkey '^[[A' up-line-or-beginning-search
 bindkey '^[[B' down-line-or-beginning-search
+
+# Ctrl+W stops at / - . instead of treating them as word chars
+WORDCHARS=${WORDCHARS//[\/\-.]}
+
+# Ctrl+X Ctrl+E opens the current command line in $EDITOR
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^X^E' edit-command-line
+
+# Disable legacy terminal flow control (frees Ctrl+S for keybinds)
+setopt NO_FLOW_CONTROL
+stty -ixon
 
 # syntax-highlighting must be sourced LAST per upstream README
 [ -f "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && source "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
