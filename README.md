@@ -76,7 +76,7 @@ Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`
 
 Everything else via `cps extend` is optional — install what you need.
 
-> **Pack ordering for runtime-backed extensions.** Some custom-extension packs invoke runtimes that `cps extend runtimes` provides — `ai-tools` (claude-code, opencode, codex, crush) uses `fnm`; `database` (pgcli, mycli), `additional-cloud-tools` (checkov, prowler, oci-cli), and `praetorian` (praetorian-cli) use `uv`. Install `cps extend runtimes` (or at least its `uv` / `fnm` tools) before those packs, otherwise the install scripts fail with "command not found." Tools in those same packs that ship as standalone binaries (`antigravity`, `aix`, `sq`, `usql`, `tofu`) have no runtime dependency.
+> **Pack ordering for runtime-backed extensions.** Some custom-extension packs invoke runtimes that `cps extend runtimes` provides — `ai-tools` (claude-code, opencode, codex, crush) uses `fnm`; `database` (pgcli, mycli), `additional-cloud-tools` (checkov, prowler, oci-cli), and `praetorian` (praetorian-cli) use `uv`. Install `cps extend runtimes` (or at least its `uv` / `fnm` tools) before those packs, otherwise the install scripts fail with "command not found." Tools in those same packs that ship as standalone binaries (`antigravity`, `cursor-agent`, `aix`, `sq`, `usql`, `tofu`) have no runtime dependency.
 
 ### `cps extend <pack> [tools...]`
 
@@ -223,7 +223,7 @@ The image is multi-arch (`linux/amd64` + `linux/arm64`) and large (multi-GB) —
 
 The prebuilt image is intentionally a **drop-in toolkit for AI coding agents** — Claude Code, Codex, opencode, Crush, antigravity, and friends. Spin up the container once and a single non-root user already has:
 
-- **The agent CLIs themselves** — `claude`, `codex`, `opencode`, `crush`, `agy` (antigravity), `aix` (the `ai-tools` reference pack is pre-installed)
+- **The agent CLIs themselves** — `claude`, `codex`, `cursor-agent`, `opencode`, `crush`, `agy` (antigravity), `aix` (the `ai-tools` reference pack is pre-installed)
 - **Language runtimes the agent will reach for** — Go, Node (via fnm), Bun, Python (via uv), Rust, Java (Temurin LTS), all on PATH with no further setup
 - **Everyday CLI building blocks** — bat, fd, ripgrep, lsd, jq, yq, fzf, gh, zoxide, gron, sd, starship, plus tmux + neovim
 - **Cloud + security tooling** — aws/azure/gcloud CLIs, kubectl, terraform, trivy, nuclei, httpx, dnsx, subfinder, ffuf, katana, and the rest of the security/cloudsec/appsec packs
@@ -233,7 +233,7 @@ The prebuilt image is intentionally a **drop-in toolkit for AI coding agents** �
 docker run -d --name agent-sandbox tanq16/cps-sandbox:latest
 docker exec -it agent-sandbox zsh -l
 # inside the container:
-claude   # or codex, opencode, crush, agy, aix, ...
+claude   # or codex, cursor-agent, opencode, crush, agy, aix, ...
 ```
 
 This is the use case the image is tuned for: an agent (or a human delegating to one) lands in a shell where every tool it's likely to invoke — for code, search, package management, cloud ops, scanning, or recon — is already on PATH. No `brew install` round-trips, no runtime bootstrapping, no "let me set up your environment first." For ephemeral runs, add `--rm` to `docker run`; for sessions you want to come back to, keep the container around and re-`exec` in.

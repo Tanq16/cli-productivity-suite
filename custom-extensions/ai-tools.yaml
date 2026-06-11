@@ -53,6 +53,39 @@ tools:
     remove: |
       npm uninstall -g @openai/codex
 
+  - name: cursor-agent
+    install: |
+      set -eo pipefail
+      DEST_DIR="$HOME/shell/extensions"
+      mkdir -p "$DEST_DIR"
+      case "$(uname -s)" in
+        Darwin) OS=darwin ;;
+        Linux) OS=linux ;;
+        *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+      esac
+      case "$(uname -m)" in
+        x86_64|amd64) ARCH=x64 ;;
+        arm64|aarch64) ARCH=arm64 ;;
+        *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+      esac
+      VERSION=$(curl -fsSL https://cursor.com/install \
+        | sed -n 's|.*downloads\.cursor\.com/lab/\([^/]*\)/.*|\1|p' | head -1)
+      [ -n "$VERSION" ] || { echo "failed to resolve cursor-agent version" >&2; exit 1; }
+      APP_DIR="$HOME/.local/share/cursor-agent"
+      TMP=$(mktemp -d)
+      trap 'rm -rf "$TMP"' EXIT
+      curl -fsSL "https://downloads.cursor.com/lab/${VERSION}/${OS}/${ARCH}/agent-cli-package.tar.gz" \
+        | tar --strip-components=1 -xzf - -C "$TMP"
+      mkdir -p "$(dirname "$APP_DIR")"
+      rm -rf "$APP_DIR"
+      mv "$TMP" "$APP_DIR"
+      ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
+    remove: |
+      rm -f "$HOME/shell/extensions/cursor-agent"
+      rm -rf "$HOME/.local/share/cursor-agent"
+      rm -rf "$HOME/.config/cursor-agent"
+      rm -rf "$HOME/.cache/cursor-agent"
+
   - name: crush
     install: |
       npm install -g @charmland/crush

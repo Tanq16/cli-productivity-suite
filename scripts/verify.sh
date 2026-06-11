@@ -102,7 +102,7 @@ done
 # misc
 for t in gowitness snitch age; do check_bin "$t" "misc"; done
 # ai-tools
-for t in claude codex opencode crush agy aix; do check_bin "$t" "ai-tools"; done
+for t in claude codex cursor-agent opencode crush agy aix; do check_bin "$t" "ai-tools"; done
 # additional-cloud-tools
 for t in checkov prowler oci tofu; do
     check_bin "$t" "additional-cloud-tools"
