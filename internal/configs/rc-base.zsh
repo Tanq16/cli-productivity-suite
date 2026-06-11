@@ -18,7 +18,7 @@ setopt HIST_VERIFY HIST_REDUCE_BLANKS
 # zsh/complist must load before compinit to register the menu-select widget
 zmodload zsh/complist
 autoload -Uz compinit
-compinit
+compinit -u
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
@@ -33,7 +33,9 @@ autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
 zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
 bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[OA' up-line-or-beginning-search
 bindkey '^[[B' down-line-or-beginning-search
+bindkey '^[OB' down-line-or-beginning-search
 
 # Make Ctrl+W stop at / - . by removing them from WORDCHARS
 WORDCHARS=${WORDCHARS//[\/\-.]}
