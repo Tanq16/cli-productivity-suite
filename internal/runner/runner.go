@@ -46,7 +46,6 @@ func Init(ghToken string) {
 		filepath.Join(p.ShellDir(), "env"),
 		filepath.Join(p.ShellDir(), "plugins"),
 		filepath.Join(p.ShellDir(), "custom-bin"),
-		filepath.Join(p.ConfigDir(), "extensions"),
 	} {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			utils.PrintFatal(fmt.Sprintf("failed to create %s", dir), err)

@@ -4,7 +4,7 @@
 
   <a href="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml"><img alt="Build Workflow" src="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml/badge.svg"></a>&nbsp;<a href="https://github.com/tanq16/cli-productivity-suite/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/tanq16/cli-productivity-suite"></a><br><br>
 
-  <a href="#prerequisites">Prerequisites</a> &bull; <a href="#install">Install</a> &bull; <a href="#usage">Usage</a> &bull; <a href="#custom-extension-packs">Custom Extensions</a> &bull; <a href="#shell-integration">Shell Integration</a> &bull; <a href="#sandbox-container">Sandbox Container</a> &bull; <a href="#deep-removal">Deep Removal</a>
+  <a href="#prerequisites">Prerequisites</a> &bull; <a href="#install">Install</a> &bull; <a href="#usage">Usage</a> &bull; <a href="#shell-integration">Shell Integration</a> &bull; <a href="#sandbox-container">Sandbox Container</a> &bull; <a href="#deep-removal">Deep Removal</a>
 </div>
 
 ---
@@ -76,7 +76,7 @@ Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`
 
 Everything else via `cps extend` is optional — install what you need.
 
-> **Pack ordering for runtime-backed extensions.** Some custom-extension packs invoke runtimes that `cps extend runtimes` provides — `ai-tools` (claude-code, opencode, codex, crush) uses `fnm`; `database` (pgcli, mycli), `additional-cloud-tools` (checkov, prowler, oci-cli), and `praetorian` (praetorian-cli) use `uv`. Install `cps extend runtimes` (or at least its `uv` / `fnm` tools) before those packs, otherwise the install scripts fail with "command not found." Tools in those same packs that ship as standalone binaries (`antigravity`, `cursor-agent`, `aix`, `sq`, `usql`, `tofu`) have no runtime dependency.
+> **Pack ordering for runtime-backed extensions.** Some packs invoke runtimes that `cps extend runtimes` provides — `ai-tools` (claude-code, opencode, codex, crush) uses `fnm`; `database` (pgcli, mycli) and `additional-cloud-tools` (checkov, prowler, oci-cli) use `uv`. Install `cps extend runtimes` (or at least its `uv` / `fnm` tools) before those packs, otherwise the install scripts fail with "command not found." Tools in those same packs that ship as standalone binaries (`antigravity`, `cursor-agent`, `aix`, `sq`, `usql`, `tofu`) have no runtime dependency.
 
 ### `cps extend <pack> [tools...]`
 
@@ -100,6 +100,9 @@ cps extend security nuclei subfinder  # pick specific tools
 | appsec | katana, ffuf, dalfox, reaper, poltergeist, wraith, gau |
 | misc | gowitness, snitch, age, caddy |
 | private | Personal tools — public subset (`nits`, `raikiri`, `gcli`, `box`, `claudex`, `linksnapper`, `kairo`) installs as-is; the truly-private two (`toon`, `cybernest`) need `--gh-token` |
+| ai-tools | AI coding agents and LLM CLIs (claude-code, opencode, antigravity, codex, cursor-agent, crush, aix) |
+| additional-cloud-tools | Extra cloud and IaC tooling (checkov, prowler, oci-cli, tofu) |
+| database | Interactive database CLIs (pgcli, mycli, sq, usql) |
 
 Packs with shell integration (`runtimes`, `cloud`, `security`) deploy RC fragments automatically.
 
@@ -119,49 +122,6 @@ Updates the `cps` binary in place (at whatever path it's running from).
 | `--debug` | Verbose debug logging |
 | `--for-ai` | AI-friendly output (no color) |
 
-## Custom Extension Packs
-
-Drop a YAML file in `~/.config/cps/extensions/` to define your own pack:
-
-```yaml
-name: my-tools
-description: My custom tools
-shell:
-  env:
-    MY_VAR: "value"
-  path_prepend:
-    - "$HOME/.local/bin"
-  source:
-    - "$HOME/.cargo/env"
-tools:
-  - name: my-tool
-    install: curl -sL https://example.com/install.sh | bash
-```
-
-Then run `cps extend my-tools`. Custom packs appear in `cps extend list` alongside built-in packs.
-
-The `shell` block controls what gets added to your shell environment via a generated RC fragment at `~/shell/rc/custom/<pack-name>.zsh`:
-
-- **`env`** — key-value pairs exported as environment variables
-- **`path_prepend`** — directories prepended to `$PATH`
-- **`source`** — files conditionally sourced (only if they exist)
-
-All three fields are optional. If the entire `shell` block is omitted, no fragment is generated.
-
-The repo's `custom-extensions/` directory ships ready-made reference packs (`ai-tools`, `additional-cloud-tools`, `database`, `praetorian`) — copy any of them to `~/.config/cps/extensions/` to use as-is, or treat them as templates for your own. Or pull all of them in one shot with `cps download-known-extensions` (below).
-
-### `cps download-known-extensions`
-
-Fetches the reference custom-extension YAMLs maintained in the CPS repo (`ai-tools`, `additional-cloud-tools`, `database`, `praetorian`) and writes them to `~/.config/cps/extensions/`. After running, they show up in `cps extend list` and you can install any of them with `cps extend <pack>` (or `cps extend <pack> <tool>` for a single tool).
-
-```bash
-cps download-known-extensions
-cps extend list                  # ai-tools, database, etc. now visible
-cps extend ai-tools claude-code  # install just claude-code from ai-tools
-```
-
-Overwrites existing files of the same name — if you've customized one of the reference packs locally, rename it before re-running.
-
 ## Shell Integration
 
 CPS uses a modular fragment system instead of a monolithic `.zshrc`:
@@ -172,19 +132,18 @@ CPS uses a modular fragment system instead of a monolithic `.zshrc`:
 | `~/shell/rc/10-runtimes.zsh` | `cps extend runtimes` |
 | `~/shell/rc/20-cloud.zsh` | `cps extend cloud` |
 | `~/shell/rc/30-security.zsh` | `cps extend security` |
-| `~/shell/rc/custom/*.zsh` | Custom packs or user-managed |
+| `~/shell/rc/custom/*.zsh` | User-managed |
 
 `~/.zshrc` is a thin loader that sources all fragments in order.
 
 ### Adding your own stuff (no extension pack needed)
 
-Three drop-zones, three buckets — you never need to write a YAML pack for personal tweaks:
+Two drop-zones, two buckets — personal tweaks never need to go through `cps extend`:
 
 | You want to add… | Drop it here | Notes |
 |---|---|---|
 | Aliases, exports, functions, custom sourcing | `~/shell/rc/custom/anything.zsh` | Loaded automatically by `~/.zshrc` after CPS fragments — so it can override CPS-set values |
 | Your own binaries / scripts | `~/shell/custom-bin/` | Prepended to PATH **ahead of** CPS-managed dirs, so your binary wins if a name collides with a CPS one |
-| A reusable, idempotent install bundle you want `cps extend` to manage | `~/.config/cps/extensions/<name>.yaml` | See [Custom Extension Packs](#custom-extension-packs) above |
 
 Both `~/shell/rc/custom/` and `~/shell/custom-bin/` are created by `cps init` and are **never touched** by subsequent `cps init` / `cps extend` runs.
 
@@ -217,13 +176,13 @@ docker run -d --name cps-sandbox cps-sandbox
 docker exec -it cps-sandbox zsh -l
 ```
 
-The image is multi-arch (`linux/amd64` + `linux/arm64`) and large (multi-GB) — it carries full language runtimes, cloud CLIs, security tooling, every reference custom-extension pack (`ai-tools`, `additional-cloud-tools`, `database`, `praetorian`), and the public-repo tools from the `private` pack (`nits`, `raikiri`, `gcli`, `box`, `claudex`, `linksnapper`, `kairo`). The two truly-private tools (`toon`, `cybernest`) are skipped since they need an auth token.
+The image is multi-arch (`linux/amd64` + `linux/arm64`) and large (multi-GB) — it carries full language runtimes, cloud CLIs, security tooling, the `ai-tools`, `additional-cloud-tools`, and `database` packs, and the public-repo tools from the `private` pack (`nits`, `raikiri`, `gcli`, `box`, `claudex`, `linksnapper`, `kairo`). The two truly-private tools (`toon`, `cybernest`) are skipped since they need an auth token.
 
 ### A ready environment for AI agents
 
 The prebuilt image is intentionally a **drop-in toolkit for AI coding agents** — Claude Code, Codex, opencode, Crush, antigravity, and friends. Spin up the container once and a single non-root user already has:
 
-- **The agent CLIs themselves** — `claude`, `codex`, `cursor-agent`, `opencode`, `crush`, `agy` (antigravity), `aix` (the `ai-tools` reference pack is pre-installed)
+- **The agent CLIs themselves** — `claude`, `codex`, `cursor-agent`, `opencode`, `crush`, `agy` (antigravity), `aix` (the `ai-tools` pack is pre-installed)
 - **Language runtimes the agent will reach for** — Go, Node (via fnm), Bun, Python (via uv), Rust, Java (Temurin LTS), all on PATH with no further setup
 - **Everyday CLI building blocks** — bat, fd, ripgrep, lsd, jq, yq, fzf, gh, zoxide, gron, sd, starship, plus tmux + neovim
 - **Cloud + security tooling** — aws/azure/gcloud CLIs, kubectl, terraform, trivy, nuclei, httpx, dnsx, subfinder, ffuf, katana, and the rest of the security/cloudsec/appsec packs

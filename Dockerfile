@@ -97,7 +97,6 @@ RUN cps extend misc \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
  && sleep 20
 
-RUN cps download-known-extensions && sleep 20
 RUN cps extend ai-tools \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
  && sleep 20
@@ -105,9 +104,6 @@ RUN cps extend additional-cloud-tools \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
  && sleep 20
 RUN cps extend database \
- && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
- && sleep 20
-RUN cps extend praetorian \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
  && sleep 20
 

@@ -658,24 +658,222 @@ var extensionPacks = []ExtensionPack{
 			},
 		},
 	},
-}
-
-var customPacks []ExtensionPack
-
-func LoadCustomPacks(packs []ExtensionPack) {
-	customPacks = packs
-}
-
-func BuiltinPackNames() map[string]bool {
-	names := make(map[string]bool, len(extensionPacks))
-	for _, p := range extensionPacks {
-		names[p.Name] = true
-	}
-	return names
+	{
+		Name:        "ai-tools",
+		Description: "AI coding agents and LLM CLIs",
+		Category:    ExtAITools,
+		Tools: []Tool{
+			{
+				Name: "claude-code", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Description: "Anthropic Claude Code CLI agent",
+				InstallCmd:  "npm install -g @anthropic-ai/claude-code",
+			},
+			{
+				Name: "opencode", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Description: "Open-source terminal coding agent",
+				InstallCmd:  "npm install -g opencode-ai@latest",
+			},
+			{
+				Name: "antigravity", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Description: "Google Antigravity CLI agent",
+				InstallCmd: `set -eo pipefail
+DEST_DIR="$HOME/shell/extensions"
+mkdir -p "$DEST_DIR"
+case "$(uname -s)" in
+  Darwin) OS=darwin ;;
+  Linux) OS=linux ;;
+  *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+esac
+case "$(uname -m)" in
+  x86_64|amd64) ARCH=amd64 ;;
+  arm64|aarch64) ARCH=arm64 ;;
+  *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+esac
+MANIFEST_URL="https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/${OS}_${ARCH}.json"
+URL=$(curl -fsSL "$MANIFEST_URL" | sed -n 's/.*"url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+[ -n "$URL" ] || { echo "failed to parse antigravity manifest" >&2; exit 1; }
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+curl -fsSL "$URL" -o "$TMP/agy.tar.gz"
+tar -xzf "$TMP/agy.tar.gz" -C "$TMP" antigravity
+install -m 0755 "$TMP/antigravity" "$DEST_DIR/agy"
+[ "$OS" = "darwin" ] && xattr -d com.apple.quarantine "$DEST_DIR/agy" 2>/dev/null || true
+`,
+			},
+			{
+				Name: "codex", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Description: "OpenAI Codex CLI agent",
+				InstallCmd:  "npm install -g @openai/codex",
+			},
+			{
+				Name: "cursor-agent", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Description: "Cursor headless coding agent",
+				InstallCmd: `set -eo pipefail
+DEST_DIR="$HOME/shell/extensions"
+mkdir -p "$DEST_DIR"
+case "$(uname -s)" in
+  Darwin) OS=darwin ;;
+  Linux) OS=linux ;;
+  *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+esac
+case "$(uname -m)" in
+  x86_64|amd64) ARCH=x64 ;;
+  arm64|aarch64) ARCH=arm64 ;;
+  *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+esac
+VERSION=$(curl -fsSL https://cursor.com/install \
+  | sed -n 's|.*downloads\.cursor\.com/lab/\([^/]*\)/.*|\1|p' | head -1)
+[ -n "$VERSION" ] || { echo "failed to resolve cursor-agent version" >&2; exit 1; }
+APP_DIR="$HOME/.local/share/cursor-agent"
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+curl -fsSL "https://downloads.cursor.com/lab/${VERSION}/${OS}/${ARCH}/agent-cli-package.tar.gz" \
+  | tar --strip-components=1 -xzf - -C "$TMP"
+mkdir -p "$(dirname "$APP_DIR")"
+rm -rf "$APP_DIR"
+mv "$TMP" "$APP_DIR"
+ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
+`,
+			},
+			{
+				Name: "crush", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Description: "Charm terminal coding agent",
+				InstallCmd:  "npm install -g @charmland/crush",
+			},
+			{
+				Name: "aix", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Description: "LLM prompt runner from ProjectDiscovery",
+				InstallCmd: `set -eo pipefail
+DEST_DIR="$HOME/shell/extensions"
+mkdir -p "$DEST_DIR"
+case "$(uname -s)" in
+  Darwin) OS=macOS ;;
+  Linux) OS=linux ;;
+  *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+esac
+case "$(uname -m)" in
+  x86_64|amd64) ARCH=amd64 ;;
+  arm64|aarch64) ARCH=arm64 ;;
+  *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+esac
+TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+  https://github.com/projectdiscovery/aix/releases/latest | sed 's|.*/tag/||')
+VERSION=${TAG#v}
+URL="https://github.com/projectdiscovery/aix/releases/download/${TAG}/aix_${VERSION}_${OS}_${ARCH}.zip"
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+curl -fsSL "$URL" -o "$TMP/aix.zip"
+unzip -qo "$TMP/aix.zip" -d "$TMP"
+install -m 0755 "$TMP/aix" "$DEST_DIR/aix"
+`,
+			},
+		},
+	},
+	{
+		Name:        "additional-cloud-tools",
+		Description: "Extra cloud and IaC tooling (uv-managed Python CLIs and OpenTofu)",
+		Category:    ExtAdditionalCloud,
+		Tools: []Tool{
+			{
+				Name: "checkov", Kind: CustomScript, Category: ExtAdditionalCloud, Extension: true,
+				Description: "IaC static analysis scanner",
+				InstallCmd:  "uv tool install --force checkov",
+			},
+			{
+				Name: "prowler", Kind: CustomScript, Category: ExtAdditionalCloud, Extension: true,
+				Description: "Cloud security posture scanner",
+				InstallCmd:  "uv tool install --force prowler",
+			},
+			{
+				Name: "oci-cli", Kind: CustomScript, Category: ExtAdditionalCloud, Extension: true,
+				Description: "Oracle Cloud Infrastructure CLI",
+				InstallCmd:  "uv tool install --force oci-cli",
+			},
+			{
+				Name: "tofu", Kind: CustomScript, Category: ExtAdditionalCloud, Extension: true,
+				Description: "OpenTofu infrastructure as code",
+				InstallCmd: `set -eo pipefail
+DEST_DIR="$HOME/shell/extensions"
+mkdir -p "$DEST_DIR"
+case "$(uname -s)" in
+  Darwin) OS=darwin ;;
+  Linux) OS=linux ;;
+  *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+esac
+case "$(uname -m)" in
+  x86_64|amd64) ARCH=amd64 ;;
+  arm64|aarch64) ARCH=arm64 ;;
+  *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+esac
+TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+  https://github.com/opentofu/opentofu/releases/latest | sed 's|.*/tag/||')
+VERSION=${TAG#v}
+URL="https://github.com/opentofu/opentofu/releases/download/${TAG}/tofu_${VERSION}_${OS}_${ARCH}.tar.gz"
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+curl -fsSL "$URL" -o "$TMP/tofu.tar.gz"
+tar -xzf "$TMP/tofu.tar.gz" -C "$TMP"
+install -m 0755 "$TMP/tofu" "$DEST_DIR/tofu"
+`,
+			},
+		},
+	},
+	{
+		Name:        "database",
+		Description: "Interactive database CLIs",
+		Category:    ExtDatabase,
+		Tools: []Tool{
+			{
+				Name: "pgcli", Kind: CustomScript, Category: ExtDatabase, Extension: true,
+				Description: "PostgreSQL CLI with autocompletion",
+				InstallCmd:  "uv tool install --force pgcli",
+			},
+			{
+				Name: "mycli", Kind: CustomScript, Category: ExtDatabase, Extension: true,
+				Description: "MySQL CLI with autocompletion",
+				InstallCmd:  "uv tool install --force mycli",
+			},
+			{
+				Name: "sq", Kind: CustomScript, Category: ExtDatabase, Extension: true,
+				Description: "jq-like data wrangler for databases",
+				InstallCmd: `set -eo pipefail
+DEST_DIR="$HOME/shell/extensions"
+mkdir -p "$DEST_DIR"
+case "$(uname -s)" in
+  Darwin) OS=macos ;;
+  Linux) OS=linux ;;
+  *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+esac
+case "$(uname -m)" in
+  x86_64|amd64) ARCH=amd64 ;;
+  arm64|aarch64) ARCH=arm64 ;;
+  *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+esac
+TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+  https://github.com/neilotoole/sq/releases/latest | sed 's|.*/tag/||')
+VERSION=${TAG#v}
+URL="https://github.com/neilotoole/sq/releases/download/${TAG}/sq-${VERSION}-${OS}-${ARCH}.tar.gz"
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+curl -fsSL "$URL" -o "$TMP/sq.tar.gz"
+tar -xzf "$TMP/sq.tar.gz" -C "$TMP"
+install -m 0755 "$TMP/sq" "$DEST_DIR/sq"
+`,
+			},
+			{
+				Name: "usql", Kind: CustomScript, Category: ExtDatabase, Extension: true,
+				Description: "Universal SQL CLI for many databases",
+				InstallCmd: `set -eo pipefail
+brew tap xo/xo
+brew install usql
+`,
+			},
+		},
+	},
 }
 
 func AllExtensionPacks() []ExtensionPack {
-	return append(extensionPacks, customPacks...)
+	return extensionPacks
 }
 
 func ExtensionPackByName(name string) *ExtensionPack {
@@ -684,17 +882,12 @@ func ExtensionPackByName(name string) *ExtensionPack {
 			return &extensionPacks[i]
 		}
 	}
-	for i := range customPacks {
-		if customPacks[i].Name == name {
-			return &customPacks[i]
-		}
-	}
 	return nil
 }
 
 func AllExtensionTools() []Tool {
 	var all []Tool
-	for _, pack := range AllExtensionPacks() {
+	for _, pack := range extensionPacks {
 		all = append(all, pack.Tools...)
 	}
 	return all

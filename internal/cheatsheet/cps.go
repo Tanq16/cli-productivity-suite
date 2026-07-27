@@ -13,14 +13,14 @@ func buildCPSSheet() string {
 	b.WriteString(headingStyle.Render("Core Commands") + "\n")
 	b.WriteString(cmdStyle.Render("  cps init") + "                        Base shell environment setup\n")
 	b.WriteString(cmdStyle.Render("  cps self-update") + "                 Update cps binary itself\n")
-	b.WriteString(cmdStyle.Render("  cps download-known-extensions") + "   Fetch reference custom-extension YAMLs from the repo\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Extend — Extension Packs") + "\n")
 	b.WriteString(cmdStyle.Render("  cps extend list") + "                 List available packs\n")
 	b.WriteString(cmdStyle.Render("  cps extend <pack>") + "               Install entire extension pack\n")
 	b.WriteString(cmdStyle.Render("  cps extend <pack> <tool> ...") + "    Install specific tools from a pack\n")
-	b.WriteString(noteStyle.Render("  Packs: essentials, core, cloud, runtimes, security, cloudsec, appsec, misc, private") + "\n")
+	b.WriteString(noteStyle.Render("  Packs: essentials, core, cloud, runtimes, security, cloudsec, appsec,") + "\n")
+	b.WriteString(noteStyle.Render("         misc, private, ai-tools, additional-cloud-tools, database") + "\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Shell Integration — RC Fragments") + "\n")
@@ -35,7 +35,6 @@ func buildCPSSheet() string {
 	b.WriteString(headingStyle.Render("Adding Your Own Stuff (no extension pack needed)") + "\n")
 	b.WriteString(noteStyle.Render("  Aliases / exports / funcs   →  drop a *.zsh file in ~/shell/rc/custom/") + "\n")
 	b.WriteString(noteStyle.Render("  Your own binaries           →  drop them in ~/shell/custom-bin/ (on PATH)") + "\n")
-	b.WriteString(noteStyle.Render("  Reusable install bundles    →  add a YAML to ~/.config/cps/extensions/") + "\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Other") + "\n")

@@ -51,7 +51,9 @@ const (
 	ExtSystem
 	ExtCloud
 	ExtRuntimes
-	ExtCustom
+	ExtAITools
+	ExtAdditionalCloud
+	ExtDatabase
 )
 
 func (c ToolCategory) String() string {
@@ -86,8 +88,12 @@ func (c ToolCategory) String() string {
 		return "ext-cloud"
 	case ExtRuntimes:
 		return "ext-runtimes"
-	case ExtCustom:
-		return "ext-custom"
+	case ExtAITools:
+		return "ext-ai-tools"
+	case ExtAdditionalCloud:
+		return "ext-additional-cloud"
+	case ExtDatabase:
+		return "ext-database"
 	default:
 		return "unknown"
 	}
@@ -122,5 +128,4 @@ type Tool struct {
 	CloneDest   string // for ShellPlugin: destination path (can use ~ for home)
 	PostClone   string // for ShellPlugin: identifier for post-clone hook logic
 	InstallCmd  string // for CustomScript: shell command run via bash -c
-	RemoveCmd   string // for CustomScript (custom packs only): shell command run via bash -c on --remove
 }

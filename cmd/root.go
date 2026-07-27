@@ -44,7 +44,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&ghToken, "gh-token", "", "GitHub PAT for private repos")
 
 	rootCmd.AddCommand(cheatCmd)
-	rootCmd.AddCommand(downloadKnownExtensionsCmd)
 	rootCmd.AddCommand(extendCmd)
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(selfUpdateCmd)

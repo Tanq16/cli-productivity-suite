@@ -32,7 +32,7 @@ for d in \
     shell/go-sdk shell/java-sdk shell/rust shell/fnm shell/py-default \
     shell/uv-tools shell/uv-tool-executables shell/uv-python \
     shell/nuclei-templates \
-    .config/cps .config/cps/extensions .config/nvim .tmux/plugins/tpm; do
+    .config/cps .config/nvim .tmux/plugins/tpm; do
     [ -d "$HOME/$d" ] || fail "dir missing: ~/$d"
 done
 
@@ -112,10 +112,6 @@ for t in pgcli mycli sq; do check_bin "$t" "database"; done
 case "$arch" in
     x86_64) check_bin "usql" "database" ;;
 esac
-# praetorian
-for t in titus julius aurelian hadrian trajan nerva augustus vespasian praetorian; do
-    check_bin "$t" "praetorian"
-done
 # private (public subset)
 for t in nits raikiri gcli box claudex linksnapper kairo; do check_bin "$t" "private"; done
 

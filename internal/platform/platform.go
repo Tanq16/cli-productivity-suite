@@ -97,7 +97,7 @@ func (p Platform) ConfigDir() string {
 }
 
 func (p Platform) StatePath() string {
-	return filepath.Join(p.HomeDir, ".config", "cps", "state.json")
+	return filepath.Join(p.ConfigDir(), "state.json")
 }
 
 func (p Platform) CustomScriptEnv() []string {
