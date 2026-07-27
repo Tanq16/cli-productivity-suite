@@ -98,8 +98,8 @@ cps extend security nuclei subfinder  # pick specific tools
 | security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, gobuster, nuclei-templates |
 | cloudsec | terraform, kubectl, kubelogin, grpcurl, cloudfox, trivy, cloudlist |
 | appsec | katana, ffuf, dalfox, reaper, poltergeist, wraith, gau |
-| misc | gowitness, snitch, age |
-| private | Personal tools — public subset (`nits`, `raikiri`, `gcli`, `box`, `claudex`) installs as-is; the truly-private four (`toon`, `nblm`, `cybernest`, `lincli`) need `--gh-token` |
+| misc | gowitness, snitch, age, caddy |
+| private | Personal tools — public subset (`nits`, `raikiri`, `gcli`, `box`, `claudex`, `linksnapper`, `kairo`) installs as-is; the truly-private two (`toon`, `cybernest`) need `--gh-token` |
 
 Packs with shell integration (`runtimes`, `cloud`, `security`) deploy RC fragments automatically.
 
@@ -217,7 +217,7 @@ docker run -d --name cps-sandbox cps-sandbox
 docker exec -it cps-sandbox zsh -l
 ```
 
-The image is multi-arch (`linux/amd64` + `linux/arm64`) and large (multi-GB) — it carries full language runtimes, cloud CLIs, security tooling, every reference custom-extension pack (`ai-tools`, `additional-cloud-tools`, `database`, `praetorian`), and the public-repo tools from the `private` pack (`nits`, `raikiri`, `gcli`, `box`, `claudex`). The four truly-private tools (`toon`, `nblm`, `cybernest`, `lincli`) are skipped since they need an auth token.
+The image is multi-arch (`linux/amd64` + `linux/arm64`) and large (multi-GB) — it carries full language runtimes, cloud CLIs, security tooling, every reference custom-extension pack (`ai-tools`, `additional-cloud-tools`, `database`, `praetorian`), and the public-repo tools from the `private` pack (`nits`, `raikiri`, `gcli`, `box`, `claudex`, `linksnapper`, `kairo`). The two truly-private tools (`toon`, `cybernest`) are skipped since they need an auth token.
 
 ### A ready environment for AI agents
 

@@ -295,6 +295,17 @@ var extensionPacks = []ExtensionPack{
 					BinaryPathInArchive: "age/age",
 				},
 			},
+			{
+				Name: "caddy", BinaryName: "caddy", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
+				Repo: "caddyserver/caddy", Description: "Web server / reverse proxy",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "mac"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows", "freebsd"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "caddy",
+				},
+			},
 		},
 	},
 	{
@@ -348,6 +359,24 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
+				Name: "linksnapper", BinaryName: "linksnapper", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
+				Repo: "Tanq16/linksnapper", Description: "LinkSnapper bookmark manager",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
+				Name: "kairo", BinaryName: "kairo", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
+				Repo: "Tanq16/kairo", Description: "Kairo markdown note-taking app",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
 				Name: "toon", BinaryName: "toon", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
 				Repo: "Tanq16/toon", Description: "Private Toon tool", IsPrivate: true,
 				Asset: AssetPattern{
@@ -358,26 +387,8 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "nblm", BinaryName: "nblm", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
-				Repo: "Tanq16/nblm", Description: "Private NBLM tool", IsPrivate: true,
-				Asset: AssetPattern{
-					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat: "none",
-				},
-			},
-			{
 				Name: "cybernest", BinaryName: "cybernest", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
 				Repo: "Tanq16/cybernest", Description: "Private Cybernest tool", IsPrivate: true,
-				Asset: AssetPattern{
-					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat: "none",
-				},
-			},
-			{
-				Name: "lincli", BinaryName: "lincli", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
-				Repo: "Tanq16/lincli", Description: "Private LinCLI tool", IsPrivate: true,
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},

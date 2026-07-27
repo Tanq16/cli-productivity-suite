@@ -111,8 +111,8 @@ RUN cps extend praetorian \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
  && sleep 20
 
-# Truly-private tools (toon, nblm, cybernest, lincli) need --gh-token; skipped here.
-RUN cps extend private nits raikiri gcli box claudex \
+# Truly-private tools (toon, cybernest) need --gh-token; skipped here.
+RUN cps extend private nits raikiri gcli box claudex linksnapper kairo \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache
 
 CMD ["sleep", "infinity"]

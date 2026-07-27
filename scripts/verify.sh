@@ -100,7 +100,7 @@ for t in katana ffuf dalfox reaper poltergeist wraith gau; do
     check_bin "$t" "appsec"
 done
 # misc
-for t in gowitness snitch age; do check_bin "$t" "misc"; done
+for t in gowitness snitch age caddy; do check_bin "$t" "misc"; done
 # ai-tools
 for t in claude codex cursor-agent opencode crush agy aix; do check_bin "$t" "ai-tools"; done
 # additional-cloud-tools
@@ -117,7 +117,7 @@ for t in titus julius aurelian hadrian trajan nerva augustus vespasian praetoria
     check_bin "$t" "praetorian"
 done
 # private (public subset)
-for t in nits raikiri gcli box claudex; do check_bin "$t" "private"; done
+for t in nits raikiri gcli box claudex linksnapper kairo; do check_bin "$t" "private"; done
 
 # --- nuclei templates non-empty ---
 [ -n "$(ls -A "$HOME/shell/nuclei-templates" 2>/dev/null)" ] || \
