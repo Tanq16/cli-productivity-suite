@@ -15,7 +15,6 @@ var extendCmd = &cobra.Command{
 			suggestions := append([]string{"list"}, runner.ExtensionPackNames()...)
 			return suggestions, cobra.ShellCompDirectiveNoFileComp
 		}
-		// For subsequent args, suggest tool names from the selected pack
 		return runner.ExtensionPackToolNames(args[0]), cobra.ShellCompDirectiveNoFileComp
 	},
 	Run: func(cmd *cobra.Command, args []string) {

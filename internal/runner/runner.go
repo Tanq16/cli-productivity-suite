@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -201,8 +202,13 @@ func runPostInstall(p platform.Platform) {
 		lineCount++
 		tpmCmd := exec.Command("bash", tpmInstall)
 		tpmCmd.Env = append(os.Environ(), fmt.Sprintf("TMUX_PLUGIN_MANAGER_PATH=%s", filepath.Join(p.HomeDir, ".tmux", "plugins")))
-		if err := utils.RunCmd(tpmCmd); err != nil {
+		err := utils.RunCmd(tpmCmd)
+		utils.ClearPreviousLine()
+		if err != nil {
+			utils.PrintIndentedError("tpm-install", err)
 			errors = append(errors, jobResult{name: "tpm-install", err: err})
+		} else {
+			utils.PrintIndentedSuccess("tpm-install: done")
 		}
 	}
 
@@ -210,8 +216,13 @@ func runPostInstall(p platform.Platform) {
 		utils.PrintIndentedRunning("nvchad-setup: running")
 		lineCount++
 		nvimCmd := exec.Command(nvimBin, "--headless", "+MasonInstallAll", "+Lazy sync", "+qa")
-		if err := utils.RunCmd(nvimCmd); err != nil {
+		err := utils.RunCmd(nvimCmd)
+		utils.ClearPreviousLine()
+		if err != nil {
+			utils.PrintIndentedError("nvchad-setup", err)
 			errors = append(errors, jobResult{name: "nvchad-setup", err: err})
+		} else {
+			utils.PrintIndentedSuccess("nvchad-setup: done")
 		}
 	}
 
@@ -238,7 +249,7 @@ func generateShellEnv(p platform.Platform, errors *[]jobResult, lineCount *int) 
 
 	brewBin, err := exec.LookPath("brew")
 	if err != nil {
-		return // brew not found, nothing to generate
+		return
 	}
 
 	utils.PrintIndentedRunning("shell-env: brew")
@@ -257,16 +268,19 @@ func generateShellEnv(p platform.Platform, errors *[]jobResult, lineCount *int) 
 	var stderr strings.Builder
 	cmd.Stderr = &stderr
 	out, err := cmd.Output()
+	if err == nil {
+		err = os.WriteFile(filepath.Join(envDir, "brew.zsh"), out, 0644)
+	} else if detail := strings.TrimSpace(stderr.String()); detail != "" {
+		err = fmt.Errorf("%s: %w", detail, err)
+	}
+
+	utils.ClearPreviousLine()
 	if err != nil {
-		if detail := strings.TrimSpace(stderr.String()); detail != "" {
-			err = fmt.Errorf("%s: %w", detail, err)
-		}
+		utils.PrintIndentedError("shell-env-brew", err)
 		*errors = append(*errors, jobResult{name: "shell-env-brew", err: err})
 		return
 	}
-	if err := os.WriteFile(filepath.Join(envDir, "brew.zsh"), out, 0644); err != nil {
-		*errors = append(*errors, jobResult{name: "shell-env-brew", err: err})
-	}
+	utils.PrintIndentedSuccess("shell-env: brew")
 }
 
 func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *int) {
@@ -303,29 +317,24 @@ func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *in
 		var stderr strings.Builder
 		cmd.Stderr = &stderr
 		out, err := cmd.Output()
+		if err == nil {
+			err = os.WriteFile(filepath.Join(compDir, d.outFile), out, 0644)
+		} else if detail := strings.TrimSpace(stderr.String()); detail != "" {
+			err = fmt.Errorf("%s: %w", detail, err)
+		}
+
+		utils.ClearPreviousLine()
 		if err != nil {
-			if detail := strings.TrimSpace(stderr.String()); detail != "" {
-				err = fmt.Errorf("%s: %w", detail, err)
-			}
+			utils.PrintIndentedError("completions-"+d.name, err)
 			*errors = append(*errors, jobResult{name: "completions-" + d.name, err: err})
 			continue
 		}
-		if err := os.WriteFile(filepath.Join(compDir, d.outFile), out, 0644); err != nil {
-			*errors = append(*errors, jobResult{name: "completions-" + d.name, err: err})
-		}
+		utils.PrintIndentedSuccess("completions: " + d.name)
 	}
 }
 
 func toolForPlatform(tool registry.Tool, p platform.Platform) bool {
-	if len(tool.Platforms) == 0 {
-		return true
-	}
-	for _, plat := range tool.Platforms {
-		if plat == p.OS.String() {
-			return true
-		}
-	}
-	return false
+	return len(tool.Platforms) == 0 || slices.Contains(tool.Platforms, p.OS.String())
 }
 
 func filterPlatformTools(tools []registry.Tool, p platform.Platform) []registry.Tool {

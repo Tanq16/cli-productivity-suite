@@ -21,14 +21,11 @@ func ExtendList() {
 		tools := filterExtPackForPlatform(pack)
 		utils.PrintInfo(fmt.Sprintf("%s — %s (%d tools)", pack.Name, pack.Description, len(tools)))
 		if len(tools) > 0 {
-			names := ""
+			names := make([]string, len(tools))
 			for i, t := range tools {
-				if i > 0 {
-					names += ", "
-				}
-				names += t.Name
+				names[i] = t.Name
 			}
-			utils.PrintGeneric("    " + names)
+			utils.PrintGeneric("    " + strings.Join(names, ", "))
 		}
 	}
 }
