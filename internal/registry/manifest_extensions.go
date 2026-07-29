@@ -664,14 +664,14 @@ var extensionPacks = []ExtensionPack{
 		Category:    ExtAITools,
 		Tools: []Tool{
 			{
-				Name: "claude-code", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Name: "claude-code", Kind: NodePackage, Category: ExtAITools, Extension: true,
 				Description: "Anthropic Claude Code CLI agent",
-				InstallCmd:  "npm install -g @anthropic-ai/claude-code",
+				NodePkg:     "@anthropic-ai/claude-code",
 			},
 			{
-				Name: "opencode", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Name: "opencode", Kind: NodePackage, Category: ExtAITools, Extension: true,
 				Description: "Open-source terminal coding agent",
-				InstallCmd:  "npm install -g opencode-ai@latest",
+				NodePkg:     "opencode-ai@latest",
 			},
 			{
 				Name: "antigravity", Kind: CustomScript, Category: ExtAITools, Extension: true,
@@ -701,9 +701,9 @@ install -m 0755 "$TMP/antigravity" "$DEST_DIR/agy"
 `,
 			},
 			{
-				Name: "codex", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Name: "codex", Kind: NodePackage, Category: ExtAITools, Extension: true,
 				Description: "OpenAI Codex CLI agent",
-				InstallCmd:  "npm install -g @openai/codex",
+				NodePkg:     "@openai/codex",
 			},
 			{
 				Name: "cursor-agent", Kind: CustomScript, Category: ExtAITools, Extension: true,
@@ -736,36 +736,20 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 `,
 			},
 			{
-				Name: "crush", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Name: "crush", Kind: NodePackage, Category: ExtAITools, Extension: true,
 				Description: "Charm terminal coding agent",
-				InstallCmd:  "npm install -g @charmland/crush",
+				NodePkg:     "@charmland/crush",
 			},
 			{
-				Name: "aix", Kind: CustomScript, Category: ExtAITools, Extension: true,
-				Description: "LLM prompt runner from ProjectDiscovery",
-				InstallCmd: `set -eo pipefail
-DEST_DIR="$HOME/shell/extensions"
-mkdir -p "$DEST_DIR"
-case "$(uname -s)" in
-  Darwin) OS=macOS ;;
-  Linux) OS=linux ;;
-  *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
-esac
-case "$(uname -m)" in
-  x86_64|amd64) ARCH=amd64 ;;
-  arm64|aarch64) ARCH=arm64 ;;
-  *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
-esac
-TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
-  https://github.com/projectdiscovery/aix/releases/latest | sed 's|.*/tag/||')
-VERSION=${TAG#v}
-URL="https://github.com/projectdiscovery/aix/releases/download/${TAG}/aix_${VERSION}_${OS}_${ARCH}.zip"
-TMP=$(mktemp -d)
-trap 'rm -rf "$TMP"' EXIT
-curl -fsSL "$URL" -o "$TMP/aix.zip"
-unzip -qo "$TMP/aix.zip" -d "$TMP"
-install -m 0755 "$TMP/aix" "$DEST_DIR/aix"
-`,
+				Name: "aix", BinaryName: "aix", Kind: GitHubRelease, Category: ExtAITools, Extension: true,
+				Repo: "projectdiscovery/aix", Description: "LLM prompt runner from ProjectDiscovery",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows", "386", "checksums"},
+					ArchiveFormat:       "zip",
+					BinaryPathInArchive: "aix",
+				},
 			},
 		},
 	},
@@ -775,46 +759,30 @@ install -m 0755 "$TMP/aix" "$DEST_DIR/aix"
 		Category:    ExtAdditionalCloud,
 		Tools: []Tool{
 			{
-				Name: "checkov", Kind: CustomScript, Category: ExtAdditionalCloud, Extension: true,
+				Name: "checkov", Kind: PythonTool, Category: ExtAdditionalCloud, Extension: true,
 				Description: "IaC static analysis scanner",
-				InstallCmd:  "uv tool install --force checkov",
+				PyTool:      "checkov",
 			},
 			{
-				Name: "prowler", Kind: CustomScript, Category: ExtAdditionalCloud, Extension: true,
+				Name: "prowler", Kind: PythonTool, Category: ExtAdditionalCloud, Extension: true,
 				Description: "Cloud security posture scanner",
-				InstallCmd:  "uv tool install --force prowler",
+				PyTool:      "prowler",
 			},
 			{
-				Name: "oci-cli", Kind: CustomScript, Category: ExtAdditionalCloud, Extension: true,
+				Name: "oci-cli", Kind: PythonTool, Category: ExtAdditionalCloud, Extension: true,
 				Description: "Oracle Cloud Infrastructure CLI",
-				InstallCmd:  "uv tool install --force oci-cli",
+				PyTool:      "oci-cli",
 			},
 			{
-				Name: "tofu", Kind: CustomScript, Category: ExtAdditionalCloud, Extension: true,
-				Description: "OpenTofu infrastructure as code",
-				InstallCmd: `set -eo pipefail
-DEST_DIR="$HOME/shell/extensions"
-mkdir -p "$DEST_DIR"
-case "$(uname -s)" in
-  Darwin) OS=darwin ;;
-  Linux) OS=linux ;;
-  *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
-esac
-case "$(uname -m)" in
-  x86_64|amd64) ARCH=amd64 ;;
-  arm64|aarch64) ARCH=arm64 ;;
-  *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
-esac
-TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
-  https://github.com/opentofu/opentofu/releases/latest | sed 's|.*/tag/||')
-VERSION=${TAG#v}
-URL="https://github.com/opentofu/opentofu/releases/download/${TAG}/tofu_${VERSION}_${OS}_${ARCH}.tar.gz"
-TMP=$(mktemp -d)
-trap 'rm -rf "$TMP"' EXIT
-curl -fsSL "$URL" -o "$TMP/tofu.tar.gz"
-tar -xzf "$TMP/tofu.tar.gz" -C "$TMP"
-install -m 0755 "$TMP/tofu" "$DEST_DIR/tofu"
-`,
+				Name: "tofu", BinaryName: "tofu", Kind: GitHubRelease, Category: ExtAdditionalCloud, Extension: true,
+				Repo: "opentofu/opentofu", Description: "OpenTofu infrastructure as code",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows", "freebsd", "openbsd", "solaris", "sig", "pem", "SHA256SUMS", ".deb", ".rpm", ".apk", ".zip"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "tofu",
+				},
 			},
 		},
 	},
@@ -824,49 +792,30 @@ install -m 0755 "$TMP/tofu" "$DEST_DIR/tofu"
 		Category:    ExtDatabase,
 		Tools: []Tool{
 			{
-				Name: "pgcli", Kind: CustomScript, Category: ExtDatabase, Extension: true,
+				Name: "pgcli", Kind: PythonTool, Category: ExtDatabase, Extension: true,
 				Description: "PostgreSQL CLI with autocompletion",
-				InstallCmd:  "uv tool install --force pgcli",
+				PyTool:      "pgcli",
 			},
 			{
-				Name: "mycli", Kind: CustomScript, Category: ExtDatabase, Extension: true,
+				Name: "mycli", Kind: PythonTool, Category: ExtDatabase, Extension: true,
 				Description: "MySQL CLI with autocompletion",
-				InstallCmd:  "uv tool install --force mycli",
+				PyTool:      "mycli",
 			},
 			{
-				Name: "sq", Kind: CustomScript, Category: ExtDatabase, Extension: true,
-				Description: "jq-like data wrangler for databases",
-				InstallCmd: `set -eo pipefail
-DEST_DIR="$HOME/shell/extensions"
-mkdir -p "$DEST_DIR"
-case "$(uname -s)" in
-  Darwin) OS=macos ;;
-  Linux) OS=linux ;;
-  *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
-esac
-case "$(uname -m)" in
-  x86_64|amd64) ARCH=amd64 ;;
-  arm64|aarch64) ARCH=arm64 ;;
-  *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
-esac
-TAG=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
-  https://github.com/neilotoole/sq/releases/latest | sed 's|.*/tag/||')
-VERSION=${TAG#v}
-URL="https://github.com/neilotoole/sq/releases/download/${TAG}/sq-${VERSION}-${OS}-${ARCH}.tar.gz"
-TMP=$(mktemp -d)
-trap 'rm -rf "$TMP"' EXIT
-curl -fsSL "$URL" -o "$TMP/sq.tar.gz"
-tar -xzf "$TMP/sq.tar.gz" -C "$TMP"
-install -m 0755 "$TMP/sq" "$DEST_DIR/sq"
-`,
+				Name: "sq", BinaryName: "sq", Kind: GitHubRelease, Category: ExtDatabase, Extension: true,
+				Repo: "neilotoole/sq", Description: "jq-like data wrangler for databases",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows", ".deb", ".rpm", ".apk", ".zst", "checksums"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "sq",
+				},
 			},
 			{
-				Name: "usql", Kind: CustomScript, Category: ExtDatabase, Extension: true,
+				Name: "usql", Kind: SystemPackage, Category: ExtDatabase, Extension: true,
 				Description: "Universal SQL CLI for many databases",
-				InstallCmd: `set -eo pipefail
-brew tap xo/xo
-brew install usql
-`,
+				BrewPkgs:    []string{"xo/xo/usql"},
 			},
 		},
 	},

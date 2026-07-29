@@ -10,6 +10,8 @@ const (
 	ConfigFile
 	ShellPlugin
 	CustomScript
+	NodePackage
+	PythonTool
 )
 
 func (k ToolKind) String() string {
@@ -28,6 +30,10 @@ func (k ToolKind) String() string {
 		return "shell-plugin"
 	case CustomScript:
 		return "custom-script"
+	case NodePackage:
+		return "node-package"
+	case PythonTool:
+		return "python-tool"
 	default:
 		return "unknown"
 	}
@@ -128,4 +134,6 @@ type Tool struct {
 	CloneDest   string // for ShellPlugin: destination path (can use ~ for home)
 	PostClone   string // for ShellPlugin: identifier for post-clone hook logic
 	InstallCmd  string // for CustomScript: shell command run via bash -c
+	NodePkg     string // for NodePackage: npm package spec, e.g. "opencode-ai@latest"
+	PyTool      string // for PythonTool: uv tool name, e.g. "checkov"
 }

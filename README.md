@@ -76,7 +76,7 @@ Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`
 
 Everything else via `cps extend` is optional — install what you need.
 
-> **Pack ordering for runtime-backed extensions.** Some packs invoke runtimes that `cps extend runtimes` provides — `ai-tools` (claude-code, opencode, codex, crush) uses `fnm`; `database` (pgcli, mycli) and `additional-cloud-tools` (checkov, prowler, oci-cli) use `uv`. Install `cps extend runtimes` (or at least its `uv` / `fnm` tools) before those packs, otherwise the install scripts fail with "command not found." Tools in those same packs that ship as standalone binaries (`antigravity`, `cursor-agent`, `aix`, `sq`, `usql`, `tofu`) have no runtime dependency.
+> **Pack ordering for runtime-backed extensions.** Some packs install through runtimes that `cps extend runtimes` provides. The `ai-tools` npm-backed CLIs (claude-code, opencode, codex, crush) need fnm's node on PATH — install `cps extend runtimes` first, then re-source your shell (or open a new one) so `fnm env` has run, otherwise CPS reports `npm install <pkg> failed`. The uv-backed Python CLIs in `database` (pgcli, mycli) and `additional-cloud-tools` (checkov, prowler, oci-cli) resolve `uv` automatically once it is installed. Tools in those packs that download a standalone binary (`antigravity`, `cursor-agent`, `aix`, `sq`, `tofu`) have no runtime dependency; `usql` comes from Homebrew.
 
 ### `cps extend <pack> [tools...]`
 

@@ -35,6 +35,10 @@ func Dispatch(kind registry.ToolKind) Installer {
 		return &ShellPluginInstaller{}
 	case registry.CustomScript:
 		return &CustomScriptInstaller{}
+	case registry.NodePackage:
+		return &NodePackageInstaller{}
+	case registry.PythonTool:
+		return &PythonToolInstaller{}
 	default:
 		return nil
 	}
