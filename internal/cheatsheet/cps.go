@@ -20,7 +20,7 @@ func buildCPSSheet() string {
 	b.WriteString(cmdStyle.Render("  cps extend <pack>") + "               Install entire extension pack\n")
 	b.WriteString(cmdStyle.Render("  cps extend <pack> <tool> ...") + "    Install specific tools from a pack\n")
 	b.WriteString(noteStyle.Render("  Packs: essentials, core, cloud, runtimes, security, cloudsec, appsec,") + "\n")
-	b.WriteString(noteStyle.Render("         misc, private, ai-tools, additional-cloud-tools, database") + "\n")
+	b.WriteString(noteStyle.Render("         misc, private, ai-tools, homelab") + "\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Shell Integration — RC Fragments") + "\n")

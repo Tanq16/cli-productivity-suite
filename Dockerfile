@@ -100,15 +100,12 @@ RUN cps extend misc \
 RUN cps extend ai-tools \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
  && sleep 20
-RUN cps extend additional-cloud-tools \
- && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
- && sleep 20
-RUN cps extend database \
+RUN cps extend homelab \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
  && sleep 20
 
 # Truly-private tools (toon, cybernest) need --gh-token; skipped here.
-RUN cps extend private nits raikiri gcli box claudex linksnapper kairo \
+RUN cps extend private nits gcli box claudex \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache
 
 CMD ["sleep", "infinity"]

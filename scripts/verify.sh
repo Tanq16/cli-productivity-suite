@@ -92,28 +92,24 @@ for t in nuclei naabu subfinder proxify trufflehog httpx dnsx gobuster; do
     check_bin "$t" "security"
 done
 # cloudsec
-for t in kubelogin grpcurl terraform kubectl cloudfox trivy cloudlist; do
+for t in kubelogin grpcurl terraform kubectl cloudfox trivy cloudlist checkov prowler oci tofu; do
     check_bin "$t" "cloudsec"
 done
 # appsec
 for t in katana ffuf dalfox reaper poltergeist wraith gau; do
     check_bin "$t" "appsec"
 done
-# misc
-for t in gowitness snitch age caddy; do check_bin "$t" "misc"; done
+# misc — usql known-broken on linux-arm64 (upstream duckdb-go-bindings)
+for t in gowitness snitch age pgcli mycli sq; do check_bin "$t" "misc"; done
+case "$arch" in
+    x86_64) check_bin "usql" "misc" ;;
+esac
 # ai-tools
 for t in claude codex cursor-agent opencode crush agy aix; do check_bin "$t" "ai-tools"; done
-# additional-cloud-tools
-for t in checkov prowler oci tofu; do
-    check_bin "$t" "additional-cloud-tools"
-done
-# database — usql known-broken on linux-arm64 (upstream duckdb-go-bindings)
-for t in pgcli mycli sq; do check_bin "$t" "database"; done
-case "$arch" in
-    x86_64) check_bin "usql" "database" ;;
-esac
+# homelab
+for t in caddy linksnapper kairo raikiri; do check_bin "$t" "homelab"; done
 # private (public subset)
-for t in nits raikiri gcli box claudex linksnapper kairo; do check_bin "$t" "private"; done
+for t in nits gcli box claudex; do check_bin "$t" "private"; done
 
 # --- nuclei templates non-empty ---
 [ -n "$(ls -A "$HOME/shell/nuclei-templates" 2>/dev/null)" ] || \

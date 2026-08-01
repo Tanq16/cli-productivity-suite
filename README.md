@@ -76,7 +76,7 @@ Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`
 
 Everything else via `cps extend` is optional — install what you need.
 
-> **Pack ordering for runtime-backed extensions.** Some packs install through runtimes that `cps extend runtimes` provides. The `ai-tools` npm-backed CLIs (claude-code, opencode, codex, crush) need fnm's node on PATH — install `cps extend runtimes` first, then re-source your shell (or open a new one) so `fnm env` has run, otherwise CPS reports `npm install <pkg> failed`. The uv-backed Python CLIs in `database` (pgcli, mycli) and `additional-cloud-tools` (checkov, prowler, oci-cli) resolve `uv` automatically once it is installed. Tools in those packs that download a standalone binary (`antigravity`, `cursor-agent`, `aix`, `sq`, `tofu`) have no runtime dependency; `usql` comes from Homebrew.
+> **Pack ordering for runtime-backed extensions.** Some packs install through runtimes that `cps extend runtimes` provides. The `ai-tools` npm-backed CLIs (claude-code, opencode, codex, crush) need fnm's node on PATH — install `cps extend runtimes` first, then re-source your shell (or open a new one) so `fnm env` has run, otherwise CPS reports `npm install <pkg> failed`. The uv-backed Python CLIs in `cloudsec` (checkov, prowler, oci-cli) and `misc` (pgcli, mycli) resolve `uv` automatically once it is installed. Tools in those packs that download a standalone binary (`antigravity`, `cursor-agent`, `aix`, `sq`, `tofu`) have no runtime dependency; `usql` comes from Homebrew.
 
 ### `cps extend <pack> [tools...]`
 
@@ -96,13 +96,12 @@ cps extend security nuclei subfinder  # pick specific tools
 | runtimes | uv, fnm, bun, Go, Java (Temurin LTS), Python (via uv), Rust, Node.js LTS (via fnm) |
 | cloud | AWS CLI, Azure CLI, gcloud CLI |
 | security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, gobuster, nuclei-templates |
-| cloudsec | terraform, kubectl, kubelogin, grpcurl, cloudfox, trivy, cloudlist |
+| cloudsec | terraform, kubectl, kubelogin, grpcurl, cloudfox, trivy, cloudlist, checkov, prowler, oci-cli, tofu |
 | appsec | katana, ffuf, dalfox, reaper, poltergeist, wraith, gau |
-| misc | gowitness, snitch, age, caddy |
-| private | Personal tools — public subset (`nits`, `raikiri`, `gcli`, `box`, `claudex`, `linksnapper`, `kairo`) installs as-is; the truly-private two (`toon`, `cybernest`) need `--gh-token` |
+| misc | gowitness, snitch, age + database CLIs (pgcli, mycli, sq, usql) |
+| private | Personal tools — public subset (`nits`, `gcli`, `box`, `claudex`) installs as-is; the truly-private two (`toon`, `cybernest`) need `--gh-token` |
 | ai-tools | AI coding agents and LLM CLIs (claude-code, opencode, antigravity, codex, cursor-agent, crush, aix) |
-| additional-cloud-tools | Extra cloud and IaC tooling (checkov, prowler, oci-cli, tofu) |
-| database | Interactive database CLIs (pgcli, mycli, sq, usql) |
+| homelab | Self-hosted services (caddy, linksnapper, kairo, raikiri) |
 
 Packs with shell integration (`runtimes`, `cloud`, `security`) deploy RC fragments automatically.
 
@@ -176,7 +175,7 @@ docker run -d --name cps-sandbox cps-sandbox
 docker exec -it cps-sandbox zsh -l
 ```
 
-The image is multi-arch (`linux/amd64` + `linux/arm64`) and large (multi-GB) — it carries full language runtimes, cloud CLIs, security tooling, the `ai-tools`, `additional-cloud-tools`, and `database` packs, and the public-repo tools from the `private` pack (`nits`, `raikiri`, `gcli`, `box`, `claudex`, `linksnapper`, `kairo`). The two truly-private tools (`toon`, `cybernest`) are skipped since they need an auth token.
+The image is multi-arch (`linux/amd64` + `linux/arm64`) and large (multi-GB) — it carries full language runtimes, cloud CLIs, security tooling, the `ai-tools` and `homelab` packs, and the public-repo tools from the `private` pack (`nits`, `gcli`, `box`, `claudex`). The two truly-private tools (`toon`, `cybernest`) are skipped since they need an auth token.
 
 ### A ready environment for AI agents
 

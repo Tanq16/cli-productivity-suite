@@ -58,8 +58,7 @@ const (
 	ExtCloud
 	ExtRuntimes
 	ExtAITools
-	ExtAdditionalCloud
-	ExtDatabase
+	ExtHomelab
 )
 
 func (c ToolCategory) String() string {
@@ -96,10 +95,8 @@ func (c ToolCategory) String() string {
 		return "ext-runtimes"
 	case ExtAITools:
 		return "ext-ai-tools"
-	case ExtAdditionalCloud:
-		return "ext-additional-cloud"
-	case ExtDatabase:
-		return "ext-database"
+	case ExtHomelab:
+		return "ext-homelab"
 	default:
 		return "unknown"
 	}

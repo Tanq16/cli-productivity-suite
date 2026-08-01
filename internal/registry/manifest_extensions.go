@@ -174,6 +174,32 @@ var extensionPacks = []ExtensionPack{
 					BinaryPathInArchive: "cloudlist",
 				},
 			},
+			{
+				Name: "checkov", Kind: PythonTool, Category: ExtCloudSec, Extension: true,
+				Description: "IaC static analysis scanner",
+				PyTool:      "checkov",
+			},
+			{
+				Name: "prowler", Kind: PythonTool, Category: ExtCloudSec, Extension: true,
+				Description: "Cloud security posture scanner",
+				PyTool:      "prowler",
+			},
+			{
+				Name: "oci-cli", Kind: PythonTool, Category: ExtCloudSec, Extension: true,
+				Description: "Oracle Cloud Infrastructure CLI",
+				PyTool:      "oci-cli",
+			},
+			{
+				Name: "tofu", BinaryName: "tofu", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
+				Repo: "opentofu/opentofu", Description: "OpenTofu infrastructure as code",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows", "freebsd", "openbsd", "solaris", "sig", "pem", "SHA256SUMS", ".deb", ".rpm", ".apk", ".zip"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "tofu",
+				},
+			},
 		},
 	},
 	{
@@ -296,15 +322,30 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "caddy", BinaryName: "caddy", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
-				Repo: "caddyserver/caddy", Description: "Web server / reverse proxy",
+				Name: "pgcli", Kind: PythonTool, Category: ExtMisc, Extension: true,
+				Description: "PostgreSQL CLI with autocompletion",
+				PyTool:      "pgcli",
+			},
+			{
+				Name: "mycli", Kind: PythonTool, Category: ExtMisc, Extension: true,
+				Description: "MySQL CLI with autocompletion",
+				PyTool:      "mycli",
+			},
+			{
+				Name: "sq", BinaryName: "sq", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
+				Repo: "neilotoole/sq", Description: "jq-like data wrangler for databases",
 				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "mac"},
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
 					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"windows", "freebsd"},
+					ExcludeSubstrings:   []string{"windows", ".deb", ".rpm", ".apk", ".zst", "checksums"},
 					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "caddy",
+					BinaryPathInArchive: "sq",
 				},
+			},
+			{
+				Name: "usql", Kind: SystemPackage, Category: ExtMisc, Extension: true,
+				Description: "Universal SQL CLI for many databases",
+				BrewPkgs:    []string{"xo/xo/usql"},
 			},
 		},
 	},
@@ -316,15 +357,6 @@ var extensionPacks = []ExtensionPack{
 			{
 				Name: "nits", BinaryName: "nits", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
 				Repo: "Tanq16/nits", Description: "Nits tool",
-				Asset: AssetPattern{
-					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat: "none",
-				},
-			},
-			{
-				Name: "raikiri", BinaryName: "raikiri", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
-				Repo: "Tanq16/raikiri", Description: "Raikiri tool",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
@@ -352,24 +384,6 @@ var extensionPacks = []ExtensionPack{
 			{
 				Name: "claudex", BinaryName: "claudex", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
 				Repo: "Tanq16/claudex", Description: "Claudex tool",
-				Asset: AssetPattern{
-					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat: "none",
-				},
-			},
-			{
-				Name: "linksnapper", BinaryName: "linksnapper", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
-				Repo: "Tanq16/linksnapper", Description: "LinkSnapper bookmark manager",
-				Asset: AssetPattern{
-					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat: "none",
-				},
-			},
-			{
-				Name: "kairo", BinaryName: "kairo", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
-				Repo: "Tanq16/kairo", Description: "Kairo markdown note-taking app",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
@@ -754,68 +768,47 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 		},
 	},
 	{
-		Name:        "additional-cloud-tools",
-		Description: "Extra cloud and IaC tooling (uv-managed Python CLIs and OpenTofu)",
-		Category:    ExtAdditionalCloud,
+		Name:        "homelab",
+		Description: "Self-hosted homelab services",
+		Category:    ExtHomelab,
 		Tools: []Tool{
 			{
-				Name: "checkov", Kind: PythonTool, Category: ExtAdditionalCloud, Extension: true,
-				Description: "IaC static analysis scanner",
-				PyTool:      "checkov",
-			},
-			{
-				Name: "prowler", Kind: PythonTool, Category: ExtAdditionalCloud, Extension: true,
-				Description: "Cloud security posture scanner",
-				PyTool:      "prowler",
-			},
-			{
-				Name: "oci-cli", Kind: PythonTool, Category: ExtAdditionalCloud, Extension: true,
-				Description: "Oracle Cloud Infrastructure CLI",
-				PyTool:      "oci-cli",
-			},
-			{
-				Name: "tofu", BinaryName: "tofu", Kind: GitHubRelease, Category: ExtAdditionalCloud, Extension: true,
-				Repo: "opentofu/opentofu", Description: "OpenTofu infrastructure as code",
+				Name: "caddy", BinaryName: "caddy", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Repo: "caddyserver/caddy", Description: "Web server / reverse proxy",
 				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "mac"},
 					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"windows", "freebsd", "openbsd", "solaris", "sig", "pem", "SHA256SUMS", ".deb", ".rpm", ".apk", ".zip"},
+					ExcludeSubstrings:   []string{"windows", "freebsd"},
 					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "tofu",
-				},
-			},
-		},
-	},
-	{
-		Name:        "database",
-		Description: "Interactive database CLIs",
-		Category:    ExtDatabase,
-		Tools: []Tool{
-			{
-				Name: "pgcli", Kind: PythonTool, Category: ExtDatabase, Extension: true,
-				Description: "PostgreSQL CLI with autocompletion",
-				PyTool:      "pgcli",
-			},
-			{
-				Name: "mycli", Kind: PythonTool, Category: ExtDatabase, Extension: true,
-				Description: "MySQL CLI with autocompletion",
-				PyTool:      "mycli",
-			},
-			{
-				Name: "sq", BinaryName: "sq", Kind: GitHubRelease, Category: ExtDatabase, Extension: true,
-				Repo: "neilotoole/sq", Description: "jq-like data wrangler for databases",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"windows", ".deb", ".rpm", ".apk", ".zst", "checksums"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "sq",
+					BinaryPathInArchive: "caddy",
 				},
 			},
 			{
-				Name: "usql", Kind: SystemPackage, Category: ExtDatabase, Extension: true,
-				Description: "Universal SQL CLI for many databases",
-				BrewPkgs:    []string{"xo/xo/usql"},
+				Name: "linksnapper", BinaryName: "linksnapper", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Repo: "Tanq16/linksnapper", Description: "LinkSnapper bookmark manager",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
+				Name: "kairo", BinaryName: "kairo", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Repo: "Tanq16/kairo", Description: "Kairo markdown note-taking app",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
+				Name: "raikiri", BinaryName: "raikiri", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Repo: "Tanq16/raikiri", Description: "Self-hosted media and music server",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
 			},
 		},
 	},
