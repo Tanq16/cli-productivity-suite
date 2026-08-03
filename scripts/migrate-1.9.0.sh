@@ -14,11 +14,11 @@ STATE_KEYS=(
   praetorian-cli reaper snitch titus trajan usql vespasian wraith
 )
 
-echo "CPS 1.8.0 migration"
+echo "CPS 1.9.0 migration"
 echo ""
 if grep -q 'shell/executables' "$HOME/shell/rc/00-base.zsh" 2>/dev/null; then
   echo "WARNING: ~/shell/rc/00-base.zsh still puts ~/shell/executables on PATH."
-  echo "Run 'cps init' with the 1.8.0 binary first, then re-run this script."
+  echo "Run 'cps init' with the 1.9.0 binary first, then re-run this script."
   echo ""
 fi
 echo "Will remove:"
@@ -31,7 +31,7 @@ echo "  - Dropped brew formulas (${BREW_PKGS[*]})"
 echo "  - Their entries in ~/.config/cps/state.json"
 echo ""
 echo "Will preserve:"
-echo "  - Everything still shipped in 1.8.0 (prowler, oci-cli, tofu, sq, caddy, ...)"
+echo "  - Everything still shipped in 1.9.0 (prowler, oci-cli, tofu, sq, caddy, ...)"
 echo "  - ~/shell/custom-bin and ~/shell/rc/custom (your drop zones)"
 echo "  - Existing ~/shell/custom-bin files (never overwritten by the move)"
 echo ""
