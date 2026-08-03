@@ -724,6 +724,7 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 			{
 				Name: "code-server", Kind: AppBundle, Category: ExtHomelab, Extension: true,
 				Repo: "coder/code-server", Description: "VS Code in the browser",
+				PostInstall: "code-server",
 				Asset: AssetPattern{
 					OSPatterns:        map[string]string{"linux": "linux", "darwin": "macos"},
 					ArchPatterns:      map[string]string{"amd64": "amd64", "arm64": "arm64"},

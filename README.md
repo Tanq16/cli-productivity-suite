@@ -164,11 +164,35 @@ Both `~/shell/rc/custom/` and `~/shell/custom-bin/` are created by `cps init` an
 
 - CPS-installed binaries all land in `~/shell/extensions/` (on PATH)
 - User-owned binaries live in `~/shell/custom-bin/` (also on PATH, prepended ahead of the CPS-managed dirs, so yours wins on a name collision)
-- App bundles (`rinnegan`, `code-server`, `neo4j`) unpack to `~/shell/apps/<name>/` instead — they are multi-file trees, not single binaries, so they are **not** on PATH. Launch them by full path, e.g. `~/shell/apps/rinnegan/bin/rinnegan serve`. `rinnegan` and `code-server` carry their own Node runtime; `neo4j` does not ship a JVM and runs on the `JAVA_HOME` that `cps extend runtimes` sets up
+- App bundles (`rinnegan`, `code-server`, `neo4j`) unpack to `~/shell/apps/<name>/` instead — they are multi-file trees, not single binaries, so they are **not** on PATH. Launch them by full path (see below). `rinnegan` and `code-server` carry their own Node runtime; `neo4j` does not ship a JVM and runs on the `JAVA_HOME` that `cps extend runtimes` sets up
 - Upgrading an app bundle replaces the whole tree, so nothing user-owned may live inside one. Neo4j would otherwise keep its databases in `~/shell/apps/neo4j/data/`, so `cps extend misc` relocates them: it seeds `~/.config/neo4j/conf/` once (never overwriting it afterwards) with absolute `server.directories.*` paths, and `40-misc.zsh` exports `NEO4J_CONF` so Neo4j reads that conf instead of the bundle's. Your graph, plugins, and tuning live in `~/.config/neo4j/` and survive every upgrade — and `deep-removal.sh` leaves them alone
 - State tracked in `~/.config/cps/state.json` — runs are idempotent, already-current tools are skipped
 - If `gh` CLI is authenticated, CPS uses its token automatically — no need for `--gh-token`
 - `00-base.zsh` exports `HOMEBREW_NO_AUTO_UPDATE=1` so `brew install` stays fast and deterministic. If you want brew to auto-update on every invocation, drop `unset HOMEBREW_NO_AUTO_UPDATE` into a file under `~/shell/rc/custom/`
+
+<details>
+<summary><b>Running the app bundles</b></summary>
+
+None of these are on PATH — run them by full path. Each keeps its state outside `~/shell/apps/`, so upgrades never touch your data.
+
+```bash
+~/shell/apps/rinnegan/bin/rinnegan serve            # PTY web terminal
+~/shell/apps/code-server/bin/code-server            # VS Code in the browser, http://127.0.0.1:8080
+~/shell/apps/neo4j/bin/neo4j console                # graph database, http://localhost:7474
+~/shell/apps/neo4j/bin/cypher-shell                 # Cypher client for the above
+```
+
+**`code-server`** is pre-configured on first install and never reconfigured afterwards. It binds to `127.0.0.1:8080` with **authentication disabled**, telemetry and update checks off, the port-proxy routes disabled, Catppuccin Mocha as the theme, and JetBrains Mono as the editor font. Override anything per-launch — `code-server --bind-addr 127.0.0.1:9000` for a different port — since CLI flags beat the config file.
+
+Config lives in `~/.config/code-server/config.yaml`; editor settings and extensions in `~/.local/share/code-server/`. Every key in that YAML is a `code-server` flag with the dashes stripped, and an **unknown key is a fatal startup error**. To add authentication later, replace `auth: none` with `auth: password` plus either `password:` or `hashed-password:` (an argon2 hash, which wins if both are set) — note these two cannot be passed as CLI flags, by design, so they must go in the config file or the `PASSWORD`/`HASHED_PASSWORD` env vars.
+
+`auth: none` is only safe because it binds to loopback. To reach it from another machine, forward the port over SSH rather than changing `bind-addr` — `ssh -L 8080:localhost:8080 you@host` — which also keeps the browser on `localhost`, a secure context. Over a plain-HTTP LAN address, webviews and clipboard access break.
+
+These extensions install with it, from Open VSX: Catppuccin theme + icons, EditorConfig, Error Lens, Code Spell Checker, YAML, Go, Python, and Ruff.
+
+**`neo4j`** reads its config from `~/.config/neo4j/conf/` via `NEO4J_CONF`, and stores databases in `~/.config/neo4j/data/`. Set a password before first start with `~/shell/apps/neo4j/bin/neo4j-admin dbms set-initial-password <password>`.
+
+</details>
 
 ## Sandbox Container
 

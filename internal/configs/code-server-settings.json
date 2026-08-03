@@ -1,0 +1,23 @@
+{
+  "workbench.colorTheme": "Catppuccin Mocha",
+  "workbench.iconTheme": "catppuccin-mocha",
+  "catppuccin.italicComments": true,
+
+  "editor.fontFamily": "'JetBrainsMono Nerd Font Mono', 'JetBrainsMono NFM Light', 'JetBrains Mono', Menlo, 'Droid Sans Mono', monospace",
+  "editor.fontLigatures": true,
+  "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font Mono', 'JetBrainsMono NFM Light', 'JetBrains Mono', Menlo, monospace",
+
+  "telemetry.telemetryLevel": "off",
+
+  "remote.autoForwardPorts": false,
+  "remote.restoreForwardedPorts": false,
+
+  "update.mode": "none",
+  "extensions.autoUpdate": false,
+  "extensions.autoCheckUpdates": false,
+  "extensions.ignoreRecommendations": true,
+  "workbench.startupEditor": "none",
+
+  "security.workspace.trust.enabled": false,
+  "security.workspace.trust.startupPrompt": "never"
+}

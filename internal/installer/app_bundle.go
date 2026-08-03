@@ -66,11 +66,11 @@ func (a *AppBundleInstaller) Install(tool *registry.Tool, p platform.Platform, g
 	if err := stageAndSwap(unwrapSingleDir(extractDir), destDir); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
+	// Version is recorded before the hook so a seeding failure retries on the next run instead of re-downloading the bundle.
+	st.SetToolVersion(tool.Name, src.version)
 	if err := runPostInstall(tool, p, destDir); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
-
-	st.SetToolVersion(tool.Name, src.version)
 
 	wasUpdated := currentVersion != "" && currentVersion != src.version
 	return Result{Tool: tool.Name, Version: src.version, WasUpdated: wasUpdated}
