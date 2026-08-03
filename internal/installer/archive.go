@@ -37,8 +37,7 @@ func ExtractArchive(archivePath, destDir, format string) error {
 	}
 }
 
-// Bundle archives wrap their payload in a single dir whose name varies by tool and version
-// (rinnegan-darwin-arm64, code-server-4.131.0-macos-amd64), so unwrap it to get a stable root.
+// Bundle archive roots are named per tool and version, so unwrap to keep the install path stable.
 func unwrapSingleDir(dir string) string {
 	entries, err := os.ReadDir(dir)
 	if err != nil || len(entries) != 1 || !entries[0].IsDir() {
