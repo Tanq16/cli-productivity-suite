@@ -117,10 +117,10 @@ type AssetPattern struct {
 
 type Tool struct {
 	Name        string
-	BinaryName  string // name of the binary in ~/shell/executables/ (or ~/shell/extensions/ for extensions)
+	BinaryName  string // name of the installed binary in ~/shell/extensions/
 	Kind        ToolKind
 	Category    ToolCategory
-	Extension   bool   // true = install to ~/shell/extensions/ instead of ~/shell/executables/
+	Extension   bool   // false = base tool installed by cps init; true = installed by cps extend
 	Repo        string // "owner/repo" for GitHub tools
 	Asset       AssetPattern
 	IsPrivate   bool

@@ -161,8 +161,8 @@ Both `~/shell/rc/custom/` and `~/shell/custom-bin/` are created by `cps init` an
 
 ## Tips & Notes
 
-- Core tools install to `~/shell/executables/`, extensions to `~/shell/extensions/` — both on PATH
-- User-owned binaries live in `~/shell/custom-bin/` (also on PATH, prepended ahead of the CPS-managed dirs)
+- CPS-installed binaries all land in `~/shell/extensions/` (on PATH)
+- User-owned binaries live in `~/shell/custom-bin/` (also on PATH, prepended ahead of the CPS-managed dirs, so yours wins on a name collision)
 - Self-contained app bundles (`rinnegan`, `code-server`) unpack to `~/shell/apps/<name>/` instead — they are multi-file trees with their own bundled Node runtime, not single binaries, so they are **not** on PATH. Launch them by full path, e.g. `~/shell/apps/rinnegan/bin/rinnegan serve`
 - State tracked in `~/.config/cps/state.json` — runs are idempotent, already-current tools are skipped
 - If `gh` CLI is authenticated, CPS uses its token automatically — no need for `--gh-token`

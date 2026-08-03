@@ -41,7 +41,6 @@ func Init(ghToken string) {
 	}
 	for _, dir := range []string{
 		p.ShellDir(),
-		p.ShellExecDir(),
 		filepath.Join(p.ShellDir(), "rc"),
 		filepath.Join(p.ShellDir(), "rc", "custom"),
 		filepath.Join(p.ShellDir(), "env"),

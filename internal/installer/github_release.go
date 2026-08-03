@@ -19,10 +19,7 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 		return Result{Tool: tool.Name, Err: fmt.Errorf("failed to fetch release: %w", err)}
 	}
 
-	destDir := p.ShellExecDir()
-	if tool.Extension {
-		destDir = p.ShellExtDir()
-	}
+	destDir := p.ShellExtDir()
 
 	currentVersion := st.ToolVersion(tool.Name)
 	if currentVersion == release.TagName {

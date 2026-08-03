@@ -25,7 +25,7 @@ sudo -n true 2>/dev/null || fail "sudo: NOPASSWD not configured"
 
 # --- directories ---
 for d in \
-    shell/executables shell/extensions shell/custom-bin shell/plugins shell/apps \
+    shell/extensions shell/custom-bin shell/plugins shell/apps \
     shell/rc shell/rc/custom shell/env shell/completions \
     shell/go-sdk shell/java-sdk shell/rust shell/fnm shell/py-default \
     shell/uv-tools shell/uv-tool-executables shell/uv-python \
@@ -61,7 +61,7 @@ done
 
 # --- PATH composition ---
 for p in \
-    "$HOME/shell/custom-bin" "$HOME/shell/extensions" "$HOME/shell/executables" \
+    "$HOME/shell/custom-bin" "$HOME/shell/extensions" \
     "$HOME/shell/uv-tool-executables" "$HOME/shell/go-sdk/bin" \
     "$HOME/shell/go/bin" "$HOME/shell/java-sdk/bin" \
     "$HOME/shell/rust/.cargo/bin" "$HOME/shell/bun/bin" \

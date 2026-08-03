@@ -22,10 +22,7 @@ func (d *DirectDownloadInstaller) Install(tool *registry.Tool, p platform.Platfo
 		return Result{Tool: tool.Name, Err: err}
 	}
 
-	destDir := p.ShellExecDir()
-	if tool.Extension {
-		destDir = p.ShellExtDir()
-	}
+	destDir := p.ShellExtDir()
 
 	currentVersion := st.ToolVersion(tool.Name)
 	if currentVersion == version && version != "" {

@@ -7,8 +7,8 @@ func buildCPSSheet() string {
 	divider := dividerStyle.Render(strings.Repeat("─", 60))
 
 	b.WriteString(titleStyle.Render("CPS Cheat Sheet") + "\n")
-	b.WriteString(noteStyle.Render("  Tools: ~/shell/executables/      Extensions: ~/shell/extensions/") + "\n")
-	b.WriteString(noteStyle.Render("  RC fragments: ~/shell/rc/        User binaries: ~/shell/custom-bin/") + "\n")
+	b.WriteString(noteStyle.Render("  Tools: ~/shell/extensions/       User binaries: ~/shell/custom-bin/") + "\n")
+	b.WriteString(noteStyle.Render("  RC fragments: ~/shell/rc/") + "\n")
 	b.WriteString(noteStyle.Render("  App bundles: ~/shell/apps/ (not on PATH — run by full path)") + "\n\n")
 
 	b.WriteString(headingStyle.Render("Core Commands") + "\n")
