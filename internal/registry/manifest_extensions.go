@@ -142,17 +142,6 @@ var extensionPacks = []ExtensionPack{
 				URL:         "https://dl.k8s.io/release/{version}/bin/{os}/{arch}/kubectl",
 			},
 			{
-				Name: "cloudfox", BinaryName: "cloudfox", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
-				Repo: "BishopFox/cloudfox", Description: "Cloud security enumeration",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"windows"},
-					ArchiveFormat:       "zip",
-					BinaryPathInArchive: "cloudfox/cloudfox",
-				},
-			},
-			{
 				Name: "trivy", BinaryName: "trivy", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
 				Repo: "aquasecurity/trivy", Description: "Vulnerability and misconfiguration scanner",
 				Asset: AssetPattern{
@@ -162,22 +151,6 @@ var extensionPacks = []ExtensionPack{
 					ArchiveFormat:       "tar.gz",
 					BinaryPathInArchive: "trivy",
 				},
-			},
-			{
-				Name: "cloudlist", BinaryName: "cloudlist", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
-				Repo: "projectdiscovery/cloudlist", Description: "Cloud asset discovery",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"checksums", "windows"},
-					ArchiveFormat:       "zip",
-					BinaryPathInArchive: "cloudlist",
-				},
-			},
-			{
-				Name: "checkov", Kind: PythonTool, Category: ExtCloudSec, Extension: true,
-				Description: "IaC static analysis scanner",
-				PyTool:      "checkov",
 			},
 			{
 				Name: "prowler", Kind: PythonTool, Category: ExtCloudSec, Extension: true,
@@ -239,39 +212,6 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "reaper", BinaryName: "reaper", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
-				Repo: "ghostsecurity/reaper", Description: "API security testing",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"checksums", "sigstore"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "reaper",
-				},
-			},
-			{
-				Name: "poltergeist", BinaryName: "poltergeist", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
-				Repo: "ghostsecurity/poltergeist", Description: "API security tool",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"sigstore", "windows", ".zip"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "poltergeist",
-				},
-			},
-			{
-				Name: "wraith", BinaryName: "wraith", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
-				Repo: "ghostsecurity/wraith", Description: "API security tool",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"checksums", "sigstore", "windows", ".zip"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "wraith",
-				},
-			},
-			{
 				Name: "gau", BinaryName: "gau", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
 				Repo: "lc/gau", Description: "URL fetcher",
 				Asset: AssetPattern{
@@ -301,7 +241,7 @@ var extensionPacks = []ExtensionPack{
 			},
 			{
 				Name: "snitch", BinaryName: "snitch", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
-				Repo: "karol-broda/snitch", Description: "Secret scanner",
+				Repo: "karol-broda/snitch", Description: "Network connection inspector",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
 					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
@@ -322,16 +262,6 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "pgcli", Kind: PythonTool, Category: ExtMisc, Extension: true,
-				Description: "PostgreSQL CLI with autocompletion",
-				PyTool:      "pgcli",
-			},
-			{
-				Name: "mycli", Kind: PythonTool, Category: ExtMisc, Extension: true,
-				Description: "MySQL CLI with autocompletion",
-				PyTool:      "mycli",
-			},
-			{
 				Name: "sq", BinaryName: "sq", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
 				Repo: "neilotoole/sq", Description: "jq-like data wrangler for databases",
 				Asset: AssetPattern{
@@ -341,11 +271,6 @@ var extensionPacks = []ExtensionPack{
 					ArchiveFormat:       "tar.gz",
 					BinaryPathInArchive: "sq",
 				},
-			},
-			{
-				Name: "usql", Kind: SystemPackage, Category: ExtMisc, Extension: true,
-				Description: "Universal SQL CLI for many databases",
-				BrewPkgs:    []string{"xo/xo/usql"},
 			},
 		},
 	},
@@ -561,15 +486,6 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "ai-context", BinaryName: "ai-context", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
-				Repo: "Tanq16/ai-context", Description: "AI context builder",
-				Asset: AssetPattern{
-					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat: "none",
-				},
-			},
-			{
 				Name: "starship-config", Kind: ConfigFile, Category: ExtEssentials, Extension: true,
 				Description: "Starship prompt configuration",
 			},
@@ -683,11 +599,6 @@ var extensionPacks = []ExtensionPack{
 				NodePkg:     "@anthropic-ai/claude-code",
 			},
 			{
-				Name: "opencode", Kind: NodePackage, Category: ExtAITools, Extension: true,
-				Description: "Open-source terminal coding agent",
-				NodePkg:     "opencode-ai@latest",
-			},
-			{
 				Name: "antigravity", Kind: CustomScript, Category: ExtAITools, Extension: true,
 				Description: "Google Antigravity CLI agent",
 				InstallCmd: `set -eo pipefail
@@ -748,22 +659,6 @@ rm -rf "$APP_DIR"
 mv "$TMP" "$APP_DIR"
 ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 `,
-			},
-			{
-				Name: "crush", Kind: NodePackage, Category: ExtAITools, Extension: true,
-				Description: "Charm terminal coding agent",
-				NodePkg:     "@charmland/crush",
-			},
-			{
-				Name: "aix", BinaryName: "aix", Kind: GitHubRelease, Category: ExtAITools, Extension: true,
-				Repo: "projectdiscovery/aix", Description: "LLM prompt runner from ProjectDiscovery",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"windows", "386", "checksums"},
-					ArchiveFormat:       "zip",
-					BinaryPathInArchive: "aix",
-				},
 			},
 		},
 	},

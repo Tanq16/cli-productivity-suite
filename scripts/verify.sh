@@ -18,8 +18,6 @@
 failed=()
 fail() { failed+=("$1"); }
 
-arch=$(uname -m)
-
 # --- identity ---
 [ "$(whoami)" = "cps" ] || fail "user: expected 'cps', got '$(whoami)'"
 [ "$(id -u)" = "1000" ] || fail "uid: expected 1000, got $(id -u)"
@@ -78,7 +76,7 @@ done
 check_bin() { command -v "$1" >/dev/null 2>&1 || fail "$2: $1"; }
 
 # essentials
-for t in bat fd rg lsd jq yq fzf gh gron zoxide sd starship anbu danzo ai-context; do
+for t in bat fd rg lsd jq yq fzf gh gron zoxide sd starship anbu danzo; do
     check_bin "$t" "essentials"
 done
 # runtimes
@@ -92,20 +90,17 @@ for t in nuclei naabu subfinder proxify trufflehog httpx dnsx gobuster; do
     check_bin "$t" "security"
 done
 # cloudsec
-for t in kubelogin grpcurl terraform kubectl cloudfox trivy cloudlist checkov prowler oci tofu; do
+for t in kubelogin grpcurl terraform kubectl trivy prowler oci tofu; do
     check_bin "$t" "cloudsec"
 done
 # appsec
-for t in katana ffuf dalfox reaper poltergeist wraith gau; do
+for t in katana ffuf dalfox gau; do
     check_bin "$t" "appsec"
 done
-# misc — usql known-broken on linux-arm64 (upstream duckdb-go-bindings)
-for t in gowitness snitch age pgcli mycli sq; do check_bin "$t" "misc"; done
-case "$arch" in
-    x86_64) check_bin "usql" "misc" ;;
-esac
+# misc
+for t in gowitness snitch age sq; do check_bin "$t" "misc"; done
 # ai-tools
-for t in claude codex cursor-agent opencode crush agy aix; do check_bin "$t" "ai-tools"; done
+for t in claude codex cursor-agent agy; do check_bin "$t" "ai-tools"; done
 # homelab
 for t in caddy linksnapper kairo raikiri; do check_bin "$t" "homelab"; done
 # private (public subset)

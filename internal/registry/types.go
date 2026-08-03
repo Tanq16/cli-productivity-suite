@@ -131,6 +131,6 @@ type Tool struct {
 	CloneDest   string // for ShellPlugin: destination path (can use ~ for home)
 	PostClone   string // for ShellPlugin: identifier for post-clone hook logic
 	InstallCmd  string // for CustomScript: shell command run via bash -c
-	NodePkg     string // for NodePackage: npm package spec, e.g. "opencode-ai@latest"
-	PyTool      string // for PythonTool: uv tool name, e.g. "checkov"
+	NodePkg     string // for NodePackage: npm package spec, e.g. "@openai/codex"
+	PyTool      string // for PythonTool: uv tool name, e.g. "prowler"
 }

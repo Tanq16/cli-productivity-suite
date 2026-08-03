@@ -76,7 +76,7 @@ Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`
 
 Everything else via `cps extend` is optional — install what you need.
 
-> **Pack ordering for runtime-backed extensions.** Some packs install through runtimes that `cps extend runtimes` provides. The `ai-tools` npm-backed CLIs (claude-code, opencode, codex, crush) need fnm's node on PATH — install `cps extend runtimes` first, then re-source your shell (or open a new one) so `fnm env` has run, otherwise CPS reports `npm install <pkg> failed`. The uv-backed Python CLIs in `cloudsec` (checkov, prowler, oci-cli) and `misc` (pgcli, mycli) resolve `uv` automatically once it is installed. Tools in those packs that download a standalone binary (`antigravity`, `cursor-agent`, `aix`, `sq`, `tofu`) have no runtime dependency; `usql` comes from Homebrew.
+> **Pack ordering for runtime-backed extensions.** Some packs install through runtimes that `cps extend runtimes` provides. The `ai-tools` npm-backed CLIs (claude-code, codex) need fnm's node on PATH — install `cps extend runtimes` first, then re-source your shell (or open a new one) so `fnm env` has run, otherwise CPS reports `npm install <pkg> failed`. The uv-backed Python CLIs in `cloudsec` (prowler, oci-cli) resolve `uv` automatically once it is installed. Tools in those packs that download a standalone binary (`antigravity`, `cursor-agent`, `sq`, `tofu`) have no runtime dependency.
 
 ### `cps extend <pack> [tools...]`
 
@@ -91,16 +91,16 @@ cps extend security nuclei subfinder  # pick specific tools
 
 | Pack | Contents |
 |---|---|
-| essentials | Everyday CLI binaries (bat, fd, ripgrep, lsd, jq, yq, fzf, gh, gron, zoxide, sd, starship, anbu, danzo, ai-context) + starship.toml |
+| essentials | Everyday CLI binaries (bat, fd, ripgrep, lsd, jq, yq, fzf, gh, gron, zoxide, sd, starship, anbu, danzo) + starship.toml |
 | core | Dev tools, network utils, media packages (cmake, nmap, ffmpeg, aerospace) |
 | runtimes | uv, fnm, bun, Go, Java (Temurin LTS), Python (via uv), Rust, Node.js LTS (via fnm) |
 | cloud | AWS CLI, Azure CLI, gcloud CLI |
 | security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, gobuster, nuclei-templates |
-| cloudsec | terraform, kubectl, kubelogin, grpcurl, cloudfox, trivy, cloudlist, checkov, prowler, oci-cli, tofu |
-| appsec | katana, ffuf, dalfox, reaper, poltergeist, wraith, gau |
-| misc | gowitness, snitch, age + database CLIs (pgcli, mycli, sq, usql) |
+| cloudsec | terraform, kubectl, kubelogin, grpcurl, trivy, prowler, oci-cli, tofu |
+| appsec | katana, ffuf, dalfox, gau |
+| misc | gowitness, snitch, age, sq |
 | private | Personal tools — public subset (`nits`, `gcli`, `box`, `claudex`) installs as-is; the truly-private two (`toon`, `cybernest`) need `--gh-token` |
-| ai-tools | AI coding agents and LLM CLIs (claude-code, opencode, antigravity, codex, cursor-agent, crush, aix) |
+| ai-tools | AI coding agents (claude-code, antigravity, codex, cursor-agent) |
 | homelab | Self-hosted services (caddy, linksnapper, kairo, raikiri) |
 
 Packs with shell integration (`runtimes`, `cloud`, `security`) deploy RC fragments automatically.
@@ -179,9 +179,9 @@ The image is multi-arch (`linux/amd64` + `linux/arm64`) and large (multi-GB) —
 
 ### A ready environment for AI agents
 
-The prebuilt image is intentionally a **drop-in toolkit for AI coding agents** — Claude Code, Codex, opencode, Crush, antigravity, and friends. Spin up the container once and a single non-root user already has:
+The prebuilt image is intentionally a **drop-in toolkit for AI coding agents** — Claude Code, Codex, Cursor, antigravity, and friends. Spin up the container once and a single non-root user already has:
 
-- **The agent CLIs themselves** — `claude`, `codex`, `cursor-agent`, `opencode`, `crush`, `agy` (antigravity), `aix` (the `ai-tools` pack is pre-installed)
+- **The agent CLIs themselves** — `claude`, `codex`, `cursor-agent`, `agy` (antigravity) (the `ai-tools` pack is pre-installed)
 - **Language runtimes the agent will reach for** — Go, Node (via fnm), Bun, Python (via uv), Rust, Java (Temurin LTS), all on PATH with no further setup
 - **Everyday CLI building blocks** — bat, fd, ripgrep, lsd, jq, yq, fzf, gh, zoxide, gron, sd, starship, plus tmux + neovim
 - **Cloud + security tooling** — aws/azure/gcloud CLIs, kubectl, terraform, trivy, nuclei, httpx, dnsx, subfinder, ffuf, katana, and the rest of the security/cloudsec/appsec packs
@@ -191,7 +191,7 @@ The prebuilt image is intentionally a **drop-in toolkit for AI coding agents** �
 docker run -d --name agent-sandbox tanq16/cps-sandbox:latest
 docker exec -it agent-sandbox zsh -l
 # inside the container:
-claude   # or codex, cursor-agent, opencode, crush, agy, aix, ...
+claude   # or codex, cursor-agent, agy, ...
 ```
 
 This is the use case the image is tuned for: an agent (or a human delegating to one) lands in a shell where every tool it's likely to invoke — for code, search, package management, cloud ops, scanning, or recon — is already on PATH. No `brew install` round-trips, no runtime bootstrapping, no "let me set up your environment first." For ephemeral runs, add `--rm` to `docker run`; for sessions you want to come back to, keep the container around and re-`exec` in.
