@@ -8,7 +8,8 @@ func buildCPSSheet() string {
 
 	b.WriteString(titleStyle.Render("CPS Cheat Sheet") + "\n")
 	b.WriteString(noteStyle.Render("  Tools: ~/shell/executables/      Extensions: ~/shell/extensions/") + "\n")
-	b.WriteString(noteStyle.Render("  RC fragments: ~/shell/rc/        User binaries: ~/shell/custom-bin/") + "\n\n")
+	b.WriteString(noteStyle.Render("  RC fragments: ~/shell/rc/        User binaries: ~/shell/custom-bin/") + "\n")
+	b.WriteString(noteStyle.Render("  App bundles: ~/shell/apps/ (not on PATH — run by full path)") + "\n\n")
 
 	b.WriteString(headingStyle.Render("Core Commands") + "\n")
 	b.WriteString(cmdStyle.Render("  cps init") + "                        Base shell environment setup\n")

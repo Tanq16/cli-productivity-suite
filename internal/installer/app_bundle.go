@@ -11,22 +11,19 @@ import (
 	"github.com/tanq16/cli-productivity-suite/internal/state"
 )
 
-type GitHubReleaseInstaller struct{}
+type AppBundleInstaller struct{}
 
-func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) Result {
+func (a *AppBundleInstaller) Install(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) Result {
 	release, err := gh.LatestRelease(tool.Repo)
 	if err != nil {
 		return Result{Tool: tool.Name, Err: fmt.Errorf("failed to fetch release: %w", err)}
 	}
 
-	destDir := p.ShellExecDir()
-	if tool.Extension {
-		destDir = p.ShellExtDir()
-	}
+	destDir := filepath.Join(p.ShellAppsDir(), tool.Name)
 
 	currentVersion := st.ToolVersion(tool.Name)
 	if currentVersion == release.TagName {
-		if _, statErr := os.Stat(filepath.Join(destDir, tool.BinaryName)); statErr == nil {
+		if _, statErr := os.Stat(destDir); statErr == nil {
 			return Result{Tool: tool.Name, Version: release.TagName, Skipped: true}
 		}
 	}
@@ -52,40 +49,23 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 		return Result{Tool: tool.Name, Err: fmt.Errorf("download failed: %w", err)}
 	}
 
-	if err := os.MkdirAll(destDir, 0755); err != nil {
+	extractDir := filepath.Join(tmpDir, "extracted")
+	if err := os.MkdirAll(extractDir, 0755); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
-
-	var binaryPath string
 
 	archiveFmt := tool.Asset.ArchiveFormat
 	if f, ok := tool.Asset.OSArchiveFormats[p.OS.String()]; ok {
 		archiveFmt = f
 	}
-	if archiveFmt == "none" {
-		binaryPath = archivePath
-	} else {
-		extractDir := filepath.Join(tmpDir, "extracted")
-		if err := os.MkdirAll(extractDir, 0755); err != nil {
-			return Result{Tool: tool.Name, Err: err}
-		}
-
-		if err := ExtractArchive(archivePath, extractDir, archiveFmt); err != nil {
-			return Result{Tool: tool.Name, Err: fmt.Errorf("extract failed: %w", err)}
-		}
-
-		pattern := tool.Asset.BinaryPathInArchive
-		if pattern == "" {
-			pattern = tool.BinaryName
-		}
-		binaryPath, err = FindBinary(extractDir, pattern)
-		if err != nil {
-			return Result{Tool: tool.Name, Err: fmt.Errorf("binary not found in archive: %w", err)}
-		}
+	if err := ExtractArchive(archivePath, extractDir, archiveFmt); err != nil {
+		return Result{Tool: tool.Name, Err: fmt.Errorf("extract failed: %w", err)}
 	}
 
-	destPath := filepath.Join(destDir, tool.BinaryName)
-	if err := AtomicInstallBinary(binaryPath, destPath); err != nil {
+	if err := os.MkdirAll(p.ShellAppsDir(), 0755); err != nil {
+		return Result{Tool: tool.Name, Err: err}
+	}
+	if err := stageAndSwap(unwrapSingleDir(extractDir), destDir); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
 

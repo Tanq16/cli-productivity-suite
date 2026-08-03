@@ -703,6 +703,25 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 					ArchiveFormat: "none",
 				},
 			},
+			{
+				Name: "rinnegan", Kind: AppBundle, Category: ExtHomelab, Extension: true,
+				Repo: "Tanq16/rinnegan", Description: "Self-contained PTY web terminal",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "x64", "arm64": "arm64"},
+					ArchiveFormat: "tar.gz",
+				},
+			},
+			{
+				Name: "code-server", Kind: AppBundle, Category: ExtHomelab, Extension: true,
+				Repo: "coder/code-server", Description: "VS Code in the browser",
+				Asset: AssetPattern{
+					OSPatterns:        map[string]string{"linux": "linux", "darwin": "macos"},
+					ArchPatterns:      map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings: []string{".deb", ".rpm"},
+					ArchiveFormat:     "tar.gz",
+				},
+			},
 		},
 	},
 }

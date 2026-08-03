@@ -101,7 +101,7 @@ cps extend security nuclei subfinder  # pick specific tools
 | misc | gowitness, age, sq |
 | private | Personal tools — public subset (`nits`, `gcli`, `box`, `claudex`) installs as-is; the truly-private two (`toon`, `cybernest`) need `--gh-token` |
 | ai-tools | AI coding agents (antigravity, cursor-agent, claude-code¹, codex¹) |
-| homelab | Self-hosted services (caddy, linksnapper, kairo, raikiri, expenseowl) |
+| homelab | Self-hosted services (caddy, linksnapper, kairo, raikiri, expenseowl) + app bundles (rinnegan, code-server) |
 
 ¹ Needs `cps extend runtimes` first — `cps extend list` marks these as `(needs runtimes)`.
 
@@ -154,6 +154,7 @@ Both `~/shell/rc/custom/` and `~/shell/custom-bin/` are created by `cps init` an
 
 - Core tools install to `~/shell/executables/`, extensions to `~/shell/extensions/` — both on PATH
 - User-owned binaries live in `~/shell/custom-bin/` (also on PATH, prepended ahead of the CPS-managed dirs)
+- Self-contained app bundles (`rinnegan`, `code-server`) unpack to `~/shell/apps/<name>/` instead — they are multi-file trees with their own bundled Node runtime, not single binaries, so they are **not** on PATH. Launch them by full path, e.g. `~/shell/apps/rinnegan/bin/rinnegan serve`
 - State tracked in `~/.config/cps/state.json` — runs are idempotent, already-current tools are skipped
 - If `gh` CLI is authenticated, CPS uses its token automatically — no need for `--gh-token`
 - `00-base.zsh` exports `HOMEBREW_NO_AUTO_UPDATE=1` so `brew install` stays fast and deterministic. If you want brew to auto-update on every invocation, drop `unset HOMEBREW_NO_AUTO_UPDATE` into a file under `~/shell/rc/custom/`

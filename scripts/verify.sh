@@ -25,7 +25,7 @@ sudo -n true 2>/dev/null || fail "sudo: NOPASSWD not configured"
 
 # --- directories ---
 for d in \
-    shell/executables shell/extensions shell/custom-bin shell/plugins \
+    shell/executables shell/extensions shell/custom-bin shell/plugins shell/apps \
     shell/rc shell/rc/custom shell/env shell/completions \
     shell/go-sdk shell/java-sdk shell/rust shell/fnm shell/py-default \
     shell/uv-tools shell/uv-tool-executables shell/uv-python \
@@ -103,6 +103,10 @@ for t in gowitness age sq; do check_bin "$t" "misc"; done
 for t in claude codex cursor-agent agy; do check_bin "$t" "ai-tools"; done
 # homelab
 for t in caddy linksnapper kairo raikiri expenseowl; do check_bin "$t" "homelab"; done
+# homelab app bundles — not on PATH, so check the launcher inside the bundle
+for b in rinnegan/bin/rinnegan code-server/bin/code-server; do
+    [ -x "$HOME/shell/apps/$b" ] || fail "homelab: ~/shell/apps/$b"
+done
 # private (public subset)
 for t in nits gcli box claudex; do check_bin "$t" "private"; done
 

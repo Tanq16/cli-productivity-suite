@@ -24,6 +24,29 @@ func ExtractZip(archivePath, destDir string) error {
 	return utils.RunCmd(cmd)
 }
 
+func ExtractArchive(archivePath, destDir, format string) error {
+	switch format {
+	case "tar.gz", "tgz":
+		return ExtractTarGz(archivePath, destDir)
+	case "tar.xz":
+		return ExtractTarXz(archivePath, destDir)
+	case "zip":
+		return ExtractZip(archivePath, destDir)
+	default:
+		return fmt.Errorf("unknown archive format: %s", format)
+	}
+}
+
+// Bundle archives wrap their payload in a single dir whose name varies by tool and version
+// (rinnegan-darwin-arm64, code-server-4.131.0-macos-amd64), so unwrap it to get a stable root.
+func unwrapSingleDir(dir string) string {
+	entries, err := os.ReadDir(dir)
+	if err != nil || len(entries) != 1 || !entries[0].IsDir() {
+		return dir
+	}
+	return filepath.Join(dir, entries[0].Name())
+}
+
 func FindBinary(dir, pattern string) (string, error) {
 	matches, err := filepath.Glob(filepath.Join(dir, pattern))
 	if err != nil {

@@ -12,6 +12,7 @@ const (
 	CustomScript
 	NodePackage
 	PythonTool
+	AppBundle
 )
 
 func (k ToolKind) String() string {
@@ -34,6 +35,8 @@ func (k ToolKind) String() string {
 		return "node-package"
 	case PythonTool:
 		return "python-tool"
+	case AppBundle:
+		return "app-bundle"
 	default:
 		return "unknown"
 	}
