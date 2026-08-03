@@ -133,4 +133,5 @@ type Tool struct {
 	InstallCmd  string // for CustomScript: shell command run via bash -c
 	NodePkg     string // for NodePackage: npm package spec, e.g. "@openai/codex"
 	PyTool      string // for PythonTool: uv tool name, e.g. "prowler"
+	Requires    string // display-only prerequisite pack name; not enforced at install time
 }

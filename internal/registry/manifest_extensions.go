@@ -84,16 +84,6 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "gobuster", BinaryName: "gobuster", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
-				Repo: "OJ/gobuster", Description: "Directory/DNS brute-forcer",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "Linux", "darwin": "Darwin"},
-					ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "arm64"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "gobuster",
-				},
-			},
-			{
 				Name: "nuclei-templates", Kind: ShellPlugin, Category: ExtSecurity, Extension: true,
 				Description: "Nuclei vulnerability templates",
 				CloneURL:    "https://github.com/projectdiscovery/nuclei-templates.git",
@@ -155,12 +145,12 @@ var extensionPacks = []ExtensionPack{
 			{
 				Name: "prowler", Kind: PythonTool, Category: ExtCloudSec, Extension: true,
 				Description: "Cloud security posture scanner",
-				PyTool:      "prowler",
+				PyTool:      "prowler", Requires: "runtimes",
 			},
 			{
 				Name: "oci-cli", Kind: PythonTool, Category: ExtCloudSec, Extension: true,
 				Description: "Oracle Cloud Infrastructure CLI",
-				PyTool:      "oci-cli",
+				PyTool:      "oci-cli", Requires: "runtimes",
 			},
 			{
 				Name: "tofu", BinaryName: "tofu", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
@@ -212,6 +202,16 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
+				Name: "gobuster", BinaryName: "gobuster", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
+				Repo: "OJ/gobuster", Description: "Directory/DNS brute-forcer",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "Linux", "darwin": "Darwin"},
+					ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "arm64"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "gobuster",
+				},
+			},
+			{
 				Name: "gau", BinaryName: "gau", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
 				Repo: "lc/gau", Description: "URL fetcher",
 				Asset: AssetPattern{
@@ -237,17 +237,6 @@ var extensionPacks = []ExtensionPack{
 					ArchPatterns:      map[string]string{"amd64": "amd64", "arm64": "arm64"},
 					ExcludeSubstrings: []string{"windows"},
 					ArchiveFormat:     "none",
-				},
-			},
-			{
-				Name: "snitch", BinaryName: "snitch", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
-				Repo: "karol-broda/snitch", Description: "Network connection inspector",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"checksums", ".deb", ".rpm", ".apk", "windows"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "snitch",
 				},
 			},
 			{
@@ -596,7 +585,7 @@ var extensionPacks = []ExtensionPack{
 			{
 				Name: "claude-code", Kind: NodePackage, Category: ExtAITools, Extension: true,
 				Description: "Anthropic Claude Code CLI agent",
-				NodePkg:     "@anthropic-ai/claude-code",
+				NodePkg:     "@anthropic-ai/claude-code", Requires: "runtimes",
 			},
 			{
 				Name: "antigravity", Kind: CustomScript, Category: ExtAITools, Extension: true,
@@ -628,7 +617,7 @@ install -m 0755 "$TMP/antigravity" "$DEST_DIR/agy"
 			{
 				Name: "codex", Kind: NodePackage, Category: ExtAITools, Extension: true,
 				Description: "OpenAI Codex CLI agent",
-				NodePkg:     "@openai/codex",
+				NodePkg:     "@openai/codex", Requires: "runtimes",
 			},
 			{
 				Name: "cursor-agent", Kind: CustomScript, Category: ExtAITools, Extension: true,
@@ -699,6 +688,15 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 			{
 				Name: "raikiri", BinaryName: "raikiri", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
 				Repo: "Tanq16/raikiri", Description: "Self-hosted media and music server",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
+				Name: "expenseowl", BinaryName: "expenseowl", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Repo: "Tanq16/expenseowl", Description: "Self-hosted expense tracker",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},

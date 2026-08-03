@@ -24,6 +24,9 @@ func ExtendList() {
 			names := make([]string, len(tools))
 			for i, t := range tools {
 				names[i] = t.Name
+				if t.Requires != "" {
+					names[i] += " (needs " + t.Requires + ")"
+				}
 			}
 			utils.PrintGeneric("    " + strings.Join(names, ", "))
 		}

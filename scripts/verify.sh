@@ -86,7 +86,7 @@ done
 # cloud
 for t in aws az gcloud; do check_bin "$t" "cloud"; done
 # security
-for t in nuclei naabu subfinder proxify trufflehog httpx dnsx gobuster; do
+for t in nuclei naabu subfinder proxify trufflehog httpx dnsx; do
     check_bin "$t" "security"
 done
 # cloudsec
@@ -94,15 +94,15 @@ for t in kubelogin grpcurl terraform kubectl trivy prowler oci tofu; do
     check_bin "$t" "cloudsec"
 done
 # appsec
-for t in katana ffuf dalfox gau; do
+for t in katana ffuf dalfox gobuster gau; do
     check_bin "$t" "appsec"
 done
 # misc
-for t in gowitness snitch age sq; do check_bin "$t" "misc"; done
+for t in gowitness age sq; do check_bin "$t" "misc"; done
 # ai-tools
 for t in claude codex cursor-agent agy; do check_bin "$t" "ai-tools"; done
 # homelab
-for t in caddy linksnapper kairo raikiri; do check_bin "$t" "homelab"; done
+for t in caddy linksnapper kairo raikiri expenseowl; do check_bin "$t" "homelab"; done
 # private (public subset)
 for t in nits gcli box claudex; do check_bin "$t" "private"; done
 

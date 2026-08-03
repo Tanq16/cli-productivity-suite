@@ -76,7 +76,7 @@ Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`
 
 Everything else via `cps extend` is optional — install what you need.
 
-> **Pack ordering for runtime-backed extensions.** Some packs install through runtimes that `cps extend runtimes` provides. The `ai-tools` npm-backed CLIs (claude-code, codex) need fnm's node on PATH — install `cps extend runtimes` first, then re-source your shell (or open a new one) so `fnm env` has run, otherwise CPS reports `npm install <pkg> failed`. The uv-backed Python CLIs in `cloudsec` (prowler, oci-cli) resolve `uv` automatically once it is installed. Tools in those packs that download a standalone binary (`antigravity`, `cursor-agent`, `sq`, `tofu`) have no runtime dependency.
+> **Pack ordering for runtime-backed extensions.** A few tools install *through* a runtime rather than downloading a binary, so they need `cps extend runtimes` first. `cps extend list` marks each one `(needs runtimes)`. The npm-backed CLIs (`claude-code`, `codex`) need fnm's node on PATH — install `runtimes`, then re-source your shell (or open a new one) so `fnm env` has run, otherwise CPS reports `npm install <pkg> failed`. The uv-backed Python CLIs (`prowler`, `oci-cli`) resolve `uv` automatically once it is installed. Everything else, including `antigravity` and `cursor-agent`, downloads a standalone binary and has no runtime dependency.
 
 ### `cps extend <pack> [tools...]`
 
@@ -95,13 +95,15 @@ cps extend security nuclei subfinder  # pick specific tools
 | core | Dev tools, network utils, media packages (cmake, nmap, ffmpeg, aerospace) |
 | runtimes | uv, fnm, bun, Go, Java (Temurin LTS), Python (via uv), Rust, Node.js LTS (via fnm) |
 | cloud | AWS CLI, Azure CLI, gcloud CLI |
-| security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, gobuster, nuclei-templates |
-| cloudsec | terraform, kubectl, kubelogin, grpcurl, trivy, prowler, oci-cli, tofu |
-| appsec | katana, ffuf, dalfox, gau |
-| misc | gowitness, snitch, age, sq |
+| security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, nuclei-templates |
+| cloudsec | terraform, kubectl, kubelogin, grpcurl, trivy, tofu, prowler¹, oci-cli¹ |
+| appsec | katana, ffuf, dalfox, gobuster, gau |
+| misc | gowitness, age, sq |
 | private | Personal tools — public subset (`nits`, `gcli`, `box`, `claudex`) installs as-is; the truly-private two (`toon`, `cybernest`) need `--gh-token` |
-| ai-tools | AI coding agents (claude-code, antigravity, codex, cursor-agent) |
-| homelab | Self-hosted services (caddy, linksnapper, kairo, raikiri) |
+| ai-tools | AI coding agents (antigravity, cursor-agent, claude-code¹, codex¹) |
+| homelab | Self-hosted services (caddy, linksnapper, kairo, raikiri, expenseowl) |
+
+¹ Needs `cps extend runtimes` first — `cps extend list` marks these as `(needs runtimes)`.
 
 Packs with shell integration (`runtimes`, `cloud`, `security`) deploy RC fragments automatically.
 
