@@ -261,6 +261,15 @@ var extensionPacks = []ExtensionPack{
 					BinaryPathInArchive: "sq",
 				},
 			},
+			{
+				Name: "neo4j", Kind: AppBundle, Category: ExtMisc, Extension: true, Requires: "runtimes",
+				Description:   "Graph database with cypher-shell and browser UI",
+				URL:           "https://dist.neo4j.org/neo4j-community-{version}-unix.tar.gz",
+				StableURL:     "https://repo1.maven.org/maven2/org/neo4j/neo4j/maven-metadata.xml",
+				VersionRegex:  `<release>([^<]+)</release>`,
+				PreservePaths: []string{"data", "conf", "import", "plugins", "certificates"},
+				Asset:         AssetPattern{ArchiveFormat: "tar.gz"},
+			},
 		},
 	},
 	{

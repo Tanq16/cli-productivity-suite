@@ -99,6 +99,10 @@ for t in katana ffuf dalfox gobuster gau; do
 done
 # misc
 for t in gowitness age sq; do check_bin "$t" "misc"; done
+# misc app bundle — neo4j needs a JVM, so check the launcher and that JAVA_HOME resolves one
+[ -x "$HOME/shell/apps/neo4j/bin/neo4j" ] || fail "misc: ~/shell/apps/neo4j/bin/neo4j"
+[ -x "$HOME/shell/apps/neo4j/bin/cypher-shell" ] || fail "misc: ~/shell/apps/neo4j/bin/cypher-shell"
+[ -x "$JAVA_HOME/bin/java" ] || fail "misc: neo4j has no JVM at \$JAVA_HOME/bin/java"
 # ai-tools
 for t in claude codex cursor-agent agy; do check_bin "$t" "ai-tools"; done
 # homelab

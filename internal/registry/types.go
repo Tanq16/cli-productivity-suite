@@ -128,7 +128,7 @@ type Tool struct {
 	BrewCasks   []string // macOS brew cask packages
 	Platforms   []string // "linux", "darwin", or both; empty means both
 	Description string
-	URL         string // for DirectDownload: URL template with {version}, {os}, {arch}
+	URL         string // for DirectDownload and URL-sourced AppBundle: URL template with {version}, {os}, {arch}
 	StableURL   string // for DirectDownload: URL to fetch latest stable version string
 	CloneURL    string // for ShellPlugin: full git clone URL
 	CloneDest   string // for ShellPlugin: destination path (can use ~ for home)
@@ -137,4 +137,7 @@ type Tool struct {
 	NodePkg     string // for NodePackage: npm package spec, e.g. "@openai/codex"
 	PyTool      string // for PythonTool: uv tool name, e.g. "prowler"
 	Requires    string // display-only prerequisite pack name; not enforced at install time
+
+	VersionRegex  string   // applied to a StableURL body that is not a bare version string; first capture group wins
+	PreservePaths []string // for AppBundle: paths carried over from the old install so an upgrade cannot discard user state
 }

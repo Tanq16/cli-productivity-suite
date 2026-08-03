@@ -13,24 +13,24 @@ import (
 
 type AppBundleInstaller struct{}
 
+type bundleSource struct {
+	version string
+	fetch   func(tmpDir string) (string, error)
+}
+
 func (a *AppBundleInstaller) Install(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) Result {
-	release, err := gh.LatestRelease(tool.Repo)
+	src, err := bundleSourceFor(tool, p, gh)
 	if err != nil {
-		return Result{Tool: tool.Name, Err: fmt.Errorf("failed to fetch release: %w", err)}
+		return Result{Tool: tool.Name, Err: err}
 	}
 
 	destDir := filepath.Join(p.ShellAppsDir(), tool.Name)
 
 	currentVersion := st.ToolVersion(tool.Name)
-	if currentVersion == release.TagName {
+	if currentVersion == src.version {
 		if _, statErr := os.Stat(destDir); statErr == nil {
-			return Result{Tool: tool.Name, Version: release.TagName, Skipped: true}
+			return Result{Tool: tool.Name, Version: src.version, Skipped: true}
 		}
-	}
-
-	asset, err := github.MatchAsset(release, tool.Asset, p.OS.String(), p.Arch.String())
-	if err != nil {
-		return Result{Tool: tool.Name, Err: fmt.Errorf("no matching asset: %w", err)}
 	}
 
 	tmpDir, err := os.MkdirTemp("", "cps-"+tool.Name+"-*")
@@ -39,12 +39,7 @@ func (a *AppBundleInstaller) Install(tool *registry.Tool, p platform.Platform, g
 	}
 	defer os.RemoveAll(tmpDir)
 
-	downloadURL := asset.BrowserDownloadURL
-	if tool.IsPrivate {
-		downloadURL = asset.URL
-	}
-
-	archivePath, err := gh.DownloadFile(downloadURL, tmpDir, asset.Name)
+	archivePath, err := src.fetch(tmpDir)
 	if err != nil {
 		return Result{Tool: tool.Name, Err: fmt.Errorf("download failed: %w", err)}
 	}
@@ -65,12 +60,48 @@ func (a *AppBundleInstaller) Install(tool *registry.Tool, p platform.Platform, g
 	if err := os.MkdirAll(p.ShellAppsDir(), 0755); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
-	if err := stageAndSwap(unwrapSingleDir(extractDir), destDir); err != nil {
+	if err := stageAndSwapPreserving(unwrapSingleDir(extractDir), destDir, tool.PreservePaths); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
 
-	st.SetToolVersion(tool.Name, release.TagName)
+	st.SetToolVersion(tool.Name, src.version)
 
-	wasUpdated := currentVersion != "" && currentVersion != release.TagName
-	return Result{Tool: tool.Name, Version: release.TagName, WasUpdated: wasUpdated}
+	wasUpdated := currentVersion != "" && currentVersion != src.version
+	return Result{Tool: tool.Name, Version: src.version, WasUpdated: wasUpdated}
+}
+
+func bundleSourceFor(tool *registry.Tool, p platform.Platform, gh *github.Client) (bundleSource, error) {
+	if tool.URL != "" {
+		version, err := resolveVersion(tool, gh)
+		if err != nil {
+			return bundleSource{}, err
+		}
+		url := expandURL(tool.URL, version, p.OS.String(), p.Arch.String())
+		return bundleSource{
+			version: version,
+			fetch: func(tmpDir string) (string, error) {
+				archivePath := filepath.Join(tmpDir, tool.Name+"-archive")
+				return archivePath, DownloadToFile(url, archivePath)
+			},
+		}, nil
+	}
+
+	release, err := gh.LatestRelease(tool.Repo)
+	if err != nil {
+		return bundleSource{}, fmt.Errorf("failed to fetch release: %w", err)
+	}
+	asset, err := github.MatchAsset(release, tool.Asset, p.OS.String(), p.Arch.String())
+	if err != nil {
+		return bundleSource{}, fmt.Errorf("no matching asset: %w", err)
+	}
+	downloadURL := asset.BrowserDownloadURL
+	if tool.IsPrivate {
+		downloadURL = asset.URL
+	}
+	return bundleSource{
+		version: release.TagName,
+		fetch: func(tmpDir string) (string, error) {
+			return gh.DownloadFile(downloadURL, tmpDir, asset.Name)
+		},
+	}, nil
 }
