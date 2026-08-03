@@ -138,6 +138,6 @@ type Tool struct {
 	PyTool      string // for PythonTool: uv tool name, e.g. "prowler"
 	Requires    string // display-only prerequisite pack name; not enforced at install time
 
-	VersionRegex  string   // applied to a StableURL body that is not a bare version string; first capture group wins
-	PreservePaths []string // for AppBundle: paths carried over from the old install so an upgrade cannot discard user state
+	VersionRegex string // applied to a StableURL body that is not a bare version string; first capture group wins
+	PostInstall  string // for AppBundle: identifier for post-install hook logic
 }

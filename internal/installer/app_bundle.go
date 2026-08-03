@@ -29,6 +29,9 @@ func (a *AppBundleInstaller) Install(tool *registry.Tool, p platform.Platform, g
 	currentVersion := st.ToolVersion(tool.Name)
 	if currentVersion == src.version {
 		if _, statErr := os.Stat(destDir); statErr == nil {
+			if err := runPostInstall(tool, p, destDir); err != nil {
+				return Result{Tool: tool.Name, Err: err}
+			}
 			return Result{Tool: tool.Name, Version: src.version, Skipped: true}
 		}
 	}
@@ -60,7 +63,10 @@ func (a *AppBundleInstaller) Install(tool *registry.Tool, p platform.Platform, g
 	if err := os.MkdirAll(p.ShellAppsDir(), 0755); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
-	if err := stageAndSwapPreserving(unwrapSingleDir(extractDir), destDir, tool.PreservePaths); err != nil {
+	if err := stageAndSwap(unwrapSingleDir(extractDir), destDir); err != nil {
+		return Result{Tool: tool.Name, Err: err}
+	}
+	if err := runPostInstall(tool, p, destDir); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
 

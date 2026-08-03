@@ -206,6 +206,9 @@ func deployPackFragment(packName string, p platform.Platform) {
 	case "security":
 		content := []byte("export NUCLEI_TEMPLATES_DIR=\"$HOME/shell/nuclei-templates\"\n")
 		deployFragment(p, "30-security.zsh", content)
+	case "misc":
+		content := []byte("export NEO4J_CONF=\"$HOME/.config/neo4j/conf\"\n")
+		deployFragment(p, "40-misc.zsh", content)
 	}
 }
 

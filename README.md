@@ -114,7 +114,7 @@ cps extend security nuclei subfinder  # pick specific tools
 
 ¹ Needs `cps extend runtimes` first — `cps extend list` marks these as `(needs runtimes)`.
 
-Packs with shell integration (`runtimes`, `cloud`, `security`) deploy RC fragments automatically.
+Packs with shell integration (`runtimes`, `cloud`, `security`, `misc`) deploy RC fragments automatically.
 
 ### `cps cheat <topic>`
 
@@ -142,6 +142,7 @@ CPS uses a modular fragment system instead of a monolithic `.zshrc`:
 | `~/shell/rc/10-runtimes.zsh` | `cps extend runtimes` |
 | `~/shell/rc/20-cloud.zsh` | `cps extend cloud` |
 | `~/shell/rc/30-security.zsh` | `cps extend security` |
+| `~/shell/rc/40-misc.zsh` | `cps extend misc` |
 | `~/shell/rc/custom/*.zsh` | User-managed |
 
 `~/.zshrc` is a thin loader that sources all fragments in order.
@@ -164,7 +165,7 @@ Both `~/shell/rc/custom/` and `~/shell/custom-bin/` are created by `cps init` an
 - CPS-installed binaries all land in `~/shell/extensions/` (on PATH)
 - User-owned binaries live in `~/shell/custom-bin/` (also on PATH, prepended ahead of the CPS-managed dirs, so yours wins on a name collision)
 - App bundles (`rinnegan`, `code-server`, `neo4j`) unpack to `~/shell/apps/<name>/` instead — they are multi-file trees, not single binaries, so they are **not** on PATH. Launch them by full path, e.g. `~/shell/apps/rinnegan/bin/rinnegan serve`. `rinnegan` and `code-server` carry their own Node runtime; `neo4j` does not ship a JVM and runs on the `JAVA_HOME` that `cps extend runtimes` sets up
-- Upgrading an app bundle swaps the whole tree, so bundles that hold state declare what survives. `neo4j` keeps `data/`, `conf/`, `import/`, `plugins/`, and `certificates/` across upgrades — everything else in `~/shell/apps/neo4j/` is replaced
+- Upgrading an app bundle replaces the whole tree, so nothing user-owned may live inside one. Neo4j would otherwise keep its databases in `~/shell/apps/neo4j/data/`, so `cps extend misc` relocates them: it seeds `~/.config/neo4j/conf/` once (never overwriting it afterwards) with absolute `server.directories.*` paths, and `40-misc.zsh` exports `NEO4J_CONF` so Neo4j reads that conf instead of the bundle's. Your graph, plugins, and tuning live in `~/.config/neo4j/` and survive every upgrade — and `deep-removal.sh` leaves them alone
 - State tracked in `~/.config/cps/state.json` — runs are idempotent, already-current tools are skipped
 - If `gh` CLI is authenticated, CPS uses its token automatically — no need for `--gh-token`
 - `00-base.zsh` exports `HOMEBREW_NO_AUTO_UPDATE=1` so `brew install` stays fast and deterministic. If you want brew to auto-update on every invocation, drop `unset HOMEBREW_NO_AUTO_UPDATE` into a file under `~/shell/rc/custom/`

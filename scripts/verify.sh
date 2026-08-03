@@ -40,7 +40,7 @@ for f in \
     .config/kitty/kitty.conf .config/kitty/current-theme.conf \
     .config/starship.toml .config/cps/state.json \
     shell/rc/00-base.zsh shell/rc/10-runtimes.zsh \
-    shell/rc/20-cloud.zsh shell/rc/30-security.zsh \
+    shell/rc/20-cloud.zsh shell/rc/30-security.zsh shell/rc/40-misc.zsh \
     shell/env/brew.zsh \
     shell/completions/fzf.zsh shell/completions/uv.zsh \
     shell/completions/fnm.zsh shell/completions/zoxide.zsh \
@@ -103,6 +103,14 @@ for t in gowitness age sq; do check_bin "$t" "misc"; done
 [ -x "$HOME/shell/apps/neo4j/bin/neo4j" ] || fail "misc: ~/shell/apps/neo4j/bin/neo4j"
 [ -x "$HOME/shell/apps/neo4j/bin/cypher-shell" ] || fail "misc: ~/shell/apps/neo4j/bin/cypher-shell"
 [ -x "$JAVA_HOME/bin/java" ] || fail "misc: neo4j has no JVM at \$JAVA_HOME/bin/java"
+# neo4j state must live outside the bundle, or an upgrade destroys the databases
+[ -n "$NEO4J_CONF" ] || fail "misc: NEO4J_CONF unset — neo4j would use the bundle's own conf"
+[ -f "$NEO4J_CONF/neo4j.conf" ] || fail "misc: no neo4j.conf at \$NEO4J_CONF"
+for d in data plugins import logs run licenses; do
+    [ -d "$HOME/.config/neo4j/$d" ] || fail "misc: ~/.config/neo4j/$d missing"
+    grep -q "^server.directories.$d=$HOME/.config/neo4j/$d\$" "$NEO4J_CONF/neo4j.conf" 2>/dev/null || \
+        fail "misc: neo4j.conf does not relocate $d"
+done
 # ai-tools
 for t in claude codex cursor-agent agy; do check_bin "$t" "ai-tools"; done
 # homelab

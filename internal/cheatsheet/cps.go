@@ -30,6 +30,7 @@ func buildCPSSheet() string {
 	b.WriteString(noteStyle.Render("  10-runtimes.zsh    deployed by cps extend runtimes") + "\n")
 	b.WriteString(noteStyle.Render("  20-cloud.zsh       deployed by cps extend cloud") + "\n")
 	b.WriteString(noteStyle.Render("  30-security.zsh    deployed by cps extend security") + "\n")
+	b.WriteString(noteStyle.Render("  40-misc.zsh        deployed by cps extend misc") + "\n")
 	b.WriteString(noteStyle.Render("  custom/*.zsh       user-managed fragments") + "\n")
 	b.WriteString(divider + "\n")
 
