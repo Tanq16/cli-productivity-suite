@@ -16,6 +16,11 @@ STATE_KEYS=(
 
 echo "CPS 1.8.0 migration"
 echo ""
+if grep -q 'shell/executables' "$HOME/shell/rc/00-base.zsh" 2>/dev/null; then
+  echo "WARNING: ~/shell/rc/00-base.zsh still puts ~/shell/executables on PATH."
+  echo "Run 'cps init' with the 1.8.0 binary first, then re-run this script."
+  echo ""
+fi
 echo "Will remove:"
 echo "  - ~/shell/executables (no longer created; only if empty)"
 echo "  - ~/.config/cps/extensions (custom-extension YAML cache, system removed)"
