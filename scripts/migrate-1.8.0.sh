@@ -22,7 +22,7 @@ if grep -q 'shell/executables' "$HOME/shell/rc/00-base.zsh" 2>/dev/null; then
   echo ""
 fi
 echo "Will remove:"
-echo "  - ~/shell/executables (no longer created; only if empty)"
+echo "  - ~/shell/executables (offers to move any contents to ~/shell/custom-bin)"
 echo "  - ~/.config/cps/extensions (custom-extension YAML cache, system removed)"
 echo "  - Dropped binaries from ~/shell/extensions and ~/shell/go/bin"
 echo "  - Dropped uv tools (${UV_TOOLS[*]})"
@@ -33,7 +33,7 @@ echo ""
 echo "Will preserve:"
 echo "  - Everything still shipped in 1.8.0 (prowler, oci-cli, tofu, sq, caddy, ...)"
 echo "  - ~/shell/custom-bin and ~/shell/rc/custom (your drop zones)"
-echo "  - Anything you placed in ~/shell/executables yourself"
+echo "  - Existing ~/shell/custom-bin files (never overwritten by the move)"
 echo ""
 read -rp "Continue? [y/N] " ans
 case "$ans" in
@@ -80,14 +80,46 @@ fi
 echo "==> removing custom-extension YAML cache"
 rm -rf "$HOME/.config/cps/extensions"
 
+EXECDIR="$HOME/shell/executables"
+CUSTOMBIN="$HOME/shell/custom-bin"
+
 echo "==> removing ~/shell/executables"
-if [ -d "$HOME/shell/executables" ]; then
-  if [ -z "$(ls -A "$HOME/shell/executables" 2>/dev/null)" ]; then
-    rmdir "$HOME/shell/executables"
-  else
-    echo "    NOT removed: ~/shell/executables is not empty"
-    echo "    it is no longer on PATH; move what you need to ~/shell/custom-bin"
-  fi
+if [ ! -d "$EXECDIR" ]; then
+  echo "    already gone"
+elif [ -z "$(ls -A "$EXECDIR" 2>/dev/null)" ]; then
+  rmdir "$EXECDIR" && echo "    removed (was empty)"
+else
+  echo "    not empty, and no longer on PATH:"
+  ls -A "$EXECDIR" | while read -r n; do echo "      $n"; done
+  read -rp "    move these to ~/shell/custom-bin? [y/N] " mv_ans
+  case "$mv_ans" in
+    [yY]|[yY][eE][sS])
+      mkdir -p "$CUSTOMBIN"
+      moved=0
+      kept=0
+      for f in "$EXECDIR"/* "$EXECDIR"/.[!.]*; do
+        [ -e "$f" ] || continue
+        base=$(basename "$f")
+        if [ -e "$CUSTOMBIN/$base" ]; then
+          echo "      kept $base (already in custom-bin)"
+          kept=$((kept + 1))
+        elif mv "$f" "$CUSTOMBIN/$base"; then
+          moved=$((moved + 1))
+        else
+          kept=$((kept + 1))
+        fi
+      done
+      echo "      moved $moved, kept $kept"
+      if [ -z "$(ls -A "$EXECDIR" 2>/dev/null)" ]; then
+        rmdir "$EXECDIR" && echo "    removed"
+      else
+        echo "    kept ~/shell/executables (still has files)"
+      fi
+      ;;
+    *)
+      echo "    kept ~/shell/executables; move what you need to ~/shell/custom-bin"
+      ;;
+  esac
 fi
 
 STATE="$HOME/.config/cps/state.json"
