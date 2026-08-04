@@ -36,7 +36,11 @@ func (a *AppBundleInstaller) Install(tool *registry.Tool, p platform.Platform, g
 		}
 	}
 
-	tmpDir, err := os.MkdirTemp("", "cps-"+tool.Name+"-*")
+	if err := os.MkdirAll(p.ShellAppsDir(), 0755); err != nil {
+		return Result{Tool: tool.Name, Err: err}
+	}
+	// Staged inside ~/shell so the swap into place is a same-filesystem rename; /tmp is a separate mount on most Linux hosts.
+	tmpDir, err := os.MkdirTemp(p.ShellDir(), "cps-"+tool.Name+"-*")
 	if err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
@@ -60,9 +64,6 @@ func (a *AppBundleInstaller) Install(tool *registry.Tool, p platform.Platform, g
 		return Result{Tool: tool.Name, Err: fmt.Errorf("extract failed: %w", err)}
 	}
 
-	if err := os.MkdirAll(p.ShellAppsDir(), 0755); err != nil {
-		return Result{Tool: tool.Name, Err: err}
-	}
 	if err := stageAndSwap(unwrapSingleDir(extractDir), destDir); err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
