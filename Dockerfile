@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-FROM golang:1.25-bookworm AS builder
+FROM golang:1.26-bookworm AS builder
 
 WORKDIR /src
 COPY go.mod go.sum ./
@@ -97,22 +97,15 @@ RUN cps extend misc \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
  && sleep 20
 
-RUN cps download-known-extensions && sleep 20
 RUN cps extend ai-tools \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
  && sleep 20
-RUN cps extend additional-cloud-tools \
- && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
- && sleep 20
-RUN cps extend database \
- && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
- && sleep 20
-RUN cps extend praetorian \
+RUN cps extend homelab \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
  && sleep 20
 
-# Truly-private tools (toon, nblm, cybernest, lincli) need --gh-token; skipped here.
-RUN cps extend private nits raikiri gcli box claudex \
+# Truly-private tools (toon, cybernest) need --gh-token; skipped here.
+RUN cps extend private nits gcli box claudex \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache
 
 CMD ["sleep", "infinity"]

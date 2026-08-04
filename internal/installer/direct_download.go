@@ -6,9 +6,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
-
-	"github.com/rs/zerolog/log"
 
 	"github.com/tanq16/cli-productivity-suite/internal/github"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
@@ -19,17 +18,12 @@ import (
 type DirectDownloadInstaller struct{}
 
 func (d *DirectDownloadInstaller) Install(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) Result {
-	log.Debug().Str("package", "installer").Msgf("installing %s via direct download", tool.Name)
-
-	version, err := d.fetchVersion(tool, gh)
+	version, err := resolveVersion(tool, gh)
 	if err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
 
-	destDir := p.ShellExecDir()
-	if tool.Extension {
-		destDir = p.ShellExtDir()
-	}
+	destDir := p.ShellExtDir()
 
 	currentVersion := st.ToolVersion(tool.Name)
 	if currentVersion == version && version != "" {
@@ -38,12 +32,7 @@ func (d *DirectDownloadInstaller) Install(tool *registry.Tool, p platform.Platfo
 		}
 	}
 
-	versionBare := strings.TrimPrefix(version, "v")
-	url := tool.URL
-	url = strings.ReplaceAll(url, "{version}", version)
-	url = strings.ReplaceAll(url, "{version_bare}", versionBare)
-	url = strings.ReplaceAll(url, "{os}", p.OS.String())
-	url = strings.ReplaceAll(url, "{arch}", p.Arch.String())
+	url := expandURL(tool.URL, version, p.OS.String(), p.Arch.String())
 
 	if err := os.MkdirAll(destDir, 0755); err != nil {
 		return Result{Tool: tool.Name, Err: err}
@@ -94,7 +83,7 @@ func (d *DirectDownloadInstaller) Install(tool *registry.Tool, p platform.Platfo
 	return Result{Tool: tool.Name, Version: version, WasUpdated: wasUpdated}
 }
 
-func (d *DirectDownloadInstaller) fetchVersion(tool *registry.Tool, gh *github.Client) (string, error) {
+func resolveVersion(tool *registry.Tool, gh *github.Client) (string, error) {
 	if tool.StableURL != "" {
 		resp, err := httpGet(tool.StableURL)
 		if err != nil {
@@ -108,7 +97,18 @@ func (d *DirectDownloadInstaller) fetchVersion(tool *registry.Tool, gh *github.C
 		if err != nil {
 			return "", err
 		}
-		return strings.TrimSpace(string(body)), nil
+		if tool.VersionRegex == "" {
+			return strings.TrimSpace(string(body)), nil
+		}
+		re, err := regexp.Compile(tool.VersionRegex)
+		if err != nil {
+			return "", fmt.Errorf("invalid version pattern for %s: %w", tool.Name, err)
+		}
+		m := re.FindSubmatch(body)
+		if len(m) < 2 {
+			return "", fmt.Errorf("version pattern %q matched nothing at %s", tool.VersionRegex, tool.StableURL)
+		}
+		return strings.TrimSpace(string(m[1])), nil
 	}
 	if tool.Repo != "" {
 		release, err := gh.LatestRelease(tool.Repo)
@@ -118,6 +118,16 @@ func (d *DirectDownloadInstaller) fetchVersion(tool *registry.Tool, gh *github.C
 		return release.TagName, nil
 	}
 	return "", fmt.Errorf("no version source configured for %s", tool.Name)
+}
+
+func expandURL(tmpl, version, osStr, archStr string) string {
+	r := strings.NewReplacer(
+		"{version}", version,
+		"{version_bare}", strings.TrimPrefix(version, "v"),
+		"{os}", osStr,
+		"{arch}", archStr,
+	)
+	return r.Replace(tmpl)
 }
 
 func (d *DirectDownloadInstaller) installArchive(tool *registry.Tool, url, version, currentVersion, destDir, archiveFormat string, st *state.State) Result {

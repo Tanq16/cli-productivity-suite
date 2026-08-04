@@ -42,7 +42,7 @@ func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Pl
 
 	case "aerospace-config":
 		if p.OS != platform.Darwin {
-			return nil, "", nil // skip on non-macOS
+			return nil, "", nil
 		}
 		content = configs.MacosAerospaceConf()
 		destPath = filepath.Join(p.HomeDir, ".aerospace.toml")

@@ -84,16 +84,6 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "gobuster", BinaryName: "gobuster", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
-				Repo: "OJ/gobuster", Description: "Directory/DNS brute-forcer",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "Linux", "darwin": "Darwin"},
-					ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "arm64"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "gobuster",
-				},
-			},
-			{
 				Name: "nuclei-templates", Kind: ShellPlugin, Category: ExtSecurity, Extension: true,
 				Description: "Nuclei vulnerability templates",
 				CloneURL:    "https://github.com/projectdiscovery/nuclei-templates.git",
@@ -142,17 +132,6 @@ var extensionPacks = []ExtensionPack{
 				URL:         "https://dl.k8s.io/release/{version}/bin/{os}/{arch}/kubectl",
 			},
 			{
-				Name: "cloudfox", BinaryName: "cloudfox", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
-				Repo: "BishopFox/cloudfox", Description: "Cloud security enumeration",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"windows"},
-					ArchiveFormat:       "zip",
-					BinaryPathInArchive: "cloudfox/cloudfox",
-				},
-			},
-			{
 				Name: "trivy", BinaryName: "trivy", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
 				Repo: "aquasecurity/trivy", Description: "Vulnerability and misconfiguration scanner",
 				Asset: AssetPattern{
@@ -164,14 +143,24 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "cloudlist", BinaryName: "cloudlist", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
-				Repo: "projectdiscovery/cloudlist", Description: "Cloud asset discovery",
+				Name: "prowler", Kind: PythonTool, Category: ExtCloudSec, Extension: true,
+				Description: "Cloud security posture scanner",
+				PyTool:      "prowler", Requires: "runtimes",
+			},
+			{
+				Name: "oci-cli", Kind: PythonTool, Category: ExtCloudSec, Extension: true,
+				Description: "Oracle Cloud Infrastructure CLI",
+				PyTool:      "oci-cli", Requires: "runtimes",
+			},
+			{
+				Name: "tofu", BinaryName: "tofu", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
+				Repo: "opentofu/opentofu", Description: "OpenTofu infrastructure as code",
 				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
 					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"checksums", "windows"},
-					ArchiveFormat:       "zip",
-					BinaryPathInArchive: "cloudlist",
+					ExcludeSubstrings:   []string{"windows", "freebsd", "openbsd", "solaris", "sig", "pem", "SHA256SUMS", ".deb", ".rpm", ".apk", ".zip"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "tofu",
 				},
 			},
 		},
@@ -213,36 +202,13 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "reaper", BinaryName: "reaper", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
-				Repo: "ghostsecurity/reaper", Description: "API security testing",
+				Name: "gobuster", BinaryName: "gobuster", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
+				Repo: "OJ/gobuster", Description: "Directory/DNS brute-forcer",
 				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"checksums", "sigstore"},
+					OSPatterns:          map[string]string{"linux": "Linux", "darwin": "Darwin"},
+					ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "arm64"},
 					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "reaper",
-				},
-			},
-			{
-				Name: "poltergeist", BinaryName: "poltergeist", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
-				Repo: "ghostsecurity/poltergeist", Description: "API security tool",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"sigstore", "windows", ".zip"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "poltergeist",
-				},
-			},
-			{
-				Name: "wraith", BinaryName: "wraith", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
-				Repo: "ghostsecurity/wraith", Description: "API security tool",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"checksums", "sigstore", "windows", ".zip"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "wraith",
+					BinaryPathInArchive: "gobuster",
 				},
 			},
 			{
@@ -274,17 +240,6 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "snitch", BinaryName: "snitch", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
-				Repo: "karol-broda/snitch", Description: "Secret scanner",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"checksums", ".deb", ".rpm", ".apk", "windows"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "snitch",
-				},
-			},
-			{
 				Name: "age", BinaryName: "age", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
 				Repo: "FiloSottile/age", Description: "File encryption tool",
 				Asset: AssetPattern{
@@ -294,6 +249,26 @@ var extensionPacks = []ExtensionPack{
 					ArchiveFormat:       "tar.gz",
 					BinaryPathInArchive: "age/age",
 				},
+			},
+			{
+				Name: "sq", BinaryName: "sq", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
+				Repo: "neilotoole/sq", Description: "jq-like data wrangler for databases",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows", ".deb", ".rpm", ".apk", ".zst", "checksums"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "sq",
+				},
+			},
+			{
+				Name: "neo4j", Kind: AppBundle, Category: ExtMisc, Extension: true, Requires: "runtimes",
+				Description:  "Graph database with cypher-shell and browser UI",
+				URL:          "https://dist.neo4j.org/neo4j-community-{version}-unix.tar.gz",
+				StableURL:    "https://repo1.maven.org/maven2/org/neo4j/neo4j/maven-metadata.xml",
+				VersionRegex: `<release>([^<]+)</release>`,
+				PostInstall:  "neo4j",
+				Asset:        AssetPattern{ArchiveFormat: "tar.gz"},
 			},
 		},
 	},
@@ -305,15 +280,6 @@ var extensionPacks = []ExtensionPack{
 			{
 				Name: "nits", BinaryName: "nits", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
 				Repo: "Tanq16/nits", Description: "Nits tool",
-				Asset: AssetPattern{
-					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat: "none",
-				},
-			},
-			{
-				Name: "raikiri", BinaryName: "raikiri", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
-				Repo: "Tanq16/raikiri", Description: "Raikiri tool",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
@@ -358,26 +324,8 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "nblm", BinaryName: "nblm", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
-				Repo: "Tanq16/nblm", Description: "Private NBLM tool", IsPrivate: true,
-				Asset: AssetPattern{
-					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat: "none",
-				},
-			},
-			{
 				Name: "cybernest", BinaryName: "cybernest", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
 				Repo: "Tanq16/cybernest", Description: "Private Cybernest tool", IsPrivate: true,
-				Asset: AssetPattern{
-					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat: "none",
-				},
-			},
-			{
-				Name: "lincli", BinaryName: "lincli", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
-				Repo: "Tanq16/lincli", Description: "Private LinCLI tool", IsPrivate: true,
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
@@ -536,15 +484,6 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "ai-context", BinaryName: "ai-context", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
-				Repo: "Tanq16/ai-context", Description: "AI context builder",
-				Asset: AssetPattern{
-					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat: "none",
-				},
-			},
-			{
 				Name: "starship-config", Kind: ConfigFile, Category: ExtEssentials, Extension: true,
 				Description: "Starship prompt configuration",
 			},
@@ -647,24 +586,158 @@ var extensionPacks = []ExtensionPack{
 			},
 		},
 	},
-}
-
-var customPacks []ExtensionPack
-
-func LoadCustomPacks(packs []ExtensionPack) {
-	customPacks = packs
-}
-
-func BuiltinPackNames() map[string]bool {
-	names := make(map[string]bool, len(extensionPacks))
-	for _, p := range extensionPacks {
-		names[p.Name] = true
-	}
-	return names
+	{
+		Name:        "ai-tools",
+		Description: "AI coding agents and LLM CLIs",
+		Category:    ExtAITools,
+		Tools: []Tool{
+			{
+				Name: "claude-code", Kind: NodePackage, Category: ExtAITools, Extension: true,
+				Description: "Anthropic Claude Code CLI agent",
+				NodePkg:     "@anthropic-ai/claude-code", Requires: "runtimes",
+			},
+			{
+				Name: "antigravity", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Description: "Google Antigravity CLI agent",
+				InstallCmd: `set -eo pipefail
+DEST_DIR="$HOME/shell/extensions"
+mkdir -p "$DEST_DIR"
+case "$(uname -s)" in
+  Darwin) OS=darwin ;;
+  Linux) OS=linux ;;
+  *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+esac
+case "$(uname -m)" in
+  x86_64|amd64) ARCH=amd64 ;;
+  arm64|aarch64) ARCH=arm64 ;;
+  *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+esac
+MANIFEST_URL="https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/${OS}_${ARCH}.json"
+URL=$(curl -fsSL "$MANIFEST_URL" | sed -n 's/.*"url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+[ -n "$URL" ] || { echo "failed to parse antigravity manifest" >&2; exit 1; }
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+curl -fsSL "$URL" -o "$TMP/agy.tar.gz"
+tar -xzf "$TMP/agy.tar.gz" -C "$TMP" antigravity
+install -m 0755 "$TMP/antigravity" "$DEST_DIR/agy"
+[ "$OS" = "darwin" ] && xattr -d com.apple.quarantine "$DEST_DIR/agy" 2>/dev/null || true
+`,
+			},
+			{
+				Name: "codex", Kind: NodePackage, Category: ExtAITools, Extension: true,
+				Description: "OpenAI Codex CLI agent",
+				NodePkg:     "@openai/codex", Requires: "runtimes",
+			},
+			{
+				Name: "cursor-agent", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Description: "Cursor headless coding agent",
+				InstallCmd: `set -eo pipefail
+DEST_DIR="$HOME/shell/extensions"
+mkdir -p "$DEST_DIR"
+case "$(uname -s)" in
+  Darwin) OS=darwin ;;
+  Linux) OS=linux ;;
+  *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+esac
+case "$(uname -m)" in
+  x86_64|amd64) ARCH=x64 ;;
+  arm64|aarch64) ARCH=arm64 ;;
+  *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+esac
+VERSION=$(curl -fsSL https://cursor.com/install \
+  | sed -n 's|.*downloads\.cursor\.com/lab/\([^/]*\)/.*|\1|p' | head -1)
+[ -n "$VERSION" ] || { echo "failed to resolve cursor-agent version" >&2; exit 1; }
+APP_DIR="$HOME/.local/share/cursor-agent"
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+curl -fsSL "https://downloads.cursor.com/lab/${VERSION}/${OS}/${ARCH}/agent-cli-package.tar.gz" \
+  | tar --strip-components=1 -xzf - -C "$TMP"
+mkdir -p "$(dirname "$APP_DIR")"
+rm -rf "$APP_DIR"
+mv "$TMP" "$APP_DIR"
+ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
+`,
+			},
+		},
+	},
+	{
+		Name:        "homelab",
+		Description: "Self-hosted homelab services",
+		Category:    ExtHomelab,
+		Tools: []Tool{
+			{
+				Name: "caddy", BinaryName: "caddy", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Repo: "caddyserver/caddy", Description: "Web server / reverse proxy",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "mac"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows", "freebsd"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "caddy",
+				},
+			},
+			{
+				Name: "linksnapper", BinaryName: "linksnapper", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Repo: "Tanq16/linksnapper", Description: "LinkSnapper bookmark manager",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
+				Name: "kairo", BinaryName: "kairo", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Repo: "Tanq16/kairo", Description: "Kairo markdown note-taking app",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
+				Name: "raikiri", BinaryName: "raikiri", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Repo: "Tanq16/raikiri", Description: "Self-hosted media and music server",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
+				Name: "expenseowl", BinaryName: "expenseowl", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Repo: "Tanq16/expenseowl", Description: "Self-hosted expense tracker",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
+				Name: "rinnegan", Kind: AppBundle, Category: ExtHomelab, Extension: true,
+				Repo: "Tanq16/rinnegan", Description: "Self-contained PTY web terminal",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "x64", "arm64": "arm64"},
+					ArchiveFormat: "tar.gz",
+				},
+			},
+			{
+				Name: "code-server", Kind: AppBundle, Category: ExtHomelab, Extension: true,
+				Repo: "coder/code-server", Description: "VS Code in the browser",
+				PostInstall: "code-server",
+				Asset: AssetPattern{
+					OSPatterns:        map[string]string{"linux": "linux", "darwin": "macos"},
+					ArchPatterns:      map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings: []string{".deb", ".rpm"},
+					ArchiveFormat:     "tar.gz",
+				},
+			},
+		},
+	},
 }
 
 func AllExtensionPacks() []ExtensionPack {
-	return append(extensionPacks, customPacks...)
+	return extensionPacks
 }
 
 func ExtensionPackByName(name string) *ExtensionPack {
@@ -673,17 +746,12 @@ func ExtensionPackByName(name string) *ExtensionPack {
 			return &extensionPacks[i]
 		}
 	}
-	for i := range customPacks {
-		if customPacks[i].Name == name {
-			return &customPacks[i]
-		}
-	}
 	return nil
 }
 
 func AllExtensionTools() []Tool {
 	var all []Tool
-	for _, pack := range AllExtensionPacks() {
+	for _, pack := range extensionPacks {
 		all = append(all, pack.Tools...)
 	}
 	return all

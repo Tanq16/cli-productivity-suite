@@ -4,12 +4,21 @@
 
   <a href="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml"><img alt="Build Workflow" src="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml/badge.svg"></a>&nbsp;<a href="https://github.com/tanq16/cli-productivity-suite/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/tanq16/cli-productivity-suite"></a><br><br>
 
-  <a href="#prerequisites">Prerequisites</a> &bull; <a href="#install">Install</a> &bull; <a href="#usage">Usage</a> &bull; <a href="#custom-extension-packs">Custom Extensions</a> &bull; <a href="#shell-integration">Shell Integration</a> &bull; <a href="#sandbox-container">Sandbox Container</a> &bull; <a href="#deep-removal">Deep Removal</a>
+  <a href="#capabilities">Capabilities</a> &bull; <a href="#prerequisites">Prerequisites</a> &bull; <a href="#install">Install</a> &bull; <a href="#usage">Usage</a> &bull; <a href="#shell-integration">Shell Integration</a> &bull; <a href="#tips--notes">Tips &amp; Notes</a> &bull; <a href="#sandbox-container">Sandbox Container</a> &bull; <a href="#deep-removal">Deep Removal</a>
 </div>
 
 ---
 
 A single Go binary (`cps`) that sets up and manages a complete CLI development environment on **Linux** and **macOS**. Run `cps init` once to get a working shell with core tools, Neovim, tmux, and configs. Extend it with `cps extend` for language runtimes, cloud CLIs, security tools, and more.
+
+## Capabilities
+
+| Category | Commands | Description |
+|----------|----------|-------------|
+| Environment | `init` | Base shell setup — zsh plugins, Neovim + NvChad, tmux + TPM, kitty and shell configs |
+| Extensions | `extend <pack>`, `extend <pack> <tool>`, `extend list` | Install tool packs or individual tools — CLI binaries, language runtimes, cloud CLIs, security tooling, self-hosted services |
+| Reference | `cheat <topic>` | Terminal cheat sheets for `cps`, Go, Java, uv, fnm, bun, Rust, tmux, nvim, fzf, jq, regex |
+| Maintenance | `self-update` | Update the `cps` binary in place |
 
 ## Prerequisites
 
@@ -76,7 +85,7 @@ Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`
 
 Everything else via `cps extend` is optional — install what you need.
 
-> **Pack ordering for runtime-backed extensions.** Some custom-extension packs invoke runtimes that `cps extend runtimes` provides — `ai-tools` (claude-code, opencode, codex, crush) uses `fnm`; `database` (pgcli, mycli), `additional-cloud-tools` (checkov, prowler, oci-cli), and `praetorian` (praetorian-cli) use `uv`. Install `cps extend runtimes` (or at least its `uv` / `fnm` tools) before those packs, otherwise the install scripts fail with "command not found." Tools in those same packs that ship as standalone binaries (`antigravity`, `cursor-agent`, `aix`, `sq`, `usql`, `tofu`) have no runtime dependency.
+> **Pack ordering for runtime-backed extensions.** A few tools install *through* a runtime rather than downloading a binary, so they need `cps extend runtimes` first. `cps extend list` marks each one `(needs runtimes)`. The npm-backed CLIs (`claude-code`, `codex`) need fnm's node on PATH — install `runtimes`, then re-source your shell (or open a new one) so `fnm env` has run, otherwise CPS reports `npm install <pkg> failed`. The uv-backed Python CLIs (`prowler`, `oci-cli`) resolve `uv` automatically once it is installed. Everything else, including `antigravity` and `cursor-agent`, downloads a standalone binary and has no runtime dependency.
 
 ### `cps extend <pack> [tools...]`
 
@@ -91,17 +100,21 @@ cps extend security nuclei subfinder  # pick specific tools
 
 | Pack | Contents |
 |---|---|
-| essentials | Everyday CLI binaries (bat, fd, ripgrep, lsd, jq, yq, fzf, gh, gron, zoxide, sd, starship, anbu, danzo, ai-context) + starship.toml |
+| essentials | Everyday CLI binaries (bat, fd, ripgrep, lsd, jq, yq, fzf, gh, gron, zoxide, sd, starship, anbu, danzo) + starship.toml |
 | core | Dev tools, network utils, media packages (cmake, nmap, ffmpeg, aerospace) |
 | runtimes | uv, fnm, bun, Go, Java (Temurin LTS), Python (via uv), Rust, Node.js LTS (via fnm) |
 | cloud | AWS CLI, Azure CLI, gcloud CLI |
-| security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, gobuster, nuclei-templates |
-| cloudsec | terraform, kubectl, kubelogin, grpcurl, cloudfox, trivy, cloudlist |
-| appsec | katana, ffuf, dalfox, reaper, poltergeist, wraith, gau |
-| misc | gowitness, snitch, age |
-| private | Personal tools — public subset (`nits`, `raikiri`, `gcli`, `box`, `claudex`) installs as-is; the truly-private four (`toon`, `nblm`, `cybernest`, `lincli`) need `--gh-token` |
+| security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, nuclei-templates |
+| cloudsec | terraform, kubectl, kubelogin, grpcurl, trivy, tofu, prowler¹, oci-cli¹ |
+| appsec | katana, ffuf, dalfox, gobuster, gau |
+| misc | gowitness, age, sq, neo4j¹ (app bundle) |
+| private | Personal tools — public subset (`nits`, `gcli`, `box`, `claudex`) installs as-is; the truly-private two (`toon`, `cybernest`) need `--gh-token` |
+| ai-tools | AI coding agents (antigravity, cursor-agent, claude-code¹, codex¹) |
+| homelab | Self-hosted services (caddy, linksnapper, kairo, raikiri, expenseowl) + app bundles (rinnegan, code-server) |
 
-Packs with shell integration (`runtimes`, `cloud`, `security`) deploy RC fragments automatically.
+¹ Needs `cps extend runtimes` first — `cps extend list` marks these as `(needs runtimes)`.
+
+Packs with shell integration (`runtimes`, `cloud`, `security`, `misc`) deploy RC fragments automatically.
 
 ### `cps cheat <topic>`
 
@@ -119,49 +132,6 @@ Updates the `cps` binary in place (at whatever path it's running from).
 | `--debug` | Verbose debug logging |
 | `--for-ai` | AI-friendly output (no color) |
 
-## Custom Extension Packs
-
-Drop a YAML file in `~/.config/cps/extensions/` to define your own pack:
-
-```yaml
-name: my-tools
-description: My custom tools
-shell:
-  env:
-    MY_VAR: "value"
-  path_prepend:
-    - "$HOME/.local/bin"
-  source:
-    - "$HOME/.cargo/env"
-tools:
-  - name: my-tool
-    install: curl -sL https://example.com/install.sh | bash
-```
-
-Then run `cps extend my-tools`. Custom packs appear in `cps extend list` alongside built-in packs.
-
-The `shell` block controls what gets added to your shell environment via a generated RC fragment at `~/shell/rc/custom/<pack-name>.zsh`:
-
-- **`env`** — key-value pairs exported as environment variables
-- **`path_prepend`** — directories prepended to `$PATH`
-- **`source`** — files conditionally sourced (only if they exist)
-
-All three fields are optional. If the entire `shell` block is omitted, no fragment is generated.
-
-The repo's `custom-extensions/` directory ships ready-made reference packs (`ai-tools`, `additional-cloud-tools`, `database`, `praetorian`) — copy any of them to `~/.config/cps/extensions/` to use as-is, or treat them as templates for your own. Or pull all of them in one shot with `cps download-known-extensions` (below).
-
-### `cps download-known-extensions`
-
-Fetches the reference custom-extension YAMLs maintained in the CPS repo (`ai-tools`, `additional-cloud-tools`, `database`, `praetorian`) and writes them to `~/.config/cps/extensions/`. After running, they show up in `cps extend list` and you can install any of them with `cps extend <pack>` (or `cps extend <pack> <tool>` for a single tool).
-
-```bash
-cps download-known-extensions
-cps extend list                  # ai-tools, database, etc. now visible
-cps extend ai-tools claude-code  # install just claude-code from ai-tools
-```
-
-Overwrites existing files of the same name — if you've customized one of the reference packs locally, rename it before re-running.
-
 ## Shell Integration
 
 CPS uses a modular fragment system instead of a monolithic `.zshrc`:
@@ -172,31 +142,57 @@ CPS uses a modular fragment system instead of a monolithic `.zshrc`:
 | `~/shell/rc/10-runtimes.zsh` | `cps extend runtimes` |
 | `~/shell/rc/20-cloud.zsh` | `cps extend cloud` |
 | `~/shell/rc/30-security.zsh` | `cps extend security` |
-| `~/shell/rc/custom/*.zsh` | Custom packs or user-managed |
+| `~/shell/rc/40-misc.zsh` | `cps extend misc` |
+| `~/shell/rc/custom/*.zsh` | User-managed |
 
 `~/.zshrc` is a thin loader that sources all fragments in order.
 
 ### Adding your own stuff (no extension pack needed)
 
-Three drop-zones, three buckets — you never need to write a YAML pack for personal tweaks:
+Two drop-zones, two buckets — personal tweaks never need to go through `cps extend`:
 
 | You want to add… | Drop it here | Notes |
 |---|---|---|
 | Aliases, exports, functions, custom sourcing | `~/shell/rc/custom/anything.zsh` | Loaded automatically by `~/.zshrc` after CPS fragments — so it can override CPS-set values |
 | Your own binaries / scripts | `~/shell/custom-bin/` | Prepended to PATH **ahead of** CPS-managed dirs, so your binary wins if a name collides with a CPS one |
-| A reusable, idempotent install bundle you want `cps extend` to manage | `~/.config/cps/extensions/<name>.yaml` | See [Custom Extension Packs](#custom-extension-packs) above |
 
 Both `~/shell/rc/custom/` and `~/shell/custom-bin/` are created by `cps init` and are **never touched** by subsequent `cps init` / `cps extend` runs.
 
 `deep-removal.sh` wipes the whole `~/shell/` tree, so anything you drop there is removed by it — if you want long-term-survival storage, keep it elsewhere.
 
-## Notes
+## Tips & Notes
 
-- Core tools install to `~/shell/executables/`, extensions to `~/shell/extensions/` — both on PATH
-- User-owned binaries live in `~/shell/custom-bin/` (also on PATH, prepended ahead of the CPS-managed dirs)
+- CPS-installed binaries all land in `~/shell/extensions/` (on PATH)
+- User-owned binaries live in `~/shell/custom-bin/` (also on PATH, prepended ahead of the CPS-managed dirs, so yours wins on a name collision)
+- App bundles (`rinnegan`, `code-server`, `neo4j`) unpack to `~/shell/apps/<name>/` instead — they are multi-file trees, not single binaries, so they are **not** on PATH. Launch them by full path (see below). `rinnegan` and `code-server` carry their own Node runtime; `neo4j` does not ship a JVM and runs on the `JAVA_HOME` that `cps extend runtimes` sets up
+- Upgrading an app bundle replaces the whole tree, so nothing user-owned may live inside one. Neo4j would otherwise keep its databases in `~/shell/apps/neo4j/data/`, so `cps extend misc` relocates them: it seeds `~/.config/neo4j/conf/` once (never overwriting it afterwards) with absolute `server.directories.*` paths, and `40-misc.zsh` exports `NEO4J_CONF` so Neo4j reads that conf instead of the bundle's. Your graph, plugins, and tuning live in `~/.config/neo4j/` and survive every upgrade — and `deep-removal.sh` leaves them alone
 - State tracked in `~/.config/cps/state.json` — runs are idempotent, already-current tools are skipped
 - If `gh` CLI is authenticated, CPS uses its token automatically — no need for `--gh-token`
 - `00-base.zsh` exports `HOMEBREW_NO_AUTO_UPDATE=1` so `brew install` stays fast and deterministic. If you want brew to auto-update on every invocation, drop `unset HOMEBREW_NO_AUTO_UPDATE` into a file under `~/shell/rc/custom/`
+
+<details>
+<summary><b>Running the app bundles</b></summary>
+
+None of these are on PATH — run them by full path. Each keeps its state outside `~/shell/apps/`, so upgrades never touch your data.
+
+```bash
+~/shell/apps/rinnegan/bin/rinnegan serve            # PTY web terminal
+~/shell/apps/code-server/bin/code-server            # VS Code in the browser, http://127.0.0.1:8080
+~/shell/apps/neo4j/bin/neo4j console                # graph database, http://localhost:7474
+~/shell/apps/neo4j/bin/cypher-shell                 # Cypher client for the above
+```
+
+**`code-server`** is pre-configured on first install and never reconfigured afterwards. It binds to `127.0.0.1:8080` with **authentication disabled**, telemetry and update checks off, the port-proxy routes disabled, Catppuccin Mocha as the theme, and JetBrains Mono as the editor font. Override anything per-launch — `code-server --bind-addr 127.0.0.1:9000` for a different port — since CLI flags beat the config file.
+
+Config lives in `~/.config/code-server/config.yaml`; editor settings and extensions in `~/.local/share/code-server/`. Every key in that YAML is a `code-server` flag with the dashes stripped, and an **unknown key is a fatal startup error**. To add authentication later, replace `auth: none` with `auth: password` plus either `password:` or `hashed-password:` (an argon2 hash, which wins if both are set) — note these two cannot be passed as CLI flags, by design, so they must go in the config file or the `PASSWORD`/`HASHED_PASSWORD` env vars.
+
+`auth: none` is only safe because it binds to loopback. To reach it from another machine, forward the port over SSH rather than changing `bind-addr` — `ssh -L 8080:localhost:8080 you@host` — which also keeps the browser on `localhost`, a secure context. Over a plain-HTTP LAN address, webviews and clipboard access break.
+
+These extensions install with it, from Open VSX: Catppuccin theme + icons, EditorConfig, Error Lens, Code Spell Checker, Go, Python, and Ruff. The Go extension will offer to install `gopls` on first use, which needs `cps extend runtimes`. Note that Pylance is not on Open VSX, so Python IntelliSense is weaker than desktop VS Code — Ruff covers linting and formatting.
+
+**`neo4j`** reads its config from `~/.config/neo4j/conf/` via `NEO4J_CONF`, and stores databases in `~/.config/neo4j/data/`. Set a password before first start with `~/shell/apps/neo4j/bin/neo4j-admin dbms set-initial-password <password>`.
+
+</details>
 
 ## Sandbox Container
 
@@ -217,13 +213,13 @@ docker run -d --name cps-sandbox cps-sandbox
 docker exec -it cps-sandbox zsh -l
 ```
 
-The image is multi-arch (`linux/amd64` + `linux/arm64`) and large (multi-GB) — it carries full language runtimes, cloud CLIs, security tooling, every reference custom-extension pack (`ai-tools`, `additional-cloud-tools`, `database`, `praetorian`), and the public-repo tools from the `private` pack (`nits`, `raikiri`, `gcli`, `box`, `claudex`). The four truly-private tools (`toon`, `nblm`, `cybernest`, `lincli`) are skipped since they need an auth token.
+The image is multi-arch (`linux/amd64` + `linux/arm64`) and large (multi-GB) — it carries full language runtimes, cloud CLIs, security tooling, the `ai-tools` and `homelab` packs, and the public-repo tools from the `private` pack (`nits`, `gcli`, `box`, `claudex`). The two truly-private tools (`toon`, `cybernest`) are skipped since they need an auth token.
 
 ### A ready environment for AI agents
 
-The prebuilt image is intentionally a **drop-in toolkit for AI coding agents** — Claude Code, Codex, opencode, Crush, antigravity, and friends. Spin up the container once and a single non-root user already has:
+The prebuilt image is intentionally a **drop-in toolkit for AI coding agents** — Claude Code, Codex, Cursor, antigravity, and friends. Spin up the container once and a single non-root user already has:
 
-- **The agent CLIs themselves** — `claude`, `codex`, `cursor-agent`, `opencode`, `crush`, `agy` (antigravity), `aix` (the `ai-tools` reference pack is pre-installed)
+- **The agent CLIs themselves** — `claude`, `codex`, `cursor-agent`, `agy` (antigravity) (the `ai-tools` pack is pre-installed)
 - **Language runtimes the agent will reach for** — Go, Node (via fnm), Bun, Python (via uv), Rust, Java (Temurin LTS), all on PATH with no further setup
 - **Everyday CLI building blocks** — bat, fd, ripgrep, lsd, jq, yq, fzf, gh, zoxide, gron, sd, starship, plus tmux + neovim
 - **Cloud + security tooling** — aws/azure/gcloud CLIs, kubectl, terraform, trivy, nuclei, httpx, dnsx, subfinder, ffuf, katana, and the rest of the security/cloudsec/appsec packs
@@ -233,7 +229,7 @@ The prebuilt image is intentionally a **drop-in toolkit for AI coding agents** �
 docker run -d --name agent-sandbox tanq16/cps-sandbox:latest
 docker exec -it agent-sandbox zsh -l
 # inside the container:
-claude   # or codex, cursor-agent, opencode, crush, agy, aix, ...
+claude   # or codex, cursor-agent, agy, ...
 ```
 
 This is the use case the image is tuned for: an agent (or a human delegating to one) lands in a shell where every tool it's likely to invoke — for code, search, package management, cloud ops, scanning, or recon — is already on PATH. No `brew install` round-trips, no runtime bootstrapping, no "let me set up your environment first." For ephemeral runs, add `--rm` to `docker run`; for sessions you want to come back to, keep the container around and re-`exec` in.

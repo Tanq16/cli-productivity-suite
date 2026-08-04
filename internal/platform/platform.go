@@ -84,12 +84,12 @@ func (p Platform) ShellDir() string {
 	return filepath.Join(p.HomeDir, "shell")
 }
 
-func (p Platform) ShellExecDir() string {
-	return filepath.Join(p.HomeDir, "shell", "executables")
-}
-
 func (p Platform) ShellExtDir() string {
 	return filepath.Join(p.HomeDir, "shell", "extensions")
+}
+
+func (p Platform) ShellAppsDir() string {
+	return filepath.Join(p.HomeDir, "shell", "apps")
 }
 
 func (p Platform) ConfigDir() string {
@@ -97,7 +97,7 @@ func (p Platform) ConfigDir() string {
 }
 
 func (p Platform) StatePath() string {
-	return filepath.Join(p.HomeDir, ".config", "cps", "state.json")
+	return filepath.Join(p.ConfigDir(), "state.json")
 }
 
 func (p Platform) CustomScriptEnv() []string {
@@ -105,7 +105,6 @@ func (p Platform) CustomScriptEnv() []string {
 	prefix := strings.Join([]string{
 		filepath.Join(p.HomeDir, "shell", "custom-bin"),
 		p.ShellExtDir(),
-		p.ShellExecDir(),
 	}, ":")
 	for i, kv := range env {
 		if strings.HasPrefix(kv, "PATH=") {

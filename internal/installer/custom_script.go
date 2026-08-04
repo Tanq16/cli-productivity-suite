@@ -1,6 +1,7 @@
 package installer
 
 import (
+	"errors"
 	"fmt"
 	"os/exec"
 
@@ -15,7 +16,7 @@ type CustomScriptInstaller struct{}
 
 func (c *CustomScriptInstaller) Install(tool *registry.Tool, p platform.Platform, _ *github.Client, st *state.State) Result {
 	if tool.InstallCmd == "" {
-		return Result{Tool: tool.Name, Err: fmt.Errorf("no install command defined")}
+		return Result{Tool: tool.Name, Err: errors.New("no install command defined")}
 	}
 
 	cmd := exec.Command("bash", "-c", tool.InstallCmd)

@@ -7,20 +7,21 @@ func buildCPSSheet() string {
 	divider := dividerStyle.Render(strings.Repeat("─", 60))
 
 	b.WriteString(titleStyle.Render("CPS Cheat Sheet") + "\n")
-	b.WriteString(noteStyle.Render("  Tools: ~/shell/executables/      Extensions: ~/shell/extensions/") + "\n")
-	b.WriteString(noteStyle.Render("  RC fragments: ~/shell/rc/        User binaries: ~/shell/custom-bin/") + "\n\n")
+	b.WriteString(noteStyle.Render("  Tools: ~/shell/extensions/       User binaries: ~/shell/custom-bin/") + "\n")
+	b.WriteString(noteStyle.Render("  RC fragments: ~/shell/rc/") + "\n")
+	b.WriteString(noteStyle.Render("  App bundles: ~/shell/apps/ (not on PATH — run by full path)") + "\n\n")
 
 	b.WriteString(headingStyle.Render("Core Commands") + "\n")
 	b.WriteString(cmdStyle.Render("  cps init") + "                        Base shell environment setup\n")
 	b.WriteString(cmdStyle.Render("  cps self-update") + "                 Update cps binary itself\n")
-	b.WriteString(cmdStyle.Render("  cps download-known-extensions") + "   Fetch reference custom-extension YAMLs from the repo\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Extend — Extension Packs") + "\n")
 	b.WriteString(cmdStyle.Render("  cps extend list") + "                 List available packs\n")
 	b.WriteString(cmdStyle.Render("  cps extend <pack>") + "               Install entire extension pack\n")
 	b.WriteString(cmdStyle.Render("  cps extend <pack> <tool> ...") + "    Install specific tools from a pack\n")
-	b.WriteString(noteStyle.Render("  Packs: essentials, core, cloud, runtimes, security, cloudsec, appsec, misc, private") + "\n")
+	b.WriteString(noteStyle.Render("  Packs: essentials, core, cloud, runtimes, security, cloudsec, appsec,") + "\n")
+	b.WriteString(noteStyle.Render("         misc, private, ai-tools, homelab") + "\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Shell Integration — RC Fragments") + "\n")
@@ -29,13 +30,13 @@ func buildCPSSheet() string {
 	b.WriteString(noteStyle.Render("  10-runtimes.zsh    deployed by cps extend runtimes") + "\n")
 	b.WriteString(noteStyle.Render("  20-cloud.zsh       deployed by cps extend cloud") + "\n")
 	b.WriteString(noteStyle.Render("  30-security.zsh    deployed by cps extend security") + "\n")
+	b.WriteString(noteStyle.Render("  40-misc.zsh        deployed by cps extend misc") + "\n")
 	b.WriteString(noteStyle.Render("  custom/*.zsh       user-managed fragments") + "\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Adding Your Own Stuff (no extension pack needed)") + "\n")
 	b.WriteString(noteStyle.Render("  Aliases / exports / funcs   →  drop a *.zsh file in ~/shell/rc/custom/") + "\n")
 	b.WriteString(noteStyle.Render("  Your own binaries           →  drop them in ~/shell/custom-bin/ (on PATH)") + "\n")
-	b.WriteString(noteStyle.Render("  Reusable install bundles    →  add a YAML to ~/.config/cps/extensions/") + "\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Other") + "\n")

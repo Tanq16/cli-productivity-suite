@@ -18,8 +18,6 @@
 failed=()
 fail() { failed+=("$1"); }
 
-arch=$(uname -m)
-
 # --- identity ---
 [ "$(whoami)" = "cps" ] || fail "user: expected 'cps', got '$(whoami)'"
 [ "$(id -u)" = "1000" ] || fail "uid: expected 1000, got $(id -u)"
@@ -27,12 +25,12 @@ sudo -n true 2>/dev/null || fail "sudo: NOPASSWD not configured"
 
 # --- directories ---
 for d in \
-    shell/executables shell/extensions shell/custom-bin shell/plugins \
+    shell/extensions shell/custom-bin shell/plugins shell/apps \
     shell/rc shell/rc/custom shell/env shell/completions \
     shell/go-sdk shell/java-sdk shell/rust shell/fnm shell/py-default \
     shell/uv-tools shell/uv-tool-executables shell/uv-python \
     shell/nuclei-templates \
-    .config/cps .config/cps/extensions .config/nvim .tmux/plugins/tpm; do
+    .config/cps .config/nvim .tmux/plugins/tpm; do
     [ -d "$HOME/$d" ] || fail "dir missing: ~/$d"
 done
 
@@ -42,7 +40,7 @@ for f in \
     .config/kitty/kitty.conf .config/kitty/current-theme.conf \
     .config/starship.toml .config/cps/state.json \
     shell/rc/00-base.zsh shell/rc/10-runtimes.zsh \
-    shell/rc/20-cloud.zsh shell/rc/30-security.zsh \
+    shell/rc/20-cloud.zsh shell/rc/30-security.zsh shell/rc/40-misc.zsh \
     shell/env/brew.zsh \
     shell/completions/fzf.zsh shell/completions/uv.zsh \
     shell/completions/fnm.zsh shell/completions/zoxide.zsh \
@@ -63,7 +61,7 @@ done
 
 # --- PATH composition ---
 for p in \
-    "$HOME/shell/custom-bin" "$HOME/shell/extensions" "$HOME/shell/executables" \
+    "$HOME/shell/custom-bin" "$HOME/shell/extensions" \
     "$HOME/shell/uv-tool-executables" "$HOME/shell/go-sdk/bin" \
     "$HOME/shell/go/bin" "$HOME/shell/java-sdk/bin" \
     "$HOME/shell/rust/.cargo/bin" "$HOME/shell/bun/bin" \
@@ -78,7 +76,7 @@ done
 check_bin() { command -v "$1" >/dev/null 2>&1 || fail "$2: $1"; }
 
 # essentials
-for t in bat fd rg lsd jq yq fzf gh gron zoxide sd starship anbu danzo ai-context; do
+for t in bat fd rg lsd jq yq fzf gh gron zoxide sd starship anbu danzo; do
     check_bin "$t" "essentials"
 done
 # runtimes
@@ -88,36 +86,47 @@ done
 # cloud
 for t in aws az gcloud; do check_bin "$t" "cloud"; done
 # security
-for t in nuclei naabu subfinder proxify trufflehog httpx dnsx gobuster; do
+for t in nuclei naabu subfinder proxify trufflehog httpx dnsx; do
     check_bin "$t" "security"
 done
 # cloudsec
-for t in kubelogin grpcurl terraform kubectl cloudfox trivy cloudlist; do
+for t in kubelogin grpcurl terraform kubectl trivy prowler oci tofu; do
     check_bin "$t" "cloudsec"
 done
 # appsec
-for t in katana ffuf dalfox reaper poltergeist wraith gau; do
+for t in katana ffuf dalfox gobuster gau; do
     check_bin "$t" "appsec"
 done
 # misc
-for t in gowitness snitch age; do check_bin "$t" "misc"; done
+for t in gowitness age sq; do check_bin "$t" "misc"; done
+# misc app bundle — neo4j needs a JVM, so check the launcher and that JAVA_HOME resolves one
+[ -x "$HOME/shell/apps/neo4j/bin/neo4j" ] || fail "misc: ~/shell/apps/neo4j/bin/neo4j"
+[ -x "$HOME/shell/apps/neo4j/bin/cypher-shell" ] || fail "misc: ~/shell/apps/neo4j/bin/cypher-shell"
+[ -x "$JAVA_HOME/bin/java" ] || fail "misc: neo4j has no JVM at \$JAVA_HOME/bin/java"
+# neo4j state must live outside the bundle, or an upgrade destroys the databases
+[ -n "$NEO4J_CONF" ] || fail "misc: NEO4J_CONF unset — neo4j would use the bundle's own conf"
+[ -f "$NEO4J_CONF/neo4j.conf" ] || fail "misc: no neo4j.conf at \$NEO4J_CONF"
+for d in data plugins import logs run licenses; do
+    [ -d "$HOME/.config/neo4j/$d" ] || fail "misc: ~/.config/neo4j/$d missing"
+    grep -q "^server.directories.$d=$HOME/.config/neo4j/$d\$" "$NEO4J_CONF/neo4j.conf" 2>/dev/null || \
+        fail "misc: neo4j.conf does not relocate $d"
+done
 # ai-tools
-for t in claude codex cursor-agent opencode crush agy aix; do check_bin "$t" "ai-tools"; done
-# additional-cloud-tools
-for t in checkov prowler oci tofu; do
-    check_bin "$t" "additional-cloud-tools"
+for t in claude codex cursor-agent agy; do check_bin "$t" "ai-tools"; done
+# homelab
+for t in caddy linksnapper kairo raikiri expenseowl; do check_bin "$t" "homelab"; done
+# homelab app bundles — not on PATH, so check the launcher inside the bundle
+for b in rinnegan/bin/rinnegan code-server/bin/code-server; do
+    [ -x "$HOME/shell/apps/$b" ] || fail "homelab: ~/shell/apps/$b"
 done
-# database — usql known-broken on linux-arm64 (upstream duckdb-go-bindings)
-for t in pgcli mycli sq; do check_bin "$t" "database"; done
-case "$arch" in
-    x86_64) check_bin "usql" "database" ;;
-esac
-# praetorian
-for t in titus julius aurelian hadrian trajan nerva augustus vespasian praetorian; do
-    check_bin "$t" "praetorian"
-done
+# code-server must be pre-seeded; without it the first launch generates a password config
+[ -f "$HOME/.config/code-server/config.yaml" ] || fail "homelab: ~/.config/code-server/config.yaml missing"
+grep -q '^auth: none$' "$HOME/.config/code-server/config.yaml" 2>/dev/null || \
+    fail "homelab: code-server auth is not disabled"
+[ -f "$HOME/.local/share/code-server/User/settings.json" ] || \
+    fail "homelab: code-server settings.json missing"
 # private (public subset)
-for t in nits raikiri gcli box claudex; do check_bin "$t" "private"; done
+for t in nits gcli box claudex; do check_bin "$t" "private"; done
 
 # --- nuclei templates non-empty ---
 [ -n "$(ls -A "$HOME/shell/nuclei-templates" 2>/dev/null)" ] || \

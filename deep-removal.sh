@@ -26,7 +26,8 @@ echo "  - System tools (git, curl, zsh from apt or macOS built-in)"
 echo "  - Broadly-useful brew formulas (wget, zip, unzip, file, tmux, htop)"
 echo "  - Linux dev toolchain (cmake, gcc, make, ninja, gettext)"
 echo "  - Aerospace (macOS tiling WM cask)"
-echo "  - Custom-extension state (clean those with: cps extend <pack> --remove)"
+echo "  - Extension-pack state outside ~/shell (~/.local/share/cursor-agent, ~/.config/antigravity)"
+echo "  - Neo4j databases and config (~/.config/neo4j) — delete it by hand if you want them gone"
 echo ""
 read -rp "Continue? [y/N] " ans
 case "$ans" in

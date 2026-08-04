@@ -10,6 +10,9 @@ const (
 	ConfigFile
 	ShellPlugin
 	CustomScript
+	NodePackage
+	PythonTool
+	AppBundle
 )
 
 func (k ToolKind) String() string {
@@ -28,6 +31,12 @@ func (k ToolKind) String() string {
 		return "shell-plugin"
 	case CustomScript:
 		return "custom-script"
+	case NodePackage:
+		return "node-package"
+	case PythonTool:
+		return "python-tool"
+	case AppBundle:
+		return "app-bundle"
 	default:
 		return "unknown"
 	}
@@ -51,7 +60,8 @@ const (
 	ExtSystem
 	ExtCloud
 	ExtRuntimes
-	ExtCustom
+	ExtAITools
+	ExtHomelab
 )
 
 func (c ToolCategory) String() string {
@@ -86,8 +96,10 @@ func (c ToolCategory) String() string {
 		return "ext-cloud"
 	case ExtRuntimes:
 		return "ext-runtimes"
-	case ExtCustom:
-		return "ext-custom"
+	case ExtAITools:
+		return "ext-ai-tools"
+	case ExtHomelab:
+		return "ext-homelab"
 	default:
 		return "unknown"
 	}
@@ -105,10 +117,10 @@ type AssetPattern struct {
 
 type Tool struct {
 	Name        string
-	BinaryName  string // name of the binary in ~/shell/executables/ (or ~/shell/extensions/ for extensions)
+	BinaryName  string // name of the installed binary in ~/shell/extensions/
 	Kind        ToolKind
 	Category    ToolCategory
-	Extension   bool   // true = install to ~/shell/extensions/ instead of ~/shell/executables/
+	Extension   bool   // false = base tool installed by cps init; true = installed by cps extend
 	Repo        string // "owner/repo" for GitHub tools
 	Asset       AssetPattern
 	IsPrivate   bool
@@ -116,11 +128,16 @@ type Tool struct {
 	BrewCasks   []string // macOS brew cask packages
 	Platforms   []string // "linux", "darwin", or both; empty means both
 	Description string
-	URL         string // for DirectDownload: URL template with {version}, {os}, {arch}
+	URL         string // for DirectDownload and URL-sourced AppBundle: URL template with {version}, {os}, {arch}
 	StableURL   string // for DirectDownload: URL to fetch latest stable version string
 	CloneURL    string // for ShellPlugin: full git clone URL
 	CloneDest   string // for ShellPlugin: destination path (can use ~ for home)
 	PostClone   string // for ShellPlugin: identifier for post-clone hook logic
 	InstallCmd  string // for CustomScript: shell command run via bash -c
-	RemoveCmd   string // for CustomScript (custom packs only): shell command run via bash -c on --remove
+	NodePkg     string // for NodePackage: npm package spec, e.g. "@openai/codex"
+	PyTool      string // for PythonTool: uv tool name, e.g. "prowler"
+	Requires    string // display-only prerequisite pack name; not enforced at install time
+
+	VersionRegex string // applied to a StableURL body that is not a bare version string; first capture group wins
+	PostInstall  string // for AppBundle: identifier for post-install hook logic
 }

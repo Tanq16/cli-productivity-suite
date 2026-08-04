@@ -32,6 +32,12 @@ var rcCloud []byte
 //go:embed starship.toml
 var starshipToml []byte
 
+//go:embed code-server-config.yaml
+var codeServerConfig []byte
+
+//go:embed code-server-settings.json
+var codeServerSettings []byte
+
 func TmuxConf() []byte           { return tmuxConf }
 func LinuxKittyConf() []byte     { return linuxKittyConf }
 func MacosKittyConf() []byte     { return macosKittyConf }
@@ -42,3 +48,5 @@ func RcBase() []byte             { return rcBase }
 func RcRuntimes() []byte         { return rcRuntimes }
 func RcCloud() []byte            { return rcCloud }
 func StarshipToml() []byte       { return starshipToml }
+func CodeServerConfig() []byte   { return codeServerConfig }
+func CodeServerSettings() []byte { return codeServerSettings }

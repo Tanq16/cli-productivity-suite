@@ -3,13 +3,10 @@ package runner
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"github.com/tanq16/cli-productivity-suite/internal/configs"
-	"github.com/tanq16/cli-productivity-suite/internal/custom"
 	"github.com/tanq16/cli-productivity-suite/internal/github"
 	"github.com/tanq16/cli-productivity-suite/internal/installer"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
@@ -18,44 +15,25 @@ import (
 	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
-var customOnce sync.Once
-
-func ensureCustomPacks() {
-	customOnce.Do(func() {
-		p, err := platform.Detect()
-		if err != nil {
-			return
-		}
-		extDir := filepath.Join(p.ConfigDir(), "extensions")
-		packs, warnings := custom.LoadDir(extDir, registry.BuiltinPackNames())
-		for _, w := range warnings {
-			utils.PrintWarn(w, nil)
-		}
-		registry.LoadCustomPacks(packs)
-	})
-}
-
 func ExtendList() {
-	ensureCustomPacks()
 	packs := registry.AllExtensionPacks()
 	for _, pack := range packs {
 		tools := filterExtPackForPlatform(pack)
 		utils.PrintInfo(fmt.Sprintf("%s — %s (%d tools)", pack.Name, pack.Description, len(tools)))
 		if len(tools) > 0 {
-			names := ""
+			names := make([]string, len(tools))
 			for i, t := range tools {
-				if i > 0 {
-					names += ", "
+				names[i] = t.Name
+				if t.Requires != "" {
+					names[i] += " (needs " + t.Requires + ")"
 				}
-				names += t.Name
 			}
-			utils.PrintGeneric("    " + names)
+			utils.PrintGeneric("    " + strings.Join(names, ", "))
 		}
 	}
 }
 
 func Extend(packName string, toolFilter []string, ghToken string) {
-	ensureCustomPacks()
 	pack := registry.ExtensionPackByName(packName)
 	if pack == nil {
 		available := ""
@@ -189,98 +167,6 @@ func Extend(packName string, toolFilter []string, ghToken string) {
 	}
 }
 
-func ExtendRemove(packName string, toolFilter []string) {
-	ensureCustomPacks()
-
-	if registry.BuiltinPackNames()[packName] {
-		utils.PrintFatal(fmt.Sprintf("--remove is only supported for custom extension packs; %q is built-in", packName), nil)
-	}
-
-	pack := registry.ExtensionPackByName(packName)
-	if pack == nil {
-		utils.PrintFatal(fmt.Sprintf("unknown custom extension pack: %s", packName), nil)
-	}
-
-	p, err := platform.Detect()
-	if err != nil {
-		utils.PrintFatal("platform detection failed", err)
-	}
-
-	st, err := state.Load(p.StatePath())
-	if err != nil {
-		utils.PrintFatal("failed to load state", err)
-	}
-
-	allTools := filterExtPackForPlatform(*pack)
-	if len(allTools) == 0 {
-		utils.PrintSuccess(fmt.Sprintf("extension pack %s: no tools for this platform", pack.Name))
-		return
-	}
-
-	if len(toolFilter) > 0 {
-		nameSet := make(map[string]bool, len(toolFilter))
-		for _, n := range toolFilter {
-			nameSet[n] = true
-		}
-		var filtered []registry.Tool
-		for _, t := range allTools {
-			if nameSet[t.Name] {
-				filtered = append(filtered, t)
-				delete(nameSet, t.Name)
-			}
-		}
-		if len(nameSet) > 0 {
-			var unknown []string
-			for name := range nameSet {
-				unknown = append(unknown, name)
-			}
-			utils.PrintFatal(fmt.Sprintf("tools not found in extension pack %s: %s", packName, strings.Join(unknown, ", ")), nil)
-		}
-		allTools = filtered
-	}
-
-	wholePackRemoval := len(toolFilter) == 0
-	var hadErrors bool
-
-	for _, t := range allTools {
-		if t.RemoveCmd == "" {
-			utils.PrintError(fmt.Sprintf("%s: no remove command defined in YAML", t.Name), nil)
-			hadErrors = true
-			continue
-		}
-		utils.PrintRunning("removing " + t.Name)
-		cmd := exec.Command("bash", "-c", t.RemoveCmd)
-		cmd.Env = p.CustomScriptEnv()
-		err := utils.RunCmd(cmd)
-		utils.ClearLines(1)
-		if err != nil {
-			utils.PrintError(fmt.Sprintf("%s: remove failed", t.Name), err)
-			hadErrors = true
-			continue
-		}
-		st.Remove(t.Name)
-		utils.PrintSuccess(fmt.Sprintf("%s: removed", t.Name))
-	}
-
-	if wholePackRemoval {
-		fragPath := filepath.Join(p.ShellDir(), "rc", "custom", packName+".zsh")
-		if err := os.Remove(fragPath); err != nil && !os.IsNotExist(err) {
-			utils.PrintError(fmt.Sprintf("failed to remove fragment %s", fragPath), err)
-			hadErrors = true
-		}
-	}
-
-	if err := st.Save(); err != nil {
-		utils.PrintError("failed to save state", err)
-	}
-
-	if hadErrors {
-		utils.PrintWarn(fmt.Sprintf("extension pack %s: removal finished with errors", pack.Name), nil)
-	} else {
-		utils.PrintSuccess(fmt.Sprintf("extension pack %s: removal complete", pack.Name))
-	}
-}
-
 func filterExtPackForPlatform(pack registry.ExtensionPack) []registry.Tool {
 	p, err := platform.Detect()
 	if err != nil {
@@ -290,7 +176,6 @@ func filterExtPackForPlatform(pack registry.ExtensionPack) []registry.Tool {
 }
 
 func ExtensionPackNames() []string {
-	ensureCustomPacks()
 	packs := registry.AllExtensionPacks()
 	names := make([]string, len(packs))
 	for i, p := range packs {
@@ -300,7 +185,6 @@ func ExtensionPackNames() []string {
 }
 
 func ExtensionPackToolNames(packName string) []string {
-	ensureCustomPacks()
 	pack := registry.ExtensionPackByName(packName)
 	if pack == nil {
 		return nil
@@ -322,13 +206,9 @@ func deployPackFragment(packName string, p platform.Platform) {
 	case "security":
 		content := []byte("export NUCLEI_TEMPLATES_DIR=\"$HOME/shell/nuclei-templates\"\n")
 		deployFragment(p, "30-security.zsh", content)
-	default:
-		if pf := custom.GetPackFile(packName); pf != nil {
-			content := custom.RenderFragment(*pf)
-			if content != nil {
-				deployFragment(p, filepath.Join("custom", packName+".zsh"), content)
-			}
-		}
+	case "misc":
+		content := []byte("export NEO4J_CONF=\"$HOME/.config/neo4j/conf\"\n")
+		deployFragment(p, "40-misc.zsh", content)
 	}
 }
 

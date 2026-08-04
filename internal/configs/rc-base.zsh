@@ -53,7 +53,7 @@ stty -ixon
 
 # --- PATH ---
 # custom-bin first so user-dropped binaries win over CPS-managed ones on name collision
-export PATH="$HOME/shell/custom-bin:$HOME/shell/extensions:$HOME/shell/executables:$HOME/.local/bin:$PATH"
+export PATH="$HOME/shell/custom-bin:$HOME/shell/extensions:$HOME/.local/bin:$PATH"
 
 # --- Starship prompt ---
 [ -f "$HOME/shell/completions/starship.zsh" ] && source "$HOME/shell/completions/starship.zsh"

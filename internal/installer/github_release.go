@@ -5,8 +5,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/rs/zerolog/log"
-
 	"github.com/tanq16/cli-productivity-suite/internal/github"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
 	"github.com/tanq16/cli-productivity-suite/internal/registry"
@@ -16,17 +14,12 @@ import (
 type GitHubReleaseInstaller struct{}
 
 func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platform, gh *github.Client, st *state.State) Result {
-	log.Debug().Str("package", "installer").Msgf("installing %s from %s", tool.Name, tool.Repo)
-
 	release, err := gh.LatestRelease(tool.Repo)
 	if err != nil {
 		return Result{Tool: tool.Name, Err: fmt.Errorf("failed to fetch release: %w", err)}
 	}
 
-	destDir := p.ShellExecDir()
-	if tool.Extension {
-		destDir = p.ShellExtDir()
-	}
+	destDir := p.ShellExtDir()
 
 	currentVersion := st.ToolVersion(tool.Name)
 	if currentVersion == release.TagName {
@@ -74,19 +67,7 @@ func (g *GitHubReleaseInstaller) Install(tool *registry.Tool, p platform.Platfor
 			return Result{Tool: tool.Name, Err: err}
 		}
 
-		switch archiveFmt {
-		case "tar.gz":
-			err = ExtractTarGz(archivePath, extractDir)
-		case "tgz":
-			err = ExtractTarGz(archivePath, extractDir)
-		case "tar.xz":
-			err = ExtractTarXz(archivePath, extractDir)
-		case "zip":
-			err = ExtractZip(archivePath, extractDir)
-		default:
-			err = fmt.Errorf("unknown archive format: %s", archiveFmt)
-		}
-		if err != nil {
+		if err := ExtractArchive(archivePath, extractDir, archiveFmt); err != nil {
 			return Result{Tool: tool.Name, Err: fmt.Errorf("extract failed: %w", err)}
 		}
 
