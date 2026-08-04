@@ -83,7 +83,6 @@ var codeServerExtensions = []string{
 	"Catppuccin.catppuccin-vsc-icons",
 	"EditorConfig.EditorConfig",
 	"usernamehw.errorlens",
-	"streetsidesoftware.code-spell-checker",
 	"golang.Go",
 	"ms-python.python",
 	"charliermarsh.ruff",
