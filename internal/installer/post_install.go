@@ -86,6 +86,7 @@ var codeServerExtensions = []string{
 	"golang.Go",
 	"ms-python.python",
 	"charliermarsh.ruff",
+	"Anthropic.claude-code",
 }
 
 func seedCodeServerConfig(p platform.Platform, bundleDir string) error {
