@@ -188,7 +188,7 @@ Config lives in `~/.config/code-server/config.yaml`; editor settings and extensi
 
 `auth: none` is only safe because it binds to loopback. To reach it from another machine, forward the port over SSH rather than changing `bind-addr` — `ssh -L 8080:localhost:8080 you@host` — which also keeps the browser on `localhost`, a secure context. Over a plain-HTTP LAN address, webviews and clipboard access break.
 
-These extensions install with it, from Open VSX: Catppuccin theme + icons, EditorConfig, Error Lens, Code Spell Checker, YAML, Go, Python, and Ruff.
+These extensions install with it, from Open VSX: Catppuccin theme + icons, EditorConfig, Error Lens, Code Spell Checker, Go, Python, and Ruff. The Go extension will offer to install `gopls` on first use, which needs `cps extend runtimes`. Note that Pylance is not on Open VSX, so Python IntelliSense is weaker than desktop VS Code — Ruff covers linting and formatting.
 
 **`neo4j`** reads its config from `~/.config/neo4j/conf/` via `NEO4J_CONF`, and stores databases in `~/.config/neo4j/data/`. Set a password before first start with `~/shell/apps/neo4j/bin/neo4j-admin dbms set-initial-password <password>`.
 

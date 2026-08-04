@@ -119,6 +119,12 @@ for t in caddy linksnapper kairo raikiri expenseowl; do check_bin "$t" "homelab"
 for b in rinnegan/bin/rinnegan code-server/bin/code-server; do
     [ -x "$HOME/shell/apps/$b" ] || fail "homelab: ~/shell/apps/$b"
 done
+# code-server must be pre-seeded; without it the first launch generates a password config
+[ -f "$HOME/.config/code-server/config.yaml" ] || fail "homelab: ~/.config/code-server/config.yaml missing"
+grep -q '^auth: none$' "$HOME/.config/code-server/config.yaml" 2>/dev/null || \
+    fail "homelab: code-server auth is not disabled"
+[ -f "$HOME/.local/share/code-server/User/settings.json" ] || \
+    fail "homelab: code-server settings.json missing"
 # private (public subset)
 for t in nits gcli box claudex; do check_bin "$t" "private"; done
 

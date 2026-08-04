@@ -73,7 +73,7 @@ func seedNeo4jConfig(p platform.Platform, bundleDir string) error {
 	}
 	out.WriteString("\n# Managed by cps: state lives here so upgrades can replace ~/shell/apps/neo4j wholesale.\n")
 	out.WriteString(relocations.String())
-	out.WriteString("# For TLS, point dbms.ssl.policy.<scope>.base_directory at " + certDir + "\n")
+	fmt.Fprintf(&out, "# For TLS, point dbms.ssl.policy.<scope>.base_directory at %s\n", certDir)
 
 	return os.WriteFile(confPath, []byte(out.String()), 0644)
 }
@@ -84,7 +84,6 @@ var codeServerExtensions = []string{
 	"EditorConfig.EditorConfig",
 	"usernamehw.errorlens",
 	"streetsidesoftware.code-spell-checker",
-	"redhat.vscode-yaml",
 	"golang.Go",
 	"ms-python.python",
 	"charliermarsh.ruff",
