@@ -61,6 +61,8 @@ export PATH="$HOME/shell/custom-bin:$HOME/shell/extensions:$HOME/.local/bin:$PAT
 # --- FZF ---
 [ -f "$HOME/shell/completions/fzf.zsh" ] && source "$HOME/shell/completions/fzf.zsh"
 export FZF_DEFAULT_OPTS="
+--color=16,fg:7,bg:-1,hl:4,fg+:15,bg+:0,hl+:12
+--color=info:8,prompt:2,pointer:5,marker:3,spinner:6,header:8,border:8,gutter:-1
 --layout=reverse
 --info=inline
 --height=95%
