@@ -31,6 +31,8 @@ o.softtabstop = 2
 o.smartindent = true
 o.wrap = false
 o.confirm = true
+-- b,s are the stock defaults; <> adds the normal-mode arrows and [] the insert-mode ones, so they cross line boundaries.
+o.whichwrap = "b,s,<,>,[,]"
 
 o.list = true
 vim.opt.listchars = { tab = "│ ", leadmultispace = "│ ", trail = "·", nbsp = "␣" }
@@ -331,6 +333,11 @@ local map = vim.keymap.set
 
 map("n", "<Esc>", "<cmd>nohlsearch<cr>", { desc = "clear search highlight" })
 map("n", "<C-s>", "<cmd>write<cr>", { desc = "save file" })
+
+-- Readline habits from the shell; these shadow i_CTRL-A (reinsert last text) and i_CTRL-E (copy the char below).
+map("i", "<C-a>", "<Home>", { desc = "start of line" })
+map("i", "<C-e>", "<End>", { desc = "end of line" })
+
 map("n", "<C-h>", "<C-w>h", { desc = "window left" })
 map("n", "<C-j>", "<C-w>j", { desc = "window down" })
 map("n", "<C-k>", "<C-w>k", { desc = "window up" })

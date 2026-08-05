@@ -27,6 +27,13 @@ func buildNvimSheet() string {
 	b.WriteString(cmdStyle.Render("  % / :<number>") + "                  Matching bracket / go to line\n")
 	b.WriteString(divider + "\n")
 
+	b.WriteString(headingStyle.Render("Insert Mode") + "\n")
+	b.WriteString(cmdStyle.Render("  Ctrl+a / Ctrl+e") + "                Start / end of line\n")
+	b.WriteString(cmdStyle.Render("  Ctrl+Left / Ctrl+Right") + "         Back / forward one word\n")
+	b.WriteString(cmdStyle.Render("  Left / Right") + "                   Wrap across line boundaries\n")
+	b.WriteString(cmdStyle.Render("  Ctrl+w / Ctrl+u") + "                Delete word / line before cursor\n")
+	b.WriteString(divider + "\n")
+
 	b.WriteString(headingStyle.Render("Editing") + "\n")
 	b.WriteString(cmdStyle.Render("  dd / yy / p") + "                    Delete / yank / paste line\n")
 	b.WriteString(cmdStyle.Render("  x") + "                              Delete char under cursor\n")
