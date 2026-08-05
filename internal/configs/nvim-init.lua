@@ -108,12 +108,6 @@ local hl = {
   StatusLineNC = { ctermfg = 8 },
   StatusLineTerm = { ctermfg = 7 },
   StatusLineTermNC = { ctermfg = 8 },
-  StlModeN = { ctermfg = 0, ctermbg = 4, bold = true },
-  StlModeI = { ctermfg = 0, ctermbg = 2, bold = true },
-  StlModeV = { ctermfg = 0, ctermbg = 5, bold = true },
-  StlModeR = { ctermfg = 0, ctermbg = 1, bold = true },
-  StlModeC = { ctermfg = 0, ctermbg = 3, bold = true },
-  StlModeT = { ctermfg = 0, ctermbg = 6, bold = true },
   StlGit = { ctermfg = 5 },
   StlErr = { ctermfg = 9 },
   StlWarn = { ctermfg = 11 },
@@ -153,6 +147,12 @@ local hl = {
   ["@diff.plus"] = { ctermfg = 2 },
   ["@diff.minus"] = { ctermfg = 1 },
 }
+
+-- Each mode colour needs the pill as a background and the same colour as a foreground for the cap glyphs beside it.
+for color = 1, 6 do
+  hl["StlMode" .. color] = { ctermfg = 0, ctermbg = color, bold = true }
+  hl["StlCap" .. color] = { ctermfg = color }
+end
 
 local function apply_highlights()
   for group, spec in pairs(hl) do
@@ -282,22 +282,20 @@ vim.diagnostic.config({
   },
 })
 
-local mode_label = {
-  n = "NORMAL", i = "INSERT", v = "VISUAL", V = "V-LINE", ["\22"] = "V-BLOCK",
-  s = "SELECT", S = "S-LINE", ["\19"] = "S-BLOCK", R = "REPLACE",
-  c = "COMMAND", r = "PROMPT", ["!"] = "SHELL", t = "TERMINAL",
-}
-
-local mode_group = {
-  n = "StlModeN", i = "StlModeI", v = "StlModeV", V = "StlModeV", ["\22"] = "StlModeV",
-  s = "StlModeV", S = "StlModeV", ["\19"] = "StlModeV", R = "StlModeR",
-  c = "StlModeC", r = "StlModeC", ["!"] = "StlModeT", t = "StlModeT",
+local modes = {
+  n = { "NORMAL", 4 }, i = { "INSERT", 2 }, v = { "VISUAL", 5 }, V = { "V-LINE", 5 },
+  ["\22"] = { "V-BLOCK", 5 }, s = { "SELECT", 5 }, S = { "S-LINE", 5 }, ["\19"] = { "S-BLOCK", 5 },
+  R = { "REPLACE", 1 }, c = { "COMMAND", 3 }, r = { "PROMPT", 3 },
+  ["!"] = { "SHELL", 6 }, t = { "TERMINAL", 6 },
 }
 
 -- The %{% %} wrapper re-parses this result, so the returned string may use % items but interpolated text must escape %.
 function _G.CpsStatusline()
-  local m = vim.api.nvim_get_mode().mode:sub(1, 1)
-  local parts = { "%#", mode_group[m] or "StlModeN", "# ", mode_label[m] or m, " %#StatusLine#" }
+  local mode = modes[vim.api.nvim_get_mode().mode:sub(1, 1)] or { "?", 4 }
+  local cap = "%#StlCap" .. mode[2] .. "#"
+  local parts = {
+    cap, "", "%#StlMode" .. mode[2] .. "# ", mode[1], " ", cap, "", "%#StatusLine#",
+  }
 
   local head = vim.b.gitsigns_head
   if head and head ~= "" then
