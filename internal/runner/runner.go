@@ -201,22 +201,6 @@ func runPostInstall(p platform.Platform) {
 	var lineCount int
 	var errors []jobResult
 
-	tpmInstall := filepath.Join(p.HomeDir, ".tmux", "plugins", "tpm", "bin", "install_plugins")
-	if _, err := os.Stat(tpmInstall); err == nil {
-		utils.PrintIndentedRunning("tpm-install: running")
-		lineCount++
-		tpmCmd := exec.Command("bash", tpmInstall)
-		tpmCmd.Env = append(os.Environ(), fmt.Sprintf("TMUX_PLUGIN_MANAGER_PATH=%s", filepath.Join(p.HomeDir, ".tmux", "plugins")))
-		err := utils.RunCmd(tpmCmd)
-		utils.ClearPreviousLine()
-		if err != nil {
-			utils.PrintIndentedError("tpm-install", err)
-			errors = append(errors, jobResult{name: "tpm-install", err: err})
-		} else {
-			utils.PrintIndentedSuccess("tpm-install: done")
-		}
-	}
-
 	generateShellEnv(p, &errors, &lineCount)
 	generateCompletions(p, &errors, &lineCount)
 

@@ -30,7 +30,7 @@ for d in \
     shell/go-sdk shell/java-sdk shell/rust shell/fnm shell/py-default \
     shell/uv-tools shell/uv-tool-executables shell/uv-python \
     shell/nuclei-templates \
-    .config/cps .config/nvim .tmux/plugins/tpm; do
+    .config/cps .config/nvim; do
     [ -d "$HOME/$d" ] || fail "dir missing: ~/$d"
 done
 

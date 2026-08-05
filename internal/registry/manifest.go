@@ -62,10 +62,4 @@ var AllTools = []Tool{
 		CloneURL:    "https://github.com/zsh-users/zsh-syntax-highlighting.git",
 		CloneDest:   "~/shell/plugins/zsh-syntax-highlighting",
 	},
-	{
-		Name: "tpm", Kind: ShellPlugin, Category: Shell,
-		Description: "Tmux Plugin Manager",
-		CloneURL:    "https://github.com/tmux-plugins/tpm.git",
-		CloneDest:   "~/.tmux/plugins/tpm",
-	},
 }

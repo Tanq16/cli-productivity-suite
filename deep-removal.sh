@@ -41,6 +41,7 @@ rm -f "$HOME/.local/bin/cps"
 
 echo "==> removing CPS-managed directories"
 rm -rf "$HOME/shell"
+# ~/.tmux is legacy — CPS cloned TPM there before tmux dropped its plugins
 rm -rf "$HOME/.tmux"
 rm -rf "$HOME/.config/nvim"
 rm -rf "$HOME/.config/cps"

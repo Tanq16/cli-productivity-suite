@@ -15,7 +15,7 @@ A single Go binary (`cps`) that sets up and manages a complete CLI development e
 
 | Category | Commands | Description |
 |----------|----------|-------------|
-| Environment | `init` | Base shell setup — zsh plugins, Neovim, tmux + TPM, kitty and shell configs |
+| Environment | `init` | Base shell setup — zsh plugins, Neovim, tmux, kitty and shell configs |
 | Extensions | `extend <pack>`, `extend <pack> <tool>`, `extend list` | Install tool packs or individual tools — CLI binaries, language runtimes, cloud CLIs, security tooling, self-hosted services |
 | Reference | `cheat <topic>` | Terminal cheat sheets for `cps`, Go, Java, uv, fnm, bun, Rust, tmux, nvim, fzf, jq, regex |
 | Maintenance | `self-update` | Update the `cps` binary in place |
@@ -81,7 +81,7 @@ cps extend core           # dev/network/media brew packages (cmake, nmap, ffmpeg
 
 ### `cps init`
 
-Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`, `file`, `tmux`, `htop`), Neovim from its official release tarball, zsh plugins (autosuggestions, syntax-highlighting), tmux with TPM, and CPS-managed config files (`.zshrc`, `.tmux.conf`, kitty configs, `init.lua`). No CLI binaries are installed here — those live in the `essentials` pack so they can be updated individually. No sudo required.
+Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`, `file`, `tmux`, `htop`), Neovim from its official release tarball, zsh plugins (autosuggestions, syntax-highlighting), and CPS-managed config files (`.zshrc`, `.tmux.conf`, kitty configs, `init.lua`). No CLI binaries are installed here — those live in the `essentials` pack so they can be updated individually. No sudo required.
 
 #### Neovim
 
@@ -94,6 +94,16 @@ Colors are inherited from the terminal rather than themed in Neovim. `termguicol
 Language servers are wired for `gopls`, `ruff`, and `ts_ls`, and each is enabled only when its binary is on `PATH` — install them through the relevant runtime and they light up on next launch.
 
 > **Upgrading from the NvChad-based setup.** `init` writes `init.lua` but does not clear the old tree. Remove `~/.config/nvim` and `~/.local/share/nvim` by hand first, or the stale NvChad files and lazy.nvim state will sit alongside the new config.
+
+#### tmux
+
+tmux runs with no plugins and no plugin manager — `.tmux.conf` is the whole configuration. What TPM used to pull in is now inline: the handful of settings worth keeping from `tmux-sensible` (`focus-events`, `aggressive-resize`, `status-keys emacs`, `display-time`, `status-interval`, and the `C-b R` reload binding), and a hand-rolled status line in place of the Catppuccin theme.
+
+The status bar follows the terminal the same way Neovim does. Every color is an ANSI index (0–15) and every backdrop is `bg=default`, so the bar is genuinely transparent and re-themes itself when the terminal does. It keeps the rounded active-window pill, and the right side shows the current directory and session name. The session glyph doubles as a prefix indicator — green normally, red while `C-b` is pending.
+
+`default-terminal` is pinned to `tmux-256color` so italics and undercurl reach Neovim intact, and truecolor pass-through uses `terminal-features` rather than the older `terminal-overrides`, which matched only `TERM=xterm-*` and silently missed Alacritty and foot.
+
+> **Upgrading from the TPM-based setup.** Nothing reads `~/.tmux` anymore; remove it to reclaim the ~4 MB of plugin clones. The status bar needs a Nerd Font for the folder, session, and rounded separator glyphs — the same requirement the Catppuccin theme had.
 
 Everything else via `cps extend` is optional — install what you need.
 
