@@ -149,10 +149,9 @@ local function build_highlights()
   }
 
   -- A cap is the pill colour drawn as a foreground, so every pill colour needs a background group and a matching foreground one.
-  -- Light palettes tune their accents to be read as text on the background, so filling a pill with one leaves the label barely legible; there the accent becomes the text instead.
-  local filled = vim.o.background == "dark"
+  -- reverse rather than ctermbg paints the label in the terminal's own background colour, which has no palette index and is the one tone guaranteed to stand off an accent under a light theme as well as a dark one.
   for color = 1, 6 do
-    hl["StlPill" .. color] = filled and { ctermfg = 0, ctermbg = color, bold = true } or { ctermfg = color, bold = true }
+    hl["StlPill" .. color] = { ctermfg = color, reverse = true, bold = true }
     hl["StlCap" .. color] = { ctermfg = color }
   end
 
@@ -166,8 +165,6 @@ local function apply_highlights()
 end
 
 vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_highlights })
--- Nvim asks the terminal for its background over OSC 11 and the reply can land after this file has run.
-vim.api.nvim_create_autocmd("OptionSet", { pattern = "background", callback = apply_highlights })
 apply_highlights()
 
 vim.pack.add({
@@ -299,11 +296,7 @@ local modes = {
 -- The %{% %} wrapper re-parses this result, so the returned string may use % items but interpolated text must escape %.
 local function pill(color, text)
   local cap = "%#StlCap" .. color .. "#"
-  -- An unfilled pill needs the thin caps; the round ones read as two detached blobs with nothing between them.
   local open, close = "", ""
-  if vim.o.background ~= "dark" then
-    open, close = "", ""
-  end
   return cap .. open .. "%#StlPill" .. color .. "#" .. text .. cap .. close .. "%#StatusLine#"
 end
 

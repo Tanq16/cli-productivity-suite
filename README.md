@@ -139,7 +139,7 @@ cps theme gruvbox-dark    # switch
 
 Fifteen themes ship embedded, in dark and light pairs where the upstream project publishes both: `mocha`/`latte` (Catppuccin), `gruvbox`, `dracula`, `tokyonight`, `monokai`, `atom-one`, `everforest`, and `nord-dark`.
 
-Only the Kitty palette changes. The tmux, Neovim and starship configs never name a hex colour — they reference ANSI indices `0-15`, which the theme file defines — so a switch re-colours everything at once. Kitty reloads its own config within a second, and running tmux and Neovim sessions pick the new palette up on their next redraw. Nothing restarts, with one exception: Neovim reads whether the background is dark or light from the terminal once at startup and styles its statusline accordingly, so switching between a dark and a light theme leaves an already-open Neovim with the wrong statusline until it is restarted.
+Only the Kitty palette changes. The tmux, Neovim and starship configs never name a hex colour — they reference ANSI indices `0-15`, which the theme file defines — so a switch re-colours everything at once. Kitty reloads its own config within a second, and running tmux and Neovim sessions pick the new palette up on their next redraw. Nothing restarts.
 
 The choice is recorded in the CPS state file, so re-running `cps init` keeps it rather than reverting to the default.
 
