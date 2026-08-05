@@ -153,7 +153,7 @@ local ts_langs = {
   "yaml",
 }
 
--- The "main" branch compiles through the tree-sitter CLI, so without it every startup would retry and fail; filtering to missing parsers keeps warm starts free.
+-- The "main" branch shells out to the tree-sitter CLI to compile each parser.
 if vim.fn.executable("tree-sitter") == 1 then
   local missing = vim.tbl_filter(function(lang)
     return #vim.api.nvim_get_runtime_file("parser/" .. lang .. ".so", false) == 0
@@ -216,7 +216,6 @@ local servers = {
   },
 }
 
--- Enabling a server whose binary is absent surfaces an error on every matching buffer.
 for name, cfg in pairs(servers) do
   if vim.fn.executable(cfg.cmd[1]) == 1 then
     vim.lsp.config(name, cfg)
