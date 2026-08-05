@@ -34,10 +34,9 @@ o.confirm = true
 o.list = true
 vim.opt.listchars = { tab = "│ ", leadmultispace = "│ ", trail = "·", nbsp = "␣" }
 
--- Terminal-inherited colors: with 'termguicolors' off Nvim emits cterm attributes, so
--- indices 0-15 resolve against the terminal's own palette and follow its theme. The
--- bundled "vim" scheme leaves Normal undefined, which keeps the background transparent.
+-- Off means Nvim emits cterm attributes, so indices 0-15 resolve against the terminal's own palette and follow its theme.
 o.termguicolors = false
+-- This scheme leaves Normal undefined, which keeps the background transparent.
 vim.cmd.colorscheme("vim")
 
 local hl = {
@@ -154,8 +153,7 @@ local ts_langs = {
   "yaml",
 }
 
--- nvim-treesitter's "main" branch compiles through the tree-sitter CLI, so without it every
--- startup would retry and fail. Requesting only missing parsers keeps warm starts free.
+-- The "main" branch compiles through the tree-sitter CLI, so without it every startup would retry and fail; filtering to missing parsers keeps warm starts free.
 if vim.fn.executable("tree-sitter") == 1 then
   local missing = vim.tbl_filter(function(lang)
     return #vim.api.nvim_get_runtime_file("parser/" .. lang .. ".so", false) == 0

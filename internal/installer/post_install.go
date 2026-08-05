@@ -118,8 +118,7 @@ func seedCodeServerConfig(p platform.Platform, bundleDir string) error {
 	return nil
 }
 
-// Neovim locates its own runtime relative to the resolved executable, so the bundle stays
-// intact in ~/shell/apps and only a symlink goes on PATH.
+// Neovim locates its own runtime relative to the resolved executable, so the bundle stays intact in ~/shell/apps and only a symlink goes on PATH.
 func linkNeovimBinary(p platform.Platform, bundleDir string) error {
 	if err := os.MkdirAll(p.ShellExtDir(), 0755); err != nil {
 		return err

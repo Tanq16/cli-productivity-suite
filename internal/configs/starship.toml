@@ -57,10 +57,9 @@ style = 'red'
 format = '[$all_status$ahead_behind]($style) '
 
 [python]
-# VIRTUAL_ENV is always exported for the py-default env, which would otherwise render this
-# module in every directory; detect on project files only. The venv name is dropped because
-# uv run binds .venv per-process, so an interactive shell always reports the stale py-default.
+# VIRTUAL_ENV is always exported for py-default, which would otherwise render this module in every directory.
 detect_env_vars = []
+# uv run binds .venv per-process, so an interactive shell only ever reports the stale py-default.
 format = 'via [${symbol}${version}]($style) '
 
 [cmd_duration]
