@@ -17,6 +17,7 @@ A single Go binary (`cps`) that sets up and manages a complete CLI development e
 |----------|----------|-------------|
 | Environment | `init` | Base shell setup — zsh plugins, Neovim, tmux, kitty and shell configs |
 | Extensions | `extend <pack>`, `extend <pack> <tool>`, `extend list` | Install tool packs or individual tools — CLI binaries, language runtimes, cloud CLIs, security tooling, self-hosted services |
+| Appearance | `theme`, `theme <name>` | Switch the terminal colour palette — 15 themes, re-colouring kitty, tmux, Neovim and the CLI tools at once |
 | Reference | `cheat <topic>` | Terminal cheat sheets for `cps`, Go, Java, uv, fnm, bun, Rust, tmux, nvim, fzf, jq, regex |
 | Maintenance | `self-update` | Update the `cps` binary in place |
 
@@ -81,7 +82,7 @@ cps extend core           # dev/network/media brew packages (cmake, nmap, ffmpeg
 
 ### `cps init`
 
-Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`, `file`, `tmux`, `htop`), Neovim from its official release tarball, zsh plugins (autosuggestions, syntax-highlighting), and CPS-managed config files (`.zshrc`, `.tmux.conf`, kitty configs, `init.lua`). No CLI binaries are installed here — those live in the `essentials` pack so they can be updated individually. No sudo required.
+Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`, `file`, `tmux`, `htop`), Neovim from its official release tarball, zsh plugins (autosuggestions, syntax-highlighting), and CPS-managed config files (`.zshrc`, `.tmux.conf`, kitty configs, `init.lua`, lsd colours). No CLI binaries are installed here — those live in the `essentials` pack so they can be updated individually. No sudo required.
 
 #### Neovim
 
@@ -89,7 +90,7 @@ Neovim installs as an app bundle under `~/shell/apps/neovim`, with `~/shell/exte
 
 The config leans on Neovim 0.12 natives — `vim.pack`, the built-in LSP client and completion, `gc` comments, `]b`/`[b` and `]d`/`[d`, `listchars` indent guides — plus five plugins: `fzf-lua`, `nvim-tree`, `gitsigns`, `nvim-autopairs`, and `nvim-treesitter` (Go, Python, JavaScript, TypeScript, Bash, Lua, JSON, YAML, Markdown). Plugins and parsers install on first launch, in the background. Parser compilation needs the `tree-sitter` CLI from the `essentials` pack; without it Neovim falls back to bundled regex syntax.
 
-Colors are inherited from the terminal: `termguicolors` is off, so highlights resolve against ANSI 0–15 and follow your terminal theme. LSP is wired for `gopls`, `ruff`, and `ts_ls`, each enabled only when its binary is on `PATH`.
+Colors are inherited from the terminal: `termguicolors` is off, so highlights resolve against ANSI 0–15 and follow your terminal theme. The statusline is hand-rolled from those same indices — mode, git branch, path, diagnostics, filetype and position — and capped with the glyphs the tmux bar uses, so the two read as one design. LSP is wired for `gopls`, `ruff`, and `ts_ls`, each enabled only when its binary is on `PATH`.
 
 #### tmux
 
@@ -139,7 +140,7 @@ cps theme gruvbox-dark    # switch
 
 Fifteen themes ship embedded, in dark and light pairs where the upstream project publishes both: `mocha`/`latte` (Catppuccin), `gruvbox`, `dracula`, `tokyonight`, `monokai`, `atom-one`, `everforest`, and `nord-dark`.
 
-Only the Kitty palette changes. The tmux, Neovim and starship configs never name a hex colour — they reference ANSI indices `0-15`, which the theme file defines — so a switch re-colours everything at once. Kitty reloads its own config within a second, and running tmux and Neovim sessions pick the new palette up on their next redraw. Nothing restarts.
+Only the Kitty palette changes. Nothing downstream names a hex colour: the tmux, Neovim and starship configs reference ANSI indices `0-15`, and bat, lsd and fzf are each pinned to those same indices rather than the fixed 256-colour cube they otherwise default to. So one switch re-colours all of them at once. Kitty reloads its own config within a second, and running tmux and Neovim sessions pick the new palette up on their next redraw. Nothing restarts.
 
 The choice is recorded in the CPS state file, so re-running `cps init` keeps it rather than reverting to the default.
 
@@ -268,5 +269,5 @@ This is the use case the image is tuned for: an agent (or a human delegating to 
 Run the included script to wipe CPS and CPS-installed brew packages (plus a legacy `~/.oh-my-zsh` directory if one is left over from pre-v1.x CPS). Homebrew itself and `~/.zsh_history` are preserved so you can reinstall cleanly without rebuilding your shell history or re-bootstrapping brew.
 
 ```bash
-./deep-removal.sh
+./scripts/deep-removal.sh
 ```
