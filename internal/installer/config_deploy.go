@@ -55,6 +55,10 @@ func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Pl
 		content = configs.StarshipToml()
 		destPath = filepath.Join(p.HomeDir, ".config", "starship.toml")
 
+	case "nvim-config":
+		content = configs.NvimInit()
+		destPath = filepath.Join(p.HomeDir, ".config", "nvim", "init.lua")
+
 	default:
 		return nil, "", fmt.Errorf("unknown config: %s", tool.Name)
 	}

@@ -64,12 +64,17 @@ func Init(ghToken string) {
 	}
 	st.Save()
 
-	if runPhase("Phase 3: Shell plugins", filterBaseTools(reg.ByKind(registry.ShellPlugin)), p, gh, st) {
+	if runPhase("Phase 3: Applications", filterBaseTools(reg.ByKind(registry.AppBundle)), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
 
-	if runPhase("Phase 4: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
+	if runPhase("Phase 4: Shell plugins", filterBaseTools(reg.ByKind(registry.ShellPlugin)), p, gh, st) {
+		hadErrors = true
+	}
+	st.Save()
+
+	if runPhase("Phase 5: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
@@ -192,7 +197,7 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 }
 
 func runPostInstall(p platform.Platform) {
-	utils.PrintRunning("(Running) Phase 5: Post-install tasks")
+	utils.PrintRunning("(Running) Phase 6: Post-install tasks")
 	var lineCount int
 	var errors []jobResult
 
@@ -212,31 +217,17 @@ func runPostInstall(p platform.Platform) {
 		}
 	}
 
-	if nvimBin, err := exec.LookPath("nvim"); err == nil {
-		utils.PrintIndentedRunning("nvchad-setup: running")
-		lineCount++
-		nvimCmd := exec.Command(nvimBin, "--headless", "+MasonInstallAll", "+Lazy sync", "+qa")
-		err := utils.RunCmd(nvimCmd)
-		utils.ClearPreviousLine()
-		if err != nil {
-			utils.PrintIndentedError("nvchad-setup", err)
-			errors = append(errors, jobResult{name: "nvchad-setup", err: err})
-		} else {
-			utils.PrintIndentedSuccess("nvchad-setup: done")
-		}
-	}
-
 	generateShellEnv(p, &errors, &lineCount)
 	generateCompletions(p, &errors, &lineCount)
 
 	utils.ClearLines(lineCount + 1) // sub-lines + running header
 	if len(errors) > 0 {
-		utils.PrintError("Phase 5: partially completed with errors", nil)
+		utils.PrintError("Phase 6: partially completed with errors", nil)
 		for _, e := range errors {
 			utils.PrintIndentedError(e.name, e.err)
 		}
 	} else {
-		utils.PrintInfo("Phase 5: Post-install tasks")
+		utils.PrintInfo("Phase 6: Post-install tasks")
 	}
 }
 

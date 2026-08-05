@@ -8,7 +8,7 @@ func buildNvimSheet() string {
 	leader := cmdStyle.Render("<Space>")
 
 	b.WriteString(titleStyle.Render("Neovim Cheat Sheet") + "\n")
-	b.WriteString(noteStyle.Render("  NvChad + catppuccin, leader: Space, aliased: vim=nvim") + "\n\n")
+	b.WriteString(noteStyle.Render("  cps config, leader: Space, colors inherited from terminal") + "\n\n")
 
 	b.WriteString(headingStyle.Render("Modes") + "\n")
 	b.WriteString(cmdStyle.Render("  i") + "  insert   " + cmdStyle.Render("v") + "  visual   " + cmdStyle.Render("V") + "  visual line   " + cmdStyle.Render("Ctrl+v") + "  visual block\n")
@@ -36,36 +36,59 @@ func buildNvimSheet() string {
 	b.WriteString(cmdStyle.Render("  >> / <<") + "                        Indent / outdent line\n")
 	b.WriteString(cmdStyle.Render("  o / O") + "                          New line below / above\n")
 	b.WriteString(cmdStyle.Render("  A / J / .") + "                      Append EOL / join line / repeat\n")
+	b.WriteString(cmdStyle.Render("  gcc / gc") + "                       Toggle comment line / selection\n")
+	b.WriteString(cmdStyle.Render("  \"+y / \"+p") + "                      Yank / paste via system clipboard\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Search & Replace") + "\n")
 	b.WriteString(cmdStyle.Render("  / / ?") + "                          Search forward / backward\n")
 	b.WriteString(cmdStyle.Render("  n / N / *") + "                      Next / prev / word under cursor\n")
-	b.WriteString(cmdStyle.Render("  :noh") + "                           Clear search highlight\n")
+	b.WriteString(cmdStyle.Render("  Esc") + "                            Clear search highlight\n")
 	b.WriteString(cmdStyle.Render("  :%s/old/new/g[c]") + "               Replace all [c = confirm each]\n")
 	b.WriteString(divider + "\n")
 
-	b.WriteString(headingStyle.Render("NvChad — File & Buffer") + "\n")
-	b.WriteString("  " + leader + " " + cmdStyle.Render("ff / fw") + "                  Find file / live grep (Telescope)\n")
-	b.WriteString("  " + leader + " " + cmdStyle.Render("fb / fo") + "                  Find buffer / recent files\n")
-	b.WriteString("  " + leader + " " + cmdStyle.Render("e") + "                       Toggle NvimTree\n")
+	b.WriteString(headingStyle.Render("Files & Buffers") + "\n")
+	b.WriteString("  " + leader + " " + cmdStyle.Render("ff") + "                      Find files (fzf-lua)\n")
+	b.WriteString("  " + leader + " " + cmdStyle.Render("fw") + "                      Live grep across project\n")
+	b.WriteString("  " + leader + " " + cmdStyle.Render("fa") + "                      Find all files (hidden + ignored)\n")
+	b.WriteString("  " + leader + " " + cmdStyle.Render("fb") + "                      Find buffers\n")
+	b.WriteString(cmdStyle.Render("  Ctrl+n") + "                         Toggle file tree\n")
+	b.WriteString("  " + leader + " " + cmdStyle.Render("e") + "                       Focus file tree\n")
+	b.WriteString(cmdStyle.Render("  ]b / [b") + "                        Next / prev buffer\n")
 	b.WriteString("  " + leader + " " + cmdStyle.Render("x") + "                       Close buffer\n")
-	b.WriteString(cmdStyle.Render("  Tab / Shift+Tab") + "                Next / prev buffer\n")
+	b.WriteString(cmdStyle.Render("  Ctrl+s") + "                         Save file\n")
 	b.WriteString(divider + "\n")
 
-	b.WriteString(headingStyle.Render("NvChad — LSP") + "\n")
-	b.WriteString(cmdStyle.Render("  gd / gr") + "                        Go to definition / references\n")
+	b.WriteString(headingStyle.Render("LSP (built-in)") + "\n")
+	b.WriteString(cmdStyle.Render("  gd / gD") + "                        Go to definition / declaration\n")
+	b.WriteString(cmdStyle.Render("  grr / gri") + "                      References / implementations\n")
+	b.WriteString(cmdStyle.Render("  grn / gra") + "                      Rename / code action\n")
+	b.WriteString(cmdStyle.Render("  grt / gO") + "                       Type definition / document symbols\n")
 	b.WriteString(cmdStyle.Render("  K") + "                              Hover documentation\n")
-	b.WriteString("  " + leader + " " + cmdStyle.Render("ra / ca") + "                  Rename / code actions\n")
 	b.WriteString(cmdStyle.Render("  ]d / [d") + "                        Next / prev diagnostic\n")
-	b.WriteString("  " + leader + " " + cmdStyle.Render("fm") + "                      Format file\n")
+	b.WriteString("  " + leader + " " + cmdStyle.Render("ds") + "                      Diagnostics to loclist\n")
+	b.WriteString("  " + leader + " " + cmdStyle.Render("fm") + "                      Format buffer\n")
+	b.WriteString(noteStyle.Render("  Servers: gopls, ruff, ts_ls — enabled only when on PATH") + "\n")
 	b.WriteString(divider + "\n")
 
-	b.WriteString(headingStyle.Render("File Operations") + "\n")
+	b.WriteString(headingStyle.Render("Git (gitsigns)") + "\n")
+	b.WriteString(cmdStyle.Render("  ]c / [c") + "                        Next / prev hunk\n")
+	b.WriteString("  " + leader + " " + cmdStyle.Render("hp / hb") + "                  Preview hunk / blame line\n")
+	b.WriteString("  " + leader + " " + cmdStyle.Render("hs / hr") + "                  Stage / reset hunk\n")
+	b.WriteString("  " + leader + " " + cmdStyle.Render("hd") + "                      Diff this file\n")
+	b.WriteString(divider + "\n")
+
+	b.WriteString(headingStyle.Render("Windows & Files") + "\n")
 	b.WriteString(cmdStyle.Render("  :w / :q / :wq / :q!") + "            Save / quit / save+quit / force quit\n")
 	b.WriteString(cmdStyle.Render("  :e <file>") + "                      Open file\n")
 	b.WriteString(cmdStyle.Render("  :vs / :sp") + "                      Vertical / horizontal split\n")
-	b.WriteString(cmdStyle.Render("  Ctrl+w h/j/k/l") + "                Navigate splits\n")
+	b.WriteString(cmdStyle.Render("  Ctrl+h/j/k/l") + "                   Navigate splits\n")
+	b.WriteString(divider + "\n")
+
+	b.WriteString(headingStyle.Render("Plugins") + "\n")
+	b.WriteString(cmdStyle.Render("  :lua vim.pack.update()") + "         Update plugins (review, :w to apply)\n")
+	b.WriteString(cmdStyle.Render("  :TSUpdate") + "                      Update treesitter parsers\n")
+	b.WriteString(cmdStyle.Render("  :checkhealth") + "                   Diagnose config problems\n")
 
 	return b.String()
 }
@@ -73,6 +96,6 @@ func buildNvimSheet() string {
 var nvimSheet = Sheet{
 	Name:        "nvim",
 	Aliases:     []string{"neovim", "vim", "vi"},
-	Description: "Neovim/NvChad navigation, editing, LSP, and Telescope cheat sheet",
+	Description: "Neovim navigation, editing, LSP, git, and fuzzy-find cheat sheet",
 	Content:     buildNvimSheet(),
 }

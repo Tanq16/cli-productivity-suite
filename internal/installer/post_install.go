@@ -22,6 +22,8 @@ func runPostInstall(tool *registry.Tool, p platform.Platform, destDir string) er
 		return seedNeo4jConfig(p, destDir)
 	case "code-server":
 		return seedCodeServerConfig(p, destDir)
+	case "neovim":
+		return linkNeovimBinary(p, destDir)
 	default:
 		return fmt.Errorf("unknown post-install hook %q for %s", tool.PostInstall, tool.Name)
 	}
@@ -114,6 +116,19 @@ func seedCodeServerConfig(p platform.Platform, bundleDir string) error {
 		return fmt.Errorf("install code-server extensions: %w", err)
 	}
 	return nil
+}
+
+// Neovim locates its own runtime relative to the resolved executable, so the bundle stays
+// intact in ~/shell/apps and only a symlink goes on PATH.
+func linkNeovimBinary(p platform.Platform, bundleDir string) error {
+	if err := os.MkdirAll(p.ShellExtDir(), 0755); err != nil {
+		return err
+	}
+	link := filepath.Join(p.ShellExtDir(), "nvim")
+	if err := os.Remove(link); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	return os.Symlink(filepath.Join(bundleDir, "bin", "nvim"), link)
 }
 
 func writeIfAbsent(path string, content []byte) error {
