@@ -148,9 +148,9 @@ local hl = {
   ["@diff.minus"] = { ctermfg = 1 },
 }
 
--- Each mode colour needs the pill as a background and the same colour as a foreground for the cap glyphs beside it.
+-- A cap is the pill colour drawn as a foreground, so every pill colour needs a background group and a matching foreground one.
 for color = 1, 6 do
-  hl["StlMode" .. color] = { ctermfg = 0, ctermbg = color, bold = true }
+  hl["StlPill" .. color] = { ctermfg = 0, ctermbg = color, bold = true }
   hl["StlCap" .. color] = { ctermfg = color }
 end
 
@@ -290,12 +290,14 @@ local modes = {
 }
 
 -- The %{% %} wrapper re-parses this result, so the returned string may use % items but interpolated text must escape %.
+local function pill(color, text)
+  local cap = "%#StlCap" .. color .. "#"
+  return cap .. "" .. "%#StlPill" .. color .. "# " .. text .. " " .. cap .. "" .. "%#StatusLine#"
+end
+
 function _G.CpsStatusline()
   local mode = modes[vim.api.nvim_get_mode().mode:sub(1, 1)] or { "?", 4 }
-  local cap = "%#StlCap" .. mode[2] .. "#"
-  local parts = {
-    cap, "", "%#StlMode" .. mode[2] .. "# ", mode[1], " ", cap, "", "%#StatusLine#",
-  }
+  local parts = { pill(mode[2], mode[1]) }
 
   local head = vim.b.gitsigns_head
   if head and head ~= "" then
@@ -320,9 +322,9 @@ function _G.CpsStatusline()
     parts[#parts + 1] = "%#StlWarn#W" .. warnings .. " %#StatusLine#"
   end
   if not label and vim.bo.filetype ~= "" then
-    parts[#parts + 1] = vim.bo.filetype .. "  "
+    parts[#parts + 1] = pill(4, vim.bo.filetype) .. " "
   end
-  parts[#parts + 1] = "%l:%c  %P "
+  parts[#parts + 1] = pill(2, "%l:%c") .. " %P "
 
   return table.concat(parts)
 end
