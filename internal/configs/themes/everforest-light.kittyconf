@@ -49,7 +49,7 @@ mark3_background #df69ba
 # The 16 terminal colors
 
 # black
-color0 #a6b0a0
+color0 #bdc3af
 color8 #939f91
 
 # red
