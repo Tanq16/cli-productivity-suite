@@ -11,6 +11,7 @@ local o = vim.o
 o.number = true
 o.signcolumn = "yes"
 o.cursorline = true
+o.cursorlineopt = "number"
 o.mouse = "a"
 o.undofile = true
 o.swapfile = false
@@ -80,10 +81,7 @@ local function build_highlights()
     Underlined = { ctermfg = 12, underline = true },
 
     LineNr = { ctermfg = 8 },
-    CursorLineNr = { ctermfg = 11, ctermbg = 0, bold = true },
-    CursorLine = { ctermbg = 0 },
-    CursorLineSign = { ctermbg = 0 },
-    CursorLineFold = { ctermbg = 0 },
+    CursorLineNr = { ctermfg = 11, bold = true },
     -- Vim's default fills these with grey, drawing a solid bar down the gutter of every window.
     SignColumn = {},
     FoldColumn = { ctermfg = 8 },

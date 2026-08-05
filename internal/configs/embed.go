@@ -3,7 +3,7 @@ package configs
 import (
 	"embed"
 	"fmt"
-	"sort"
+	"slices"
 	"strings"
 )
 
@@ -86,6 +86,6 @@ func ThemeNames() []string {
 	for _, e := range entries {
 		names = append(names, strings.TrimSuffix(e.Name(), ".kittyconf"))
 	}
-	sort.Strings(names)
+	slices.Sort(names)
 	return names
 }

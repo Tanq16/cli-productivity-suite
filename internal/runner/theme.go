@@ -67,7 +67,5 @@ func Theme(name string) {
 	utils.ClearLines(1)
 
 	utils.PrintSuccess(fmt.Sprintf("theme set to %s", name))
-	// Nothing has to restart: kitty auto-reloads its config, and the tmux and nvim configs only ever
-	// name palette indices, so they redraw against the new colours on their own.
 	utils.PrintGeneric("  kitty reloads within a second; running tmux and nvim follow on next redraw")
 }

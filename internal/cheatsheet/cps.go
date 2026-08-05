@@ -42,7 +42,7 @@ func buildCPSSheet() string {
 	b.WriteString(headingStyle.Render("Theme") + "\n")
 	b.WriteString(cmdStyle.Render("  cps theme") + "                       List themes, marking the active one\n")
 	b.WriteString(cmdStyle.Render("  cps theme <name>") + "                Switch the terminal palette\n")
-	b.WriteString(noteStyle.Render("  Repaints kitty, tmux and nvim at once — nothing restarts") + "\n")
+	b.WriteString(noteStyle.Render("  Repaints kitty, tmux and nvim at once — restart nvim across dark↔light") + "\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Other") + "\n")
