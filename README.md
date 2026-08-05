@@ -87,7 +87,7 @@ Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`
 
 Neovim installs as an app bundle under `~/shell/apps/neovim`, with `~/shell/extensions/nvim` symlinked to its launcher. CPS deploys a single `~/.config/nvim/init.lua`.
 
-The config leans on Neovim 0.12 natives — `vim.pack`, the built-in LSP client and completion, `gc` comments, `]b`/`[b` and `]d`/`[d`, `listchars` indent guides, the default statusline — plus four plugins: `fzf-lua`, `nvim-tree`, `gitsigns`, and `nvim-treesitter` (Go, Python, JavaScript, TypeScript, Bash, Lua, JSON, YAML, Markdown). Plugins and parsers install on first launch, in the background. Parser compilation needs the `tree-sitter` CLI from the `essentials` pack; without it Neovim falls back to bundled regex syntax.
+The config leans on Neovim 0.12 natives — `vim.pack`, the built-in LSP client and completion, `gc` comments, `]b`/`[b` and `]d`/`[d`, `listchars` indent guides — plus four plugins: `fzf-lua`, `nvim-tree`, `gitsigns`, and `nvim-treesitter` (Go, Python, JavaScript, TypeScript, Bash, Lua, JSON, YAML, Markdown). Plugins and parsers install on first launch, in the background. Parser compilation needs the `tree-sitter` CLI from the `essentials` pack; without it Neovim falls back to bundled regex syntax.
 
 Colors are inherited from the terminal: `termguicolors` is off, so highlights resolve against ANSI 0–15 and follow your terminal theme. LSP is wired for `gopls`, `ruff`, and `ts_ls`, each enabled only when its binary is on `PATH`.
 

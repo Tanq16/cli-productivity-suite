@@ -21,6 +21,7 @@ o.splitright = true
 o.scrolloff = 8
 o.sidescrolloff = 8
 o.laststatus = 3
+o.showmode = false
 o.updatetime = 250
 o.timeoutlen = 400
 o.expandtab = true
@@ -33,6 +34,7 @@ o.confirm = true
 
 o.list = true
 vim.opt.listchars = { tab = "│ ", leadmultispace = "│ ", trail = "·", nbsp = "␣" }
+vim.opt.fillchars = { eob = " " }
 
 -- Off means Nvim emits cterm attributes, so indices 0-15 resolve against the terminal's own palette and follow its theme.
 o.termguicolors = false
@@ -72,18 +74,45 @@ local hl = {
   Underlined = { ctermfg = 12, underline = true },
 
   LineNr = { ctermfg = 8 },
-  CursorLineNr = { ctermfg = 11, bold = true },
+  CursorLineNr = { ctermfg = 11, ctermbg = 0, bold = true },
   CursorLine = { ctermbg = 0 },
+  CursorLineSign = { ctermbg = 0 },
+  CursorLineFold = { ctermbg = 0 },
+  -- Vim's default fills these with grey, drawing a solid bar down the gutter of every window.
+  SignColumn = {},
+  FoldColumn = { ctermfg = 8 },
   Whitespace = { ctermfg = 8 },
   NonText = { ctermfg = 8 },
+  Conceal = { ctermfg = 8 },
   Visual = { reverse = true },
   Search = { ctermfg = 0, ctermbg = 11 },
   IncSearch = { ctermfg = 0, ctermbg = 9 },
   MatchParen = { ctermfg = 14, bold = true, underline = true },
   Pmenu = { ctermbg = 8 },
   PmenuSel = { ctermbg = 4, ctermfg = 15, bold = true },
+  PmenuSbar = { ctermbg = 8 },
+  PmenuThumb = { ctermbg = 7 },
   WinSeparator = { ctermfg = 8 },
   Folded = { ctermfg = 8, italic = true },
+  ErrorMsg = { ctermfg = 9, bold = true },
+  TabLine = { ctermfg = 8 },
+  TabLineFill = {},
+  TabLineSel = { ctermfg = 4, bold = true },
+
+  -- Vim's default is cterm=reverse, which renders the whole bar as a solid slab.
+  StatusLine = { ctermfg = 7 },
+  StatusLineNC = { ctermfg = 8 },
+  StatusLineTerm = { ctermfg = 7 },
+  StatusLineTermNC = { ctermfg = 8 },
+  StlModeN = { ctermfg = 0, ctermbg = 4, bold = true },
+  StlModeI = { ctermfg = 0, ctermbg = 2, bold = true },
+  StlModeV = { ctermfg = 0, ctermbg = 5, bold = true },
+  StlModeR = { ctermfg = 0, ctermbg = 1, bold = true },
+  StlModeC = { ctermfg = 0, ctermbg = 3, bold = true },
+  StlModeT = { ctermfg = 0, ctermbg = 6, bold = true },
+  StlGit = { ctermfg = 5 },
+  StlErr = { ctermfg = 9 },
+  StlWarn = { ctermfg = 11 },
 
   DiagnosticError = { ctermfg = 9 },
   DiagnosticWarn = { ctermfg = 11 },
@@ -245,6 +274,55 @@ vim.diagnostic.config({
     },
   },
 })
+
+local mode_label = {
+  n = "NORMAL", i = "INSERT", v = "VISUAL", V = "V-LINE", ["\22"] = "V-BLOCK",
+  s = "SELECT", S = "S-LINE", ["\19"] = "S-BLOCK", R = "REPLACE",
+  c = "COMMAND", r = "PROMPT", ["!"] = "SHELL", t = "TERMINAL",
+}
+
+local mode_group = {
+  n = "StlModeN", i = "StlModeI", v = "StlModeV", V = "StlModeV", ["\22"] = "StlModeV",
+  s = "StlModeV", S = "StlModeV", ["\19"] = "StlModeV", R = "StlModeR",
+  c = "StlModeC", r = "StlModeC", ["!"] = "StlModeT", t = "StlModeT",
+}
+
+-- The %{% %} wrapper re-parses this result, so the returned string may use % items but interpolated text must escape %.
+function _G.CpsStatusline()
+  local m = vim.api.nvim_get_mode().mode:sub(1, 1)
+  local parts = { "%#", mode_group[m] or "StlModeN", "# ", mode_label[m] or m, " %#StatusLine#" }
+
+  local head = vim.b.gitsigns_head
+  if head and head ~= "" then
+    parts[#parts + 1] = "%#StlGit# " .. head:gsub("%%", "%%%%") .. "%#StatusLine#"
+  end
+  local label
+  if vim.bo.filetype == "NvimTree" then
+    label = " explorer"
+  elseif vim.bo.buftype == "terminal" then
+    label = " terminal"
+  end
+  parts[#parts + 1] = label or " %f%m%r"
+  parts[#parts + 1] = "%="
+
+  local counts = vim.diagnostic.count(0)
+  local errors = counts[vim.diagnostic.severity.ERROR]
+  local warnings = counts[vim.diagnostic.severity.WARN]
+  if errors then
+    parts[#parts + 1] = "%#StlErr#E" .. errors .. " %#StatusLine#"
+  end
+  if warnings then
+    parts[#parts + 1] = "%#StlWarn#W" .. warnings .. " %#StatusLine#"
+  end
+  if not label and vim.bo.filetype ~= "" then
+    parts[#parts + 1] = vim.bo.filetype .. "  "
+  end
+  parts[#parts + 1] = "%l:%c  %P "
+
+  return table.concat(parts)
+end
+
+vim.o.statusline = "%{%v:lua.CpsStatusline()%}"
 
 local map = vim.keymap.set
 
