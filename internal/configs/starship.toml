@@ -56,6 +56,12 @@ format = 'on [$symbol$branch]($style) '
 style = 'red'
 format = '[$all_status$ahead_behind]($style) '
 
+[python]
+# VIRTUAL_ENV is always exported for py-default, which would otherwise render this module in every directory.
+detect_env_vars = []
+# uv run binds .venv per-process, so an interactive shell only ever reports the stale py-default.
+format = 'via [${symbol}${version}]($style) '
+
 [cmd_duration]
 min_time = 2000
 format = 'took [$duration](bold yellow) '

@@ -38,6 +38,9 @@ var codeServerConfig []byte
 //go:embed code-server-settings.json
 var codeServerSettings []byte
 
+//go:embed nvim-init.lua
+var nvimInit []byte
+
 func TmuxConf() []byte           { return tmuxConf }
 func LinuxKittyConf() []byte     { return linuxKittyConf }
 func MacosKittyConf() []byte     { return macosKittyConf }
@@ -50,3 +53,4 @@ func RcCloud() []byte            { return rcCloud }
 func StarshipToml() []byte       { return starshipToml }
 func CodeServerConfig() []byte   { return codeServerConfig }
 func CodeServerSettings() []byte { return codeServerSettings }
+func NvimInit() []byte           { return nvimInit }

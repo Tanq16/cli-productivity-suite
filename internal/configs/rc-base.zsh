@@ -65,7 +65,7 @@ export FZF_DEFAULT_OPTS="
 --info=inline
 --height=95%
 --multi
---preview '([[ -f {} ]] && (bat --style=numbers --color=always {} || cat {})) || ([[ -d {} ]] && (tree -C {} | less)) || echo {} 2>/dev/null | head -200'
+--preview '([[ -f {} ]] && (bat --style=numbers --color=always {} || cat {})) || ([[ -d {} ]] && lsd --tree --color=always {}) || echo {} 2>/dev/null | head -200'
 --bind=ctrl-k:preview-down
 --bind=ctrl-j:preview-up
 "
@@ -77,6 +77,7 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 setopt AUTO_CD
 setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
 export BAT_PAGER=''
+# Inert in zsh (setopt HIST_IGNORE_* covers it above); kept so an ad-hoc bash shell behaves the same
 export HISTCONTROL=ignoreboth
 export LESS_TERMCAP_mb=$'\e[1;32m'
 export LESS_TERMCAP_md=$'\e[1;32m'
@@ -101,7 +102,6 @@ alias c=clear
 alias l='lsd -l'
 alias la='lsd -la'
 alias sshide='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null"'
-alias sessionrec='script -f $HOME/session-$(date +"%d-%b-%y_%H-%M-%S").log'
 alias dockernonerm='for i in $(docker images -f dangling=true -q); do docker image rm $i; done'
 
 # --- Zoxide ---

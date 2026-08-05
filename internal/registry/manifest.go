@@ -13,9 +13,15 @@ var AllTools = []Tool{
 	},
 
 	{
-		Name: "neovim", Kind: SystemPackage, Category: System,
-		Description: "Neovim text editor (0.11+ for NvChad)",
-		BrewPkgs:    []string{"neovim"},
+		Name: "neovim", Kind: AppBundle, Category: System,
+		Repo: "neovim/neovim", Description: "Neovim text editor",
+		PostInstall: "neovim",
+		Asset: AssetPattern{
+			OSPatterns:        map[string]string{"linux": "linux", "darwin": "macos"},
+			ArchPatterns:      map[string]string{"amd64": "x86_64", "arm64": "arm64"},
+			ExcludeSubstrings: []string{".appimage", ".zsync", ".msi", ".zip"},
+			ArchiveFormat:     "tar.gz",
+		},
 	},
 
 	{
@@ -39,6 +45,10 @@ var AllTools = []Tool{
 		Name: "rcfile", Kind: ConfigFile, Category: Config,
 		Description: "Zsh RC file (complete .zshrc)",
 	},
+	{
+		Name: "nvim-config", Kind: ConfigFile, Category: Config,
+		Description: "Neovim configuration",
+	},
 
 	{
 		Name: "zsh-autosuggestions", Kind: ShellPlugin, Category: Shell,
@@ -51,19 +61,5 @@ var AllTools = []Tool{
 		Description: "ZSH syntax highlighting plugin",
 		CloneURL:    "https://github.com/zsh-users/zsh-syntax-highlighting.git",
 		CloneDest:   "~/shell/plugins/zsh-syntax-highlighting",
-	},
-	{
-		Name: "tpm", Kind: ShellPlugin, Category: Shell,
-		Description: "Tmux Plugin Manager",
-		CloneURL:    "https://github.com/tmux-plugins/tpm.git",
-		CloneDest:   "~/.tmux/plugins/tpm",
-		PostClone:   "tpm",
-	},
-	{
-		Name: "nvchad", Kind: ShellPlugin, Category: Shell,
-		Description: "NvChad Neovim configuration",
-		CloneURL:    "https://github.com/NvChad/starter.git",
-		CloneDest:   "~/.config/nvim",
-		PostClone:   "nvchad",
 	},
 }

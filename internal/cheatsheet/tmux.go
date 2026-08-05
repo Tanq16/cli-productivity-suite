@@ -7,7 +7,8 @@ func buildTmuxSheet() string {
 	divider := dividerStyle.Render(strings.Repeat("─", 60))
 
 	b.WriteString(titleStyle.Render("Tmux Cheat Sheet") + "\n")
-	b.WriteString(noteStyle.Render("  CPS config: mouse on, emacs copy-mode, catppuccin theme, status top") + "\n")
+	b.WriteString(noteStyle.Render("  CPS config: mouse on, emacs copy-mode, status top, no plugins") + "\n")
+	b.WriteString(noteStyle.Render("  Colors inherited from terminal — session glyph turns red on prefix") + "\n")
 	b.WriteString(noteStyle.Render("  Windows/panes start at 1, auto-rename on, history 99999 lines") + "\n\n")
 
 	b.WriteString(headingStyle.Render("Shell Aliases") + "\n")
@@ -64,6 +65,8 @@ func buildTmuxSheet() string {
 	b.WriteString(cmdStyle.Render("  C-b z") + "                           Toggle pane zoom (fullscreen)\n")
 	b.WriteString(cmdStyle.Render("  C-b q") + "                           Show pane numbers\n")
 	b.WriteString(cmdStyle.Render("  C-b :") + "                           Command prompt\n")
+	b.WriteString(cmdStyle.Render("  C-b l") + "                           Last window (toggle back)\n")
+	b.WriteString(cmdStyle.Render("  C-b R") + "                           Reload ~/.tmux.conf\n")
 
 	return b.String()
 }

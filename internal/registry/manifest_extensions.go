@@ -422,6 +422,16 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
+				Name: "tree-sitter", BinaryName: "tree-sitter", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Repo: "tree-sitter/tree-sitter", Description: "Tree-sitter CLI (builds Neovim parsers)",
+				Asset: AssetPattern{
+					OSPatterns:         map[string]string{"linux": "linux", "darwin": "macos"},
+					ArchPatterns:       map[string]string{"amd64": "x64", "arm64": "arm64"},
+					RequiredSubstrings: []string{"tree-sitter-cli-"},
+					ArchiveFormat:      "zip",
+				},
+			},
+			{
 				Name: "gron", BinaryName: "gron", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
 				Repo: "tomnomnom/gron", Description: "Make JSON greppable",
 				Asset: AssetPattern{

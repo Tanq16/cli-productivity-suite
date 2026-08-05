@@ -30,7 +30,7 @@ for d in \
     shell/go-sdk shell/java-sdk shell/rust shell/fnm shell/py-default \
     shell/uv-tools shell/uv-tool-executables shell/uv-python \
     shell/nuclei-templates \
-    .config/cps .config/nvim .tmux/plugins/tpm; do
+    .config/cps .config/nvim; do
     [ -d "$HOME/$d" ] || fail "dir missing: ~/$d"
 done
 
@@ -39,6 +39,8 @@ for f in \
     .zshrc .zprofile .tmux.conf \
     .config/kitty/kitty.conf .config/kitty/current-theme.conf \
     .config/starship.toml .config/cps/state.json \
+    .config/nvim/init.lua \
+    shell/apps/neovim/bin/nvim \
     shell/rc/00-base.zsh shell/rc/10-runtimes.zsh \
     shell/rc/20-cloud.zsh shell/rc/30-security.zsh shell/rc/40-misc.zsh \
     shell/env/brew.zsh \
@@ -79,6 +81,10 @@ check_bin() { command -v "$1" >/dev/null 2>&1 || fail "$2: $1"; }
 for t in bat fd rg lsd jq yq fzf gh gron zoxide sd starship anbu danzo; do
     check_bin "$t" "essentials"
 done
+# base app bundle — nvim reaches PATH via a symlink; the bundle itself must stay intact
+check_bin nvim "base"
+[ "$(readlink "$HOME/shell/extensions/nvim")" = "$HOME/shell/apps/neovim/bin/nvim" ] || \
+    fail "base: ~/shell/extensions/nvim does not point at the neovim bundle"
 # runtimes
 for t in uv fnm bun go java python rustc cargo node npm; do
     check_bin "$t" "runtimes"

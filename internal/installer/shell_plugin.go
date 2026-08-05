@@ -25,7 +25,7 @@ func (s *ShellPluginInstaller) Install(tool *registry.Tool, p platform.Platform,
 			return Result{Tool: tool.Name, Err: fmt.Errorf("git pull failed (local changes?): %w — remove %s manually to reclone", err, dest)}
 		}
 		st.SetToolVersion(tool.Name, "git-managed")
-		return s.runPostClone(tool, p, st)
+		return Result{Tool: tool.Name, Version: "git-managed"}
 	}
 
 	if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
@@ -38,35 +38,6 @@ func (s *ShellPluginInstaller) Install(tool *registry.Tool, p platform.Platform,
 	}
 
 	st.SetToolVersion(tool.Name, "git-managed")
-	return s.runPostClone(tool, p, st)
-}
-
-func (s *ShellPluginInstaller) runPostClone(tool *registry.Tool, p platform.Platform, st *state.State) Result {
-	switch tool.PostClone {
-	case "nvchad":
-		return s.postCloneNvChad(tool, p)
-	case "tpm":
-		// TPM install_plugins runs after tmux.conf is deployed (in init flow)
-		return Result{Tool: tool.Name, Version: "git-managed"}
-	default:
-		return Result{Tool: tool.Name, Version: "git-managed"}
-	}
-}
-
-func (s *ShellPluginInstaller) postCloneNvChad(tool *registry.Tool, p platform.Platform) Result {
-	dest := expandHome(tool.CloneDest, p.HomeDir)
-	chadrcPath := filepath.Join(dest, "lua", "chadrc.lua")
-	data, err := os.ReadFile(chadrcPath)
-	if err == nil {
-		patched := strings.Replace(string(data), `theme = "`, `theme = "catppuccin", -- `, 1)
-		if string(data) == patched {
-			patched = strings.Replace(string(data), "theme =", `theme = "catppuccin", transparency = true, --`, 1)
-		}
-		if err := os.WriteFile(chadrcPath, []byte(patched), 0644); err != nil {
-			return Result{Tool: tool.Name, Err: fmt.Errorf("failed to patch chadrc.lua: %w", err)}
-		}
-	}
-
 	return Result{Tool: tool.Name, Version: "git-managed"}
 }
 

@@ -16,8 +16,8 @@ echo "  - Neovim caches/state (~/.local/share/nvim, ~/.local/state/nvim, ~/.cach
 echo "  - Legacy pre-v1.3 paths (~/.nvm, ~/google-cloud-sdk, ~/nuclei-templates)"
 echo "  - Legacy runtime caches (~/.local/share/uv, ~/.bun, ~/.npm, go-build cache)"
 echo "  - CPS-deployed configs (.zshrc, .tmux.conf, .aerospace.toml, kitty configs, starship.toml)"
-echo "  - Brew packages installed by CPS (neovim, nmap, openssl, ffmpeg, aws-cli,"
-echo "    azure-cli, gcloud-cli cask)"
+echo "  - Brew packages installed by CPS (nmap, openssl, ffmpeg, aws-cli,"
+echo "    azure-cli, gcloud-cli cask, plus legacy brew neovim)"
 echo ""
 echo "Will preserve:"
 echo "  - ~/.zsh_history"
@@ -41,6 +41,7 @@ rm -f "$HOME/.local/bin/cps"
 
 echo "==> removing CPS-managed directories"
 rm -rf "$HOME/shell"
+# ~/.tmux is legacy — CPS cloned TPM there before tmux dropped its plugins
 rm -rf "$HOME/.tmux"
 rm -rf "$HOME/.config/nvim"
 rm -rf "$HOME/.config/cps"
@@ -75,6 +76,7 @@ if command -v brew >/dev/null 2>&1; then
   echo "==> uninstalling CPS-installed brew formulas"
   # Kept (broadly useful, not CPS-specific): wget zip unzip file tmux htop
   # Kept (Linux dev-tools group): cmake gcc make ninja gettext
+  # neovim is legacy here — CPS installed it via brew before it became an app bundle.
   brew uninstall \
     neovim \
     nmap openssl ffmpeg \
