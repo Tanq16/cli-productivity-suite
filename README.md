@@ -87,7 +87,7 @@ Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`
 
 Neovim installs as an app bundle under `~/shell/apps/neovim`, with `~/shell/extensions/nvim` symlinked to its launcher — no Homebrew dependency chain and no compile step. CPS deploys a single `~/.config/nvim/init.lua`.
 
-The config is deliberately small and leans on what Neovim 0.12 provides natively: `vim.pack` for plugins, the built-in LSP client and completion, `gc` comments, `]b`/`[b` and `]d`/`[d` navigation, `listchars` indent guides, and the default statusline. Four plugins carry what the core does not — `fzf-lua` (find files, live grep), `nvim-tree` (file explorer), `gitsigns` (git gutter and hunk actions), and `nvim-treesitter` (parsers for Go, Python, TypeScript, Bash, Lua, JSON, YAML, and Markdown). No icon plugin is installed; both `fzf-lua` and `nvim-tree` treat one as optional and fall back to text. Plugins and parsers install on first launch — roughly four seconds from cold, in the background — so no headless bootstrap runs during `init`.
+The config is deliberately small and leans on what Neovim 0.12 provides natively: `vim.pack` for plugins, the built-in LSP client and completion, `gc` comments, `]b`/`[b` and `]d`/`[d` navigation, `listchars` indent guides, and the default statusline. Four plugins carry what the core does not — `fzf-lua` (find files, live grep), `nvim-tree` (file explorer), `gitsigns` (git gutter and hunk actions), and `nvim-treesitter` (parsers for Go, Python, TypeScript, Bash, Lua, JSON, YAML, and Markdown). No icon plugin is installed; both `fzf-lua` and `nvim-tree` treat one as optional and fall back to text. Plugins and parsers install on first launch — roughly four seconds from cold, in the background — so no headless bootstrap runs during `init`. Compiling parsers needs the `tree-sitter` CLI, which ships in the `essentials` pack; until that pack is installed Neovim quietly falls back to its bundled regex syntax files instead of erroring.
 
 Colors are inherited from the terminal rather than themed in Neovim. `termguicolors` is off, so highlights resolve through cterm attributes against ANSI indices 0–15 — change your terminal theme and Neovim follows it. The bundled `vim` colorscheme leaves `Normal` undefined, which keeps the background transparent. Semantic granularity comes from attributes (bold, italic, undercurl) layered over those 16 slots instead of hardcoded hex.
 
@@ -122,7 +122,7 @@ cps extend security nuclei subfinder  # pick specific tools
 
 | Pack | Contents |
 |---|---|
-| essentials | Everyday CLI binaries (bat, fd, ripgrep, lsd, jq, yq, fzf, gh, gron, zoxide, sd, starship, anbu, danzo) + starship.toml |
+| essentials | Everyday CLI binaries (bat, fd, ripgrep, lsd, jq, yq, fzf, gh, gron, zoxide, sd, starship, tree-sitter, anbu, danzo) + starship.toml |
 | core | Dev tools, network utils, media packages (cmake, nmap, ffmpeg, aerospace) |
 | runtimes | uv, fnm, bun, Go, Java (Temurin LTS), Python (via uv), Rust, Node.js LTS (via fnm) |
 | cloud | AWS CLI, Azure CLI, gcloud CLI |
