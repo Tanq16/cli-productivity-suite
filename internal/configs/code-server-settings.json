@@ -6,8 +6,10 @@
   "editor.fontFamily": "'JetBrainsMono Nerd Font Mono', 'JetBrainsMono NFM Light', 'JetBrains Mono', Menlo, 'Droid Sans Mono', monospace",
   "editor.fontLigatures": true,
   "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font Mono', 'JetBrainsMono NFM Light', 'JetBrains Mono', Menlo, monospace",
+  "terminal.integrated.scrollback": 10000,
 
   "telemetry.telemetryLevel": "off",
+  "chat.disableAIFeatures": true,
 
   "remote.autoForwardPorts": false,
   "remote.restoreForwardedPorts": false,
