@@ -56,6 +56,13 @@ format = 'on [$symbol$branch]($style) '
 style = 'red'
 format = '[$all_status$ahead_behind]($style) '
 
+[python]
+# VIRTUAL_ENV is always exported for the py-default env, which would otherwise render this
+# module in every directory; detect on project files only. The venv name is dropped because
+# uv run binds .venv per-process, so an interactive shell always reports the stale py-default.
+detect_env_vars = []
+format = 'via [${symbol}${version}]($style) '
+
 [cmd_duration]
 min_time = 2000
 format = 'took [$duration](bold yellow) '
