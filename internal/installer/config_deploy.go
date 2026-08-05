@@ -38,7 +38,7 @@ func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Pl
 
 	case "kitty-theme":
 		destPath = filepath.Join(p.HomeDir, ".config", "kitty", "current-theme.conf")
-		// The state records whichever theme `cps theme` last wrote, so re-running init keeps it.
+		// Re-running init keeps whatever `cps theme` last wrote.
 		name := st.CurrentTheme()
 		if name == "" {
 			name = configs.DefaultTheme

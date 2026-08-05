@@ -23,7 +23,7 @@ o.scrolloff = 8
 o.sidescrolloff = 8
 o.laststatus = 3
 o.showmode = false
--- noinsert highlights the top candidate without writing it; noselect would leave nothing for <CR> to accept.
+-- noselect would leave nothing for <CR> to accept.
 o.completeopt = "menu,menuone,noinsert,popup,fuzzy"
 o.updatetime = 250
 o.timeoutlen = 400
@@ -34,7 +34,6 @@ o.softtabstop = 2
 o.smartindent = true
 o.wrap = false
 o.confirm = true
--- Adds the arrow keys to the stock b,s so they cross line boundaries: <> in normal mode, [] in insert.
 o.whichwrap = "b,s,<,>,[,]"
 
 o.list = true
@@ -46,7 +45,7 @@ o.termguicolors = false
 -- This scheme leaves Normal undefined, which keeps the background transparent.
 vim.cmd.colorscheme("vim")
 
--- Every palette shipped with cps keeps 0/8 on the background side of the grey ramp and 7/15 on the foreground side, so these indices carry the same meaning under a light theme as a dark one.
+-- Every cps palette keeps 0/8 on the background side of the grey ramp and 7/15 on the foreground side, light themes included.
 local function build_highlights()
   local hl = {
     Comment = { ctermfg = 8, italic = true },
@@ -82,7 +81,7 @@ local function build_highlights()
 
     LineNr = { ctermfg = 8 },
     CursorLineNr = { ctermfg = 11, bold = true },
-    -- Vim's default fills these with grey, drawing a solid bar down the gutter of every window.
+    -- Vim's default fills these with grey.
     SignColumn = {},
     FoldColumn = { ctermfg = 8 },
     Whitespace = { ctermfg = 8 },
@@ -103,7 +102,7 @@ local function build_highlights()
     TabLineFill = {},
     TabLineSel = { ctermfg = 4, bold = true },
 
-    -- Vim's default is cterm=reverse, which renders the whole bar as a solid slab.
+    -- Vim's default is cterm=reverse, a solid slab.
     StatusLine = { ctermfg = 7 },
     StatusLineNC = { ctermfg = 8 },
     StatusLineTerm = { ctermfg = 7 },
@@ -148,8 +147,7 @@ local function build_highlights()
     ["@diff.minus"] = { ctermfg = 1 },
   }
 
-  -- A cap is the pill colour drawn as a foreground, so every pill colour needs a background group and a matching foreground one.
-  -- reverse rather than ctermbg paints the label in the terminal's own background colour, which has no palette index and is the one tone guaranteed to stand off an accent under a light theme as well as a dark one.
+  -- reverse, not ctermbg: the label wants the terminal's background colour, which has no palette index.
   for color = 1, 6 do
     hl["StlPill" .. color] = { ctermfg = color, reverse = true, bold = true }
     hl["StlCap" .. color] = { ctermfg = color }
@@ -293,7 +291,7 @@ local modes = {
   ["!"] = { "SHELL", 6 }, t = { "TERMINAL", 6 },
 }
 
--- The %{% %} wrapper re-parses this result, so the returned string may use % items but interpolated text must escape %.
+-- The %{% %} wrapper re-parses this result, so interpolated text must escape %.
 local function pill(color, text)
   local cap = "%#StlCap" .. color .. "#"
   local open, close = "", ""
@@ -344,7 +342,7 @@ map("n", "<C-s>", "<cmd>write<cr>", { desc = "save file" })
 map("i", "<C-a>", "<Home>", { desc = "start of line" })
 map("i", "<C-e>", "<End>", { desc = "end of line" })
 
--- Unlike zl, the horizontal wheel is not clamped to the longest line, so it drags the view into empty space.
+-- The horizontal wheel is not clamped to the longest line, so it drags the view into empty space.
 map({ "n", "v", "i" }, "<ScrollWheelLeft>", "<Nop>")
 map({ "n", "v", "i" }, "<ScrollWheelRight>", "<Nop>")
 

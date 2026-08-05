@@ -1,6 +1,5 @@
 ---
-# lsd's defaults draw most of this table from the fixed 256-colour cube, which does not follow the
-# terminal palette. Every value here is an ANSI index so the listing tracks the active theme.
+# lsd's defaults come from the fixed 256-colour cube; ANSI indices track the theme instead.
 user: 7
 group: 8
 permission:

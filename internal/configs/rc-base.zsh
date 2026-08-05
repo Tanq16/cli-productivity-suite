@@ -79,7 +79,7 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 setopt AUTO_CD
 setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
 export BAT_PAGER=''
-# Every other bat theme paints from the fixed 256-colour cube, which ignores the terminal palette
+# Every other bat theme paints from the fixed 256-colour cube
 export BAT_THEME='ansi'
 # Inert in zsh (setopt HIST_IGNORE_* covers it above); kept so an ad-hoc bash shell behaves the same
 export HISTCONTROL=ignoreboth
