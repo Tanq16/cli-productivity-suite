@@ -339,6 +339,10 @@ map("n", "<C-s>", "<cmd>write<cr>", { desc = "save file" })
 map("i", "<C-a>", "<Home>", { desc = "start of line" })
 map("i", "<C-e>", "<End>", { desc = "end of line" })
 
+-- Unlike zl, the horizontal wheel is not clamped to the longest line, so it drags the view into empty space.
+map({ "n", "v", "i" }, "<ScrollWheelLeft>", "<Nop>")
+map({ "n", "v", "i" }, "<ScrollWheelRight>", "<Nop>")
+
 map("n", "<C-h>", "<C-w>h", { desc = "window left" })
 map("n", "<C-j>", "<C-w>j", { desc = "window down" })
 map("n", "<C-k>", "<C-w>k", { desc = "window up" })
