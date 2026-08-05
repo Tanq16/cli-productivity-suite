@@ -22,8 +22,8 @@ o.scrolloff = 8
 o.sidescrolloff = 8
 o.laststatus = 3
 o.showmode = false
--- Without noselect, triggering completion writes the first candidate straight into the buffer.
-o.completeopt = "menu,menuone,noselect,popup,fuzzy"
+-- noinsert highlights the top candidate without writing it; noselect would leave nothing for <CR> to accept.
+o.completeopt = "menu,menuone,noinsert,popup,fuzzy"
 o.updatetime = 250
 o.timeoutlen = 400
 o.expandtab = true
