@@ -163,6 +163,7 @@ vim.pack.add({
   { src = "https://github.com/ibhagwan/fzf-lua" },
   { src = "https://github.com/nvim-tree/nvim-tree.lua" },
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
+  { src = "https://github.com/windwp/nvim-autopairs" },
   -- The "main" rewrite has a different API than "master"; pin it so an upstream default-branch change cannot swap it silently.
   { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
 })
@@ -223,6 +224,8 @@ require("gitsigns").setup({
     map("<leader>hd", gs.diffthis, "diff this file")
   end,
 })
+
+require("nvim-autopairs").setup({ check_ts = true })
 
 local fzf = require("fzf-lua")
 fzf.setup({})
