@@ -22,6 +22,8 @@ o.scrolloff = 8
 o.sidescrolloff = 8
 o.laststatus = 3
 o.showmode = false
+-- Without noselect the first candidate is written into the buffer on trigger; menuone keeps a lone match in the menu too.
+o.completeopt = "menu,menuone,noselect,popup"
 o.updatetime = 250
 o.timeoutlen = 400
 o.expandtab = true
