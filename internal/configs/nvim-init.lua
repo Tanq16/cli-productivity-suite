@@ -22,8 +22,8 @@ o.scrolloff = 8
 o.sidescrolloff = 8
 o.laststatus = 3
 o.showmode = false
--- Without noselect the first candidate is written into the buffer on trigger; menuone keeps a lone match in the menu too.
-o.completeopt = "menu,menuone,noselect,popup"
+-- Without noselect, triggering completion writes the first candidate straight into the buffer.
+o.completeopt = "menu,menuone,noselect,popup,fuzzy"
 o.updatetime = 250
 o.timeoutlen = 400
 o.expandtab = true
@@ -33,7 +33,7 @@ o.softtabstop = 2
 o.smartindent = true
 o.wrap = false
 o.confirm = true
--- b,s are the stock defaults; <> adds the normal-mode arrows and [] the insert-mode ones, so they cross line boundaries.
+-- Adds the arrow keys to the stock b,s so they cross line boundaries: <> in normal mode, [] in insert.
 o.whichwrap = "b,s,<,>,[,]"
 
 o.list = true
@@ -336,7 +336,6 @@ local map = vim.keymap.set
 map("n", "<Esc>", "<cmd>nohlsearch<cr>", { desc = "clear search highlight" })
 map("n", "<C-s>", "<cmd>write<cr>", { desc = "save file" })
 
--- Readline habits from the shell; these shadow i_CTRL-A (reinsert last text) and i_CTRL-E (copy the char below).
 map("i", "<C-a>", "<Home>", { desc = "start of line" })
 map("i", "<C-e>", "<End>", { desc = "end of line" })
 
