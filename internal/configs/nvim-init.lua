@@ -292,7 +292,7 @@ local modes = {
 -- The %{% %} wrapper re-parses this result, so the returned string may use % items but interpolated text must escape %.
 local function pill(color, text)
   local cap = "%#StlCap" .. color .. "#"
-  return cap .. "" .. "%#StlPill" .. color .. "# " .. text .. " " .. cap .. "" .. "%#StatusLine#"
+  return cap .. "" .. "%#StlPill" .. color .. "#" .. text .. cap .. "" .. "%#StatusLine#"
 end
 
 function _G.CpsStatusline()
