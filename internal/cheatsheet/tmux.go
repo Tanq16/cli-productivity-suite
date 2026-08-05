@@ -65,8 +65,7 @@ func buildTmuxSheet() string {
 	b.WriteString(cmdStyle.Render("  C-b z") + "                           Toggle pane zoom (fullscreen)\n")
 	b.WriteString(cmdStyle.Render("  C-b q") + "                           Show pane numbers\n")
 	b.WriteString(cmdStyle.Render("  C-b :") + "                           Command prompt\n")
-	b.WriteString(cmdStyle.Render("  C-b b") + "                           Last window (toggle back)\n")
-	b.WriteString(cmdStyle.Render("  C-b C-n / C-b C-p") + "               Next / previous window\n")
+	b.WriteString(cmdStyle.Render("  C-b l") + "                           Last window (toggle back)\n")
 	b.WriteString(cmdStyle.Render("  C-b R") + "                           Reload ~/.tmux.conf\n")
 
 	return b.String()

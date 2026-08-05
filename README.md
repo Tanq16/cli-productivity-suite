@@ -97,7 +97,7 @@ Language servers are wired for `gopls`, `ruff`, and `ts_ls`, and each is enabled
 
 #### tmux
 
-tmux runs with no plugins and no plugin manager — `.tmux.conf` is the whole configuration. What TPM used to pull in is now inline: the handful of settings worth keeping from `tmux-sensible` (`focus-events`, `aggressive-resize`, `status-keys emacs`, `display-time`, `status-interval`, and the `C-b R` reload binding), and a hand-rolled status line in place of the Catppuccin theme.
+tmux runs with no plugins and no plugin manager — `.tmux.conf` is the whole configuration. What TPM used to pull in is now inline: the handful of settings worth keeping from `tmux-sensible` (`focus-events`, `aggressive-resize`, `status-keys emacs`, `display-time`, `status-interval`, and a `C-b R` reload binding), and a hand-rolled status line in place of the Catppuccin theme.
 
 The status bar follows the terminal the same way Neovim does. Every color is an ANSI index (0–15) and every backdrop is `bg=default`, so the bar is genuinely transparent and re-themes itself when the terminal does. It keeps the rounded active-window pill, and the right side shows the current directory and session name. The session glyph doubles as a prefix indicator — green normally, red while `C-b` is pending.
 
