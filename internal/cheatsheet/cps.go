@@ -39,6 +39,12 @@ func buildCPSSheet() string {
 	b.WriteString(noteStyle.Render("  Your own binaries           →  drop them in ~/shell/custom-bin/ (on PATH)") + "\n")
 	b.WriteString(divider + "\n")
 
+	b.WriteString(headingStyle.Render("Theme") + "\n")
+	b.WriteString(cmdStyle.Render("  cps theme") + "                       List themes, marking the active one\n")
+	b.WriteString(cmdStyle.Render("  cps theme <name>") + "                Switch the terminal palette\n")
+	b.WriteString(noteStyle.Render("  Repaints kitty, tmux and nvim at once — nothing restarts") + "\n")
+	b.WriteString(divider + "\n")
+
 	b.WriteString(headingStyle.Render("Other") + "\n")
 	b.WriteString(cmdStyle.Render("  cps cheat <topic>") + "               Cheat sheets (go, java, uv, fnm, bun, rust, tmux, nvim, fzf, jq, regex)\n")
 	b.WriteString(cmdStyle.Render("  --gh-token <token>") + "              GitHub PAT for private repos\n")

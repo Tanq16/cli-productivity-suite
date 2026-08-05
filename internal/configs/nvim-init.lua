@@ -45,122 +45,131 @@ o.termguicolors = false
 -- This scheme leaves Normal undefined, which keeps the background transparent.
 vim.cmd.colorscheme("vim")
 
-local hl = {
-  Comment = { ctermfg = 8, italic = true },
-  Constant = { ctermfg = 14 },
-  String = { ctermfg = 2 },
-  Character = { ctermfg = 2 },
-  Number = { ctermfg = 13 },
-  Boolean = { ctermfg = 13, bold = true },
-  Float = { ctermfg = 13 },
-  Identifier = { ctermfg = 15 },
-  Function = { ctermfg = 12 },
-  Statement = { ctermfg = 5 },
-  Conditional = { ctermfg = 5 },
-  Repeat = { ctermfg = 5 },
-  Label = { ctermfg = 5 },
-  Operator = { ctermfg = 6 },
-  Keyword = { ctermfg = 5 },
-  Exception = { ctermfg = 9 },
-  PreProc = { ctermfg = 13 },
-  Include = { ctermfg = 13, bold = true },
-  Define = { ctermfg = 13 },
-  Macro = { ctermfg = 13 },
-  Type = { ctermfg = 11 },
-  StorageClass = { ctermfg = 11 },
-  Structure = { ctermfg = 11, bold = true },
-  Typedef = { ctermfg = 11 },
-  Special = { ctermfg = 6 },
-  SpecialKey = { ctermfg = 8 },
-  Delimiter = { ctermfg = 7 },
-  Todo = { ctermfg = 11, bold = true },
-  Error = { ctermfg = 9, bold = true },
-  Underlined = { ctermfg = 12, underline = true },
+-- Every palette shipped with cps keeps 0/8 on the background side of the grey ramp and 7/15 on the foreground side, so these indices carry the same meaning under a light theme as a dark one.
+local function build_highlights()
+  local hl = {
+    Comment = { ctermfg = 8, italic = true },
+    Constant = { ctermfg = 14 },
+    String = { ctermfg = 2 },
+    Character = { ctermfg = 2 },
+    Number = { ctermfg = 13 },
+    Boolean = { ctermfg = 13, bold = true },
+    Float = { ctermfg = 13 },
+    Identifier = { ctermfg = 15 },
+    Function = { ctermfg = 12 },
+    Statement = { ctermfg = 5 },
+    Conditional = { ctermfg = 5 },
+    Repeat = { ctermfg = 5 },
+    Label = { ctermfg = 5 },
+    Operator = { ctermfg = 6 },
+    Keyword = { ctermfg = 5 },
+    Exception = { ctermfg = 9 },
+    PreProc = { ctermfg = 13 },
+    Include = { ctermfg = 13, bold = true },
+    Define = { ctermfg = 13 },
+    Macro = { ctermfg = 13 },
+    Type = { ctermfg = 11 },
+    StorageClass = { ctermfg = 11 },
+    Structure = { ctermfg = 11, bold = true },
+    Typedef = { ctermfg = 11 },
+    Special = { ctermfg = 6 },
+    SpecialKey = { ctermfg = 8 },
+    Delimiter = { ctermfg = 7 },
+    Todo = { ctermfg = 11, bold = true },
+    Error = { ctermfg = 9, bold = true },
+    Underlined = { ctermfg = 12, underline = true },
 
-  LineNr = { ctermfg = 8 },
-  CursorLineNr = { ctermfg = 11, ctermbg = 0, bold = true },
-  CursorLine = { ctermbg = 0 },
-  CursorLineSign = { ctermbg = 0 },
-  CursorLineFold = { ctermbg = 0 },
-  -- Vim's default fills these with grey, drawing a solid bar down the gutter of every window.
-  SignColumn = {},
-  FoldColumn = { ctermfg = 8 },
-  Whitespace = { ctermfg = 8 },
-  NonText = { ctermfg = 8 },
-  Conceal = { ctermfg = 8 },
-  Visual = { reverse = true },
-  Search = { ctermfg = 0, ctermbg = 11 },
-  IncSearch = { ctermfg = 0, ctermbg = 9 },
-  MatchParen = { ctermfg = 14, bold = true, underline = true },
-  Pmenu = { ctermbg = 8 },
-  PmenuSel = { ctermbg = 4, ctermfg = 15, bold = true },
-  PmenuSbar = { ctermbg = 8 },
-  PmenuThumb = { ctermbg = 7 },
-  WinSeparator = { ctermfg = 8 },
-  Folded = { ctermfg = 8, italic = true },
-  ErrorMsg = { ctermfg = 9, bold = true },
-  TabLine = { ctermfg = 8 },
-  TabLineFill = {},
-  TabLineSel = { ctermfg = 4, bold = true },
+    LineNr = { ctermfg = 8 },
+    CursorLineNr = { ctermfg = 11, ctermbg = 0, bold = true },
+    CursorLine = { ctermbg = 0 },
+    CursorLineSign = { ctermbg = 0 },
+    CursorLineFold = { ctermbg = 0 },
+    -- Vim's default fills these with grey, drawing a solid bar down the gutter of every window.
+    SignColumn = {},
+    FoldColumn = { ctermfg = 8 },
+    Whitespace = { ctermfg = 8 },
+    NonText = { ctermfg = 8 },
+    Conceal = { ctermfg = 8 },
+    Visual = { reverse = true },
+    Search = { ctermfg = 0, ctermbg = 11 },
+    IncSearch = { ctermfg = 0, ctermbg = 9 },
+    MatchParen = { ctermfg = 14, bold = true, underline = true },
+    Pmenu = { ctermbg = 8 },
+    PmenuSel = { ctermbg = 4, ctermfg = 0, bold = true },
+    PmenuSbar = { ctermbg = 8 },
+    PmenuThumb = { ctermbg = 7 },
+    WinSeparator = { ctermfg = 8 },
+    Folded = { ctermfg = 8, italic = true },
+    ErrorMsg = { ctermfg = 9, bold = true },
+    TabLine = { ctermfg = 8 },
+    TabLineFill = {},
+    TabLineSel = { ctermfg = 4, bold = true },
 
-  -- Vim's default is cterm=reverse, which renders the whole bar as a solid slab.
-  StatusLine = { ctermfg = 7 },
-  StatusLineNC = { ctermfg = 8 },
-  StatusLineTerm = { ctermfg = 7 },
-  StatusLineTermNC = { ctermfg = 8 },
-  StlGit = { ctermfg = 5 },
-  StlErr = { ctermfg = 9 },
-  StlWarn = { ctermfg = 11 },
+    -- Vim's default is cterm=reverse, which renders the whole bar as a solid slab.
+    StatusLine = { ctermfg = 7 },
+    StatusLineNC = { ctermfg = 8 },
+    StatusLineTerm = { ctermfg = 7 },
+    StatusLineTermNC = { ctermfg = 8 },
+    StlGit = { ctermfg = 5 },
+    StlErr = { ctermfg = 9 },
+    StlWarn = { ctermfg = 11 },
 
-  DiagnosticError = { ctermfg = 9 },
-  DiagnosticWarn = { ctermfg = 11 },
-  DiagnosticInfo = { ctermfg = 12 },
-  DiagnosticHint = { ctermfg = 14 },
-  DiagnosticUnderlineError = { ctermfg = 9, undercurl = true },
-  DiagnosticUnderlineWarn = { ctermfg = 11, undercurl = true },
+    DiagnosticError = { ctermfg = 9 },
+    DiagnosticWarn = { ctermfg = 11 },
+    DiagnosticInfo = { ctermfg = 12 },
+    DiagnosticHint = { ctermfg = 14 },
+    DiagnosticUnderlineError = { ctermfg = 9, undercurl = true },
+    DiagnosticUnderlineWarn = { ctermfg = 11, undercurl = true },
 
-  DiffAdd = { ctermfg = 2 },
-  DiffChange = { ctermfg = 3 },
-  DiffDelete = { ctermfg = 1 },
-  DiffText = { ctermfg = 11, bold = true },
-  GitSignsAdd = { ctermfg = 2 },
-  GitSignsChange = { ctermfg = 3 },
-  GitSignsDelete = { ctermfg = 1 },
+    DiffAdd = { ctermfg = 2 },
+    DiffChange = { ctermfg = 3 },
+    DiffDelete = { ctermfg = 1 },
+    DiffText = { ctermfg = 11, bold = true },
+    GitSignsAdd = { ctermfg = 2 },
+    GitSignsChange = { ctermfg = 3 },
+    GitSignsDelete = { ctermfg = 1 },
 
-  ["@variable"] = { ctermfg = 15 },
-  ["@variable.builtin"] = { ctermfg = 9, italic = true },
-  ["@variable.parameter"] = { ctermfg = 7, italic = true },
-  ["@variable.member"] = { ctermfg = 14 },
-  ["@function.builtin"] = { ctermfg = 12, bold = true },
-  ["@function.call"] = { ctermfg = 12 },
-  ["@function.method"] = { ctermfg = 12 },
-  ["@constructor"] = { ctermfg = 11, bold = true },
-  ["@type.builtin"] = { ctermfg = 3 },
-  ["@keyword.import"] = { ctermfg = 13, bold = true },
-  ["@keyword.return"] = { ctermfg = 5, bold = true },
-  ["@punctuation.bracket"] = { ctermfg = 7 },
-  ["@punctuation.delimiter"] = { ctermfg = 7 },
-  ["@comment.documentation"] = { ctermfg = 8, italic = true },
-  ["@markup.heading"] = { ctermfg = 12, bold = true },
-  ["@markup.link"] = { ctermfg = 14, underline = true },
-  ["@markup.raw"] = { ctermfg = 2 },
-  ["@diff.plus"] = { ctermfg = 2 },
-  ["@diff.minus"] = { ctermfg = 1 },
-}
+    ["@variable"] = { ctermfg = 15 },
+    ["@variable.builtin"] = { ctermfg = 9, italic = true },
+    ["@variable.parameter"] = { ctermfg = 7, italic = true },
+    ["@variable.member"] = { ctermfg = 14 },
+    ["@function.builtin"] = { ctermfg = 12, bold = true },
+    ["@function.call"] = { ctermfg = 12 },
+    ["@function.method"] = { ctermfg = 12 },
+    ["@constructor"] = { ctermfg = 11, bold = true },
+    ["@type.builtin"] = { ctermfg = 3 },
+    ["@keyword.import"] = { ctermfg = 13, bold = true },
+    ["@keyword.return"] = { ctermfg = 5, bold = true },
+    ["@punctuation.bracket"] = { ctermfg = 7 },
+    ["@punctuation.delimiter"] = { ctermfg = 7 },
+    ["@comment.documentation"] = { ctermfg = 8, italic = true },
+    ["@markup.heading"] = { ctermfg = 12, bold = true },
+    ["@markup.link"] = { ctermfg = 14, underline = true },
+    ["@markup.raw"] = { ctermfg = 2 },
+    ["@diff.plus"] = { ctermfg = 2 },
+    ["@diff.minus"] = { ctermfg = 1 },
+  }
 
--- A cap is the pill colour drawn as a foreground, so every pill colour needs a background group and a matching foreground one.
-for color = 1, 6 do
-  hl["StlPill" .. color] = { ctermfg = 0, ctermbg = color, bold = true }
-  hl["StlCap" .. color] = { ctermfg = color }
+  -- A cap is the pill colour drawn as a foreground, so every pill colour needs a background group and a matching foreground one.
+  -- Light palettes tune their accents to be read as text on the background, so filling a pill with one leaves the label barely legible; there the accent becomes the text instead.
+  local filled = vim.o.background == "dark"
+  for color = 1, 6 do
+    hl["StlPill" .. color] = filled and { ctermfg = 0, ctermbg = color, bold = true } or { ctermfg = color, bold = true }
+    hl["StlCap" .. color] = { ctermfg = color }
+  end
+
+  return hl
 end
 
 local function apply_highlights()
-  for group, spec in pairs(hl) do
+  for group, spec in pairs(build_highlights()) do
     vim.api.nvim_set_hl(0, group, spec)
   end
 end
 
 vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_highlights })
+-- Nvim asks the terminal for its background over OSC 11 and the reply can land after this file has run.
+vim.api.nvim_create_autocmd("OptionSet", { pattern = "background", callback = apply_highlights })
 apply_highlights()
 
 vim.pack.add({
@@ -292,7 +301,12 @@ local modes = {
 -- The %{% %} wrapper re-parses this result, so the returned string may use % items but interpolated text must escape %.
 local function pill(color, text)
   local cap = "%#StlCap" .. color .. "#"
-  return cap .. "" .. "%#StlPill" .. color .. "#" .. text .. cap .. "" .. "%#StatusLine#"
+  -- An unfilled pill needs the thin caps; the round ones read as two detached blobs with nothing between them.
+  local open, close = "", ""
+  if vim.o.background ~= "dark" then
+    open, close = "", ""
+  end
+  return cap .. open .. "%#StlPill" .. color .. "#" .. text .. cap .. close .. "%#StatusLine#"
 end
 
 function _G.CpsStatusline()

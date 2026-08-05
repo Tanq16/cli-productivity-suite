@@ -1,11 +1,7 @@
 # vim:ft=kitty
 
-## name: Catppuccin Kitty Mocha
-## author: Catppuccin Org
-## license: MIT
+## name: Catppuccin Mocha
 ## upstream: https://github.com/catppuccin/kitty/blob/main/themes/mocha.conf
-## blurb: Soothing pastel theme for the high-spirited!
-
 
 
 # The basic colors
@@ -62,7 +58,7 @@ color9 #eba0ac
 
 # green
 color2 #a6e3a1
-color10 #a6e3a1
+color10 #89d88b
 
 # yellow
 color3 #f9e2af
@@ -81,5 +77,5 @@ color6 #94e2d5
 color14 #89dceb
 
 # white
-color7 #bac2de
-color15 #a6adc8
+color7 #a6adc8
+color15 #bac2de

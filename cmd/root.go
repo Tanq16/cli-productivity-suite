@@ -47,6 +47,7 @@ func init() {
 	rootCmd.AddCommand(extendCmd)
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(selfUpdateCmd)
+	rootCmd.AddCommand(themeCmd)
 
 	cobra.OnInitialize(setupLogs)
 }

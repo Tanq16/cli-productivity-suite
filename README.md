@@ -46,7 +46,7 @@ Homebrew is required — `cps init` won't run without it. CPS uses brew for all 
 
 **Recommended:**
 
-- [Kitty](https://sw.kovidgoyal.net/kitty/) terminal — CPS deploys a Kitty config and Catppuccin theme. Without Kitty, those config files are harmless but unused.
+- [Kitty](https://sw.kovidgoyal.net/kitty/) terminal — CPS deploys a Kitty config and a colour theme (Catppuccin Mocha by default, switchable with `cps theme`). Without Kitty, those config files are harmless but unused.
 - [JetBrains Mono Nerd Font](https://www.nerdfonts.com/font-downloads) — the Kitty and Neovim configs expect a nerd font. Without one, icons and glyphs will render as boxes.
 
 ## Install
@@ -127,6 +127,21 @@ cps extend security nuclei subfinder  # pick specific tools
 ¹ Needs `cps extend runtimes` first — `cps extend list` marks these as `(needs runtimes)`.
 
 Packs with shell integration (`runtimes`, `cloud`, `security`, `misc`) deploy RC fragments automatically.
+
+### `cps theme [name]`
+
+Swaps the terminal colour theme. Run bare to list what's available and see which is active.
+
+```bash
+cps theme                 # list, marking the active one
+cps theme gruvbox-dark    # switch
+```
+
+Seventeen themes ship embedded, in dark and light pairs where the upstream project publishes both: `mocha`/`latte` (Catppuccin), `gruvbox`, `dracula`, `tokyonight`, `monokai`, `solarized`, `atom-one`, `everforest`, and `nord-dark`.
+
+Only the Kitty palette changes. The tmux, Neovim and starship configs never name a hex colour — they reference ANSI indices `0-15`, which the theme file defines — so a switch re-colours everything at once. Kitty reloads its own config within a second, and running tmux and Neovim sessions pick the new palette up on their next redraw. Nothing restarts.
+
+The choice is recorded in the CPS state file, so re-running `cps init` keeps it rather than reverting to the default.
 
 ### `cps cheat <topic>`
 

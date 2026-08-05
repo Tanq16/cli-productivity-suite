@@ -1,0 +1,81 @@
+# vim:ft=kitty
+
+## name: Atom One Dark
+## upstream: https://github.com/atom/one-dark-syntax
+
+
+# The basic colors
+foreground #abb2bf
+background #282c34
+selection_foreground #abb2bf
+selection_background #3e4451
+
+# Cursor colors
+cursor #528bff
+cursor_text_color #282c34
+
+# Scrollbar colors
+scrollbar_handle_color #4b5362
+scrollbar_track_color #21252b
+
+# URL color when hovering with mouse
+url_color #61afef
+
+# Kitty window border colors
+active_border_color #528bff
+inactive_border_color #181a1f
+bell_border_color #e5c07b
+
+# OS Window titlebar colors
+wayland_titlebar_color system
+macos_titlebar_color system
+macos_show_window_title_in none
+
+# Tab bar colors
+active_tab_foreground #d7dae0
+active_tab_background #282c34
+inactive_tab_foreground #828997
+inactive_tab_background #21252b
+tab_bar_background #21252b
+
+# Colors for marks (marked text in the terminal)
+mark1_foreground #282c34
+mark1_background #61afef
+mark2_foreground #282c34
+mark2_background #e5c07b
+mark3_foreground #282c34
+mark3_background #c678dd
+
+# The 16 terminal colors
+
+# black
+color0 #21252b
+color8 #5c6370
+
+# red
+color1 #e06c75
+color9 #be5046
+
+# green
+color2 #98c379
+color10 #73c990
+
+# yellow
+color3 #e5c07b
+color11 #d19a66
+
+# blue
+color4 #61afef
+color12 #528bff
+
+# magenta
+color5 #c678dd
+color13 #c678dd
+
+# cyan
+color6 #56b6c2
+color14 #56b6c2
+
+# white
+color7 #828997
+color15 #abb2bf

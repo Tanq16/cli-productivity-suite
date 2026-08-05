@@ -15,7 +15,7 @@ import (
 
 type ConfigDeployInstaller struct{}
 
-func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Platform) (content []byte, destPath string, err error) {
+func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Platform, st *state.State) (content []byte, destPath string, err error) {
 	switch tool.Name {
 	case "tmux-config":
 		content = configs.TmuxConf()
@@ -38,7 +38,15 @@ func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Pl
 
 	case "kitty-theme":
 		destPath = filepath.Join(p.HomeDir, ".config", "kitty", "current-theme.conf")
-		content = configs.MochaKittyConf()
+		// The state records whichever theme `cps theme` last wrote, so re-running init keeps it.
+		name := st.CurrentTheme()
+		if name == "" {
+			name = configs.DefaultTheme
+		}
+		content, err = configs.Theme(name)
+		if err != nil {
+			return nil, "", err
+		}
 
 	case "aerospace-config":
 		if p.OS != platform.Darwin {
@@ -67,7 +75,7 @@ func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Pl
 }
 
 func (c *ConfigDeployInstaller) Install(tool *registry.Tool, p platform.Platform, _ *github.Client, st *state.State) Result {
-	content, destPath, err := c.resolveConfig(tool, p)
+	content, destPath, err := c.resolveConfig(tool, p, st)
 	if err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}

@@ -1,0 +1,81 @@
+# vim:ft=kitty
+
+## name: Everforest Light
+## upstream: https://github.com/sainnhe/everforest
+
+
+# The basic colors
+foreground #5c6a72
+background #fdf6e3
+selection_foreground #829181
+selection_background #eaedc8
+
+# Cursor colors
+cursor #5c6a72
+cursor_text_color #f4f0d9
+
+# Scrollbar colors
+scrollbar_handle_color #bdc3af
+scrollbar_track_color #f4f0d9
+
+# URL color when hovering with mouse
+url_color #3a94c5
+
+# Kitty window border colors
+active_border_color #8da101
+inactive_border_color #bdc3af
+bell_border_color #f57d26
+
+# OS Window titlebar colors
+wayland_titlebar_color system
+macos_titlebar_color system
+macos_show_window_title_in none
+
+# Tab bar colors
+active_tab_foreground #5c6a72
+active_tab_background #fdf6e3
+inactive_tab_foreground #939f91
+inactive_tab_background #efebd4
+tab_bar_background #f4f0d9
+
+# Colors for marks (marked text in the terminal)
+mark1_foreground #fdf6e3
+mark1_background #3a94c5
+mark2_foreground #fdf6e3
+mark2_background #dfa000
+mark3_foreground #fdf6e3
+mark3_background #df69ba
+
+# The 16 terminal colors
+
+# black
+color0 #a6b0a0
+color8 #939f91
+
+# red
+color1 #f85552
+color9 #e66868
+
+# green
+color2 #8da101
+color10 #93b259
+
+# yellow
+color3 #dfa000
+color11 #f57d26
+
+# blue
+color4 #3a94c5
+color12 #3a94c5
+
+# magenta
+color5 #df69ba
+color13 #df69ba
+
+# cyan
+color6 #35a77c
+color14 #35a77c
+
+# white
+color7 #829181
+color15 #5c6a72

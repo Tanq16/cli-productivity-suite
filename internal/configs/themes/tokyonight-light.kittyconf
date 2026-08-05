@@ -1,0 +1,81 @@
+# vim:ft=kitty
+
+## name: Tokyo Night Day
+## upstream: https://github.com/folke/tokyonight.nvim
+
+
+# The basic colors
+foreground #3760bf
+background #e1e2e7
+selection_foreground #3760bf
+selection_background #b7c1e3
+
+# Cursor colors
+cursor #3760bf
+cursor_text_color #e1e2e7
+
+# Scrollbar colors
+scrollbar_handle_color #8990b3
+scrollbar_track_color #c4c8da
+
+# URL color when hovering with mouse
+url_color #387068
+
+# Kitty window border colors
+active_border_color #2e7de9
+inactive_border_color #c4c8da
+bell_border_color #8c6c3e
+
+# OS Window titlebar colors
+wayland_titlebar_color system
+macos_titlebar_color system
+macos_show_window_title_in none
+
+# Tab bar colors
+active_tab_foreground #d0d5e3
+active_tab_background #2e7de9
+inactive_tab_foreground #8990b3
+inactive_tab_background #c4c8da
+tab_bar_background #b4b5b9
+
+# Colors for marks (marked text in the terminal)
+mark1_foreground #e1e2e7
+mark1_background #2e7de9
+mark2_foreground #e1e2e7
+mark2_background #9854f1
+mark3_foreground #e1e2e7
+mark3_background #007197
+
+# The 16 terminal colors
+
+# black
+color0 #b4b5b9
+color8 #a1a6c5
+
+# red
+color1 #f52a65
+color9 #ff4774
+
+# green
+color2 #587539
+color10 #5c8524
+
+# yellow
+color3 #8c6c3e
+color11 #a27629
+
+# blue
+color4 #2e7de9
+color12 #358aff
+
+# magenta
+color5 #9854f1
+color13 #a463ff
+
+# cyan
+color6 #007197
+color14 #007ea8
+
+# white
+color7 #6172b0
+color15 #3760bf
