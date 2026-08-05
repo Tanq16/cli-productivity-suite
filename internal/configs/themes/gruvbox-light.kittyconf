@@ -1,0 +1,81 @@
+# vim:ft=kitty
+
+## name: Gruvbox Light
+## upstream: https://github.com/morhetz/gruvbox-contrib
+
+
+# The basic colors
+foreground #3c3836
+background #fbf1c7
+selection_foreground #bdae93
+selection_background #3c3836
+
+# Cursor colors
+cursor #3c3836
+cursor_text_color #fbf1c7
+
+# Scrollbar colors
+scrollbar_handle_color #bdae93
+scrollbar_track_color #ebdbb2
+
+# URL color when hovering with mouse
+url_color #d65d0e
+
+# Kitty window border colors
+active_border_color #7c6f64
+inactive_border_color #bdae93
+bell_border_color #b57614
+
+# OS Window titlebar colors
+wayland_titlebar_color system
+macos_titlebar_color system
+macos_show_window_title_in none
+
+# Tab bar colors
+active_tab_foreground #fbf1c7
+active_tab_background #3c3836
+inactive_tab_foreground #7c6f64
+inactive_tab_background #ebdbb2
+tab_bar_background #f2e5bc
+
+# Colors for marks (marked text in the terminal)
+mark1_foreground #fbf1c7
+mark1_background #9d0006
+mark2_foreground #fbf1c7
+mark2_background #af3a03
+mark3_foreground #fbf1c7
+mark3_background #076678
+
+# The 16 terminal colors
+
+# black
+color0 #d5c4a1
+color8 #a89984
+
+# red
+color1 #cc241d
+color9 #9d0006
+
+# green
+color2 #98971a
+color10 #79740e
+
+# yellow
+color3 #d79921
+color11 #b57614
+
+# blue
+color4 #458588
+color12 #076678
+
+# magenta
+color5 #b16286
+color13 #8f3f71
+
+# cyan
+color6 #689d6a
+color14 #427b58
+
+# white
+color7 #928374
+color15 #3c3836

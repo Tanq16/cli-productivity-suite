@@ -15,7 +15,7 @@ import (
 
 type ConfigDeployInstaller struct{}
 
-func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Platform) (content []byte, destPath string, err error) {
+func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Platform, st *state.State) (content []byte, destPath string, err error) {
 	switch tool.Name {
 	case "tmux-config":
 		content = configs.TmuxConf()
@@ -38,7 +38,19 @@ func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Pl
 
 	case "kitty-theme":
 		destPath = filepath.Join(p.HomeDir, ".config", "kitty", "current-theme.conf")
-		content = configs.MochaKittyConf()
+		// Re-running init keeps whatever `cps theme` last wrote.
+		name := st.CurrentTheme()
+		if name == "" {
+			name = configs.DefaultTheme
+		}
+		content, err = configs.Theme(name)
+		if err != nil {
+			return nil, "", err
+		}
+
+	case "lsd-colors":
+		content = configs.LsdColors()
+		destPath = filepath.Join(p.HomeDir, ".config", "lsd", "colors.yaml")
 
 	case "aerospace-config":
 		if p.OS != platform.Darwin {
@@ -67,7 +79,7 @@ func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Pl
 }
 
 func (c *ConfigDeployInstaller) Install(tool *registry.Tool, p platform.Platform, _ *github.Client, st *state.State) Result {
-	content, destPath, err := c.resolveConfig(tool, p)
+	content, destPath, err := c.resolveConfig(tool, p, st)
 	if err != nil {
 		return Result{Tool: tool.Name, Err: err}
 	}
@@ -81,6 +93,13 @@ func (c *ConfigDeployInstaller) Install(tool *registry.Tool, p platform.Platform
 
 	if err := os.WriteFile(destPath, content, 0644); err != nil {
 		return Result{Tool: tool.Name, Err: err}
+	}
+
+	if tool.Name == "lsd-colors" {
+		cfgPath := filepath.Join(filepath.Dir(destPath), "config.yaml")
+		if err := os.WriteFile(cfgPath, configs.LsdConfig(), 0644); err != nil {
+			return Result{Tool: tool.Name, Err: fmt.Errorf("write lsd config: %w", err)}
+		}
 	}
 
 	if tool.Name == "rcfile" {

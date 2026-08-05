@@ -46,7 +46,7 @@ Homebrew is required — `cps init` won't run without it. CPS uses brew for all 
 
 **Recommended:**
 
-- [Kitty](https://sw.kovidgoyal.net/kitty/) terminal — CPS deploys a Kitty config and Catppuccin theme. Without Kitty, those config files are harmless but unused.
+- [Kitty](https://sw.kovidgoyal.net/kitty/) terminal — CPS deploys a Kitty config and a colour theme (Catppuccin Mocha by default, switchable with `cps theme`). Without Kitty, those config files are harmless but unused.
 - [JetBrains Mono Nerd Font](https://www.nerdfonts.com/font-downloads) — the Kitty and Neovim configs expect a nerd font. Without one, icons and glyphs will render as boxes.
 
 ## Install
@@ -87,7 +87,7 @@ Sets up the base shell environment — Homebrew packages (`wget`, `zip`, `unzip`
 
 Neovim installs as an app bundle under `~/shell/apps/neovim`, with `~/shell/extensions/nvim` symlinked to its launcher. CPS deploys a single `~/.config/nvim/init.lua`.
 
-The config leans on Neovim 0.12 natives — `vim.pack`, the built-in LSP client and completion, `gc` comments, `]b`/`[b` and `]d`/`[d`, `listchars` indent guides, the default statusline — plus four plugins: `fzf-lua`, `nvim-tree`, `gitsigns`, and `nvim-treesitter` (Go, Python, JavaScript, TypeScript, Bash, Lua, JSON, YAML, Markdown). Plugins and parsers install on first launch, in the background. Parser compilation needs the `tree-sitter` CLI from the `essentials` pack; without it Neovim falls back to bundled regex syntax.
+The config leans on Neovim 0.12 natives — `vim.pack`, the built-in LSP client and completion, `gc` comments, `]b`/`[b` and `]d`/`[d`, `listchars` indent guides — plus five plugins: `fzf-lua`, `nvim-tree`, `gitsigns`, `nvim-autopairs`, and `nvim-treesitter` (Go, Python, JavaScript, TypeScript, Bash, Lua, JSON, YAML, Markdown). Plugins and parsers install on first launch, in the background. Parser compilation needs the `tree-sitter` CLI from the `essentials` pack; without it Neovim falls back to bundled regex syntax.
 
 Colors are inherited from the terminal: `termguicolors` is off, so highlights resolve against ANSI 0–15 and follow your terminal theme. LSP is wired for `gopls`, `ruff`, and `ts_ls`, each enabled only when its binary is on `PATH`.
 
@@ -127,6 +127,21 @@ cps extend security nuclei subfinder  # pick specific tools
 ¹ Needs `cps extend runtimes` first — `cps extend list` marks these as `(needs runtimes)`.
 
 Packs with shell integration (`runtimes`, `cloud`, `security`, `misc`) deploy RC fragments automatically.
+
+### `cps theme [name]`
+
+Swaps the terminal colour theme. Run bare to list what's available and see which is active.
+
+```bash
+cps theme                 # list, marking the active one
+cps theme gruvbox-dark    # switch
+```
+
+Fifteen themes ship embedded, in dark and light pairs where the upstream project publishes both: `mocha`/`latte` (Catppuccin), `gruvbox`, `dracula`, `tokyonight`, `monokai`, `atom-one`, `everforest`, and `nord-dark`.
+
+Only the Kitty palette changes. The tmux, Neovim and starship configs never name a hex colour — they reference ANSI indices `0-15`, which the theme file defines — so a switch re-colours everything at once. Kitty reloads its own config within a second, and running tmux and Neovim sessions pick the new palette up on their next redraw. Nothing restarts.
+
+The choice is recorded in the CPS state file, so re-running `cps init` keeps it rather than reverting to the default.
 
 ### `cps cheat <topic>`
 

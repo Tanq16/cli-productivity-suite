@@ -61,6 +61,8 @@ export PATH="$HOME/shell/custom-bin:$HOME/shell/extensions:$HOME/.local/bin:$PAT
 # --- FZF ---
 [ -f "$HOME/shell/completions/fzf.zsh" ] && source "$HOME/shell/completions/fzf.zsh"
 export FZF_DEFAULT_OPTS="
+--color=16,fg:7,bg:-1,hl:4,fg+:15,bg+:0,hl+:12
+--color=info:8,prompt:2,pointer:5,marker:3,spinner:6,header:8,border:8,gutter:-1
 --layout=reverse
 --info=inline
 --height=95%
@@ -77,6 +79,8 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 setopt AUTO_CD
 setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
 export BAT_PAGER=''
+# Every other bat theme paints from the fixed 256-colour cube
+export BAT_THEME='ansi'
 # Inert in zsh (setopt HIST_IGNORE_* covers it above); kept so an ad-hoc bash shell behaves the same
 export HISTCONTROL=ignoreboth
 export LESS_TERMCAP_mb=$'\e[1;32m'

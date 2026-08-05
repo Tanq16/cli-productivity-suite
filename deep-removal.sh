@@ -70,6 +70,7 @@ rm -f "$HOME/.zprofile"
 rm -f "$HOME/.aerospace.toml"
 rm -f "$HOME/.config/kitty/kitty.conf"
 rm -f "$HOME/.config/kitty/current-theme.conf"
+rm -rf "$HOME/.config/lsd"
 rm -f "$HOME/.config/starship.toml"
 
 if command -v brew >/dev/null 2>&1; then

@@ -37,6 +37,10 @@ var AllTools = []Tool{
 		Description: "Kitty theme configuration",
 	},
 	{
+		Name: "lsd-colors", Kind: ConfigFile, Category: Config,
+		Description: "lsd colour theme",
+	},
+	{
 		Name: "aerospace-config", Kind: ConfigFile, Category: Config,
 		Description: "Aerospace WM configuration",
 		Platforms:   []string{"darwin"},

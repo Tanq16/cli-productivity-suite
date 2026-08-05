@@ -1,0 +1,81 @@
+# vim:ft=kitty
+
+## name: Alucard (Dracula Light)
+## upstream: https://github.com/dracula/foot/blob/main/alucard.ini
+
+
+# The basic colors
+foreground #1f1f1f
+background #fffbeb
+selection_foreground #1f1f1f
+selection_background #cfcfde
+
+# Cursor colors
+cursor #1f1f1f
+cursor_text_color #fffbeb
+
+# Scrollbar colors
+scrollbar_handle_color #6c664b
+scrollbar_track_color #ece9df
+
+# URL color when hovering with mouse
+url_color #036a96
+
+# Kitty window border colors
+active_border_color #1f1f1f
+inactive_border_color #6c664b
+bell_border_color #846e15
+
+# OS Window titlebar colors
+wayland_titlebar_color system
+macos_titlebar_color system
+macos_show_window_title_in none
+
+# Tab bar colors
+active_tab_foreground #fffbeb
+active_tab_background #1f1f1f
+inactive_tab_foreground #fffbeb
+inactive_tab_background #6c664b
+tab_bar_background #bcbab3
+
+# Colors for marks (marked text in the terminal)
+mark1_foreground #fffbeb
+mark1_background #cb3a2a
+mark2_foreground #fffbeb
+mark2_background #a34d14
+mark3_foreground #fffbeb
+mark3_background #14710a
+
+# The 16 terminal colors
+
+# black
+color0 #ceccc0
+color8 #bcbab3
+
+# red
+color1 #cb3a2a
+color9 #d74c3d
+
+# green
+color2 #14710a
+color10 #198d0c
+
+# yellow
+color3 #846e15
+color11 #9e841a
+
+# blue
+color4 #644ac9
+color12 #7862d0
+
+# magenta
+color5 #a3144d
+color13 #bf185a
+
+# cyan
+color6 #036a96
+color14 #047fb4
+
+# white
+color7 #6c664b
+color15 #2c2b31

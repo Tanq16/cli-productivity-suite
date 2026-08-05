@@ -11,6 +11,7 @@ local o = vim.o
 o.number = true
 o.signcolumn = "yes"
 o.cursorline = true
+o.cursorlineopt = "number"
 o.mouse = "a"
 o.undofile = true
 o.swapfile = false
@@ -21,6 +22,9 @@ o.splitright = true
 o.scrolloff = 8
 o.sidescrolloff = 8
 o.laststatus = 3
+o.showmode = false
+-- noselect would leave nothing for <CR> to accept.
+o.completeopt = "menu,menuone,noinsert,popup,fuzzy"
 o.updatetime = 250
 o.timeoutlen = 400
 o.expandtab = true
@@ -30,99 +34,130 @@ o.softtabstop = 2
 o.smartindent = true
 o.wrap = false
 o.confirm = true
+o.whichwrap = "b,s,<,>,[,]"
 
 o.list = true
 vim.opt.listchars = { tab = "│ ", leadmultispace = "│ ", trail = "·", nbsp = "␣" }
+vim.opt.fillchars = { eob = " " }
 
 -- Off means Nvim emits cterm attributes, so indices 0-15 resolve against the terminal's own palette and follow its theme.
 o.termguicolors = false
 -- This scheme leaves Normal undefined, which keeps the background transparent.
 vim.cmd.colorscheme("vim")
 
-local hl = {
-  Comment = { ctermfg = 8, italic = true },
-  Constant = { ctermfg = 14 },
-  String = { ctermfg = 2 },
-  Character = { ctermfg = 2 },
-  Number = { ctermfg = 13 },
-  Boolean = { ctermfg = 13, bold = true },
-  Float = { ctermfg = 13 },
-  Identifier = { ctermfg = 15 },
-  Function = { ctermfg = 12 },
-  Statement = { ctermfg = 5 },
-  Conditional = { ctermfg = 5 },
-  Repeat = { ctermfg = 5 },
-  Label = { ctermfg = 5 },
-  Operator = { ctermfg = 6 },
-  Keyword = { ctermfg = 5 },
-  Exception = { ctermfg = 9 },
-  PreProc = { ctermfg = 13 },
-  Include = { ctermfg = 13, bold = true },
-  Define = { ctermfg = 13 },
-  Macro = { ctermfg = 13 },
-  Type = { ctermfg = 11 },
-  StorageClass = { ctermfg = 11 },
-  Structure = { ctermfg = 11, bold = true },
-  Typedef = { ctermfg = 11 },
-  Special = { ctermfg = 6 },
-  SpecialKey = { ctermfg = 8 },
-  Delimiter = { ctermfg = 7 },
-  Todo = { ctermfg = 11, bold = true },
-  Error = { ctermfg = 9, bold = true },
-  Underlined = { ctermfg = 12, underline = true },
+-- Every cps palette keeps 0/8 on the background side of the grey ramp and 7/15 on the foreground side, light themes included.
+local function build_highlights()
+  local hl = {
+    Comment = { ctermfg = 8, italic = true },
+    Constant = { ctermfg = 14 },
+    String = { ctermfg = 2 },
+    Character = { ctermfg = 2 },
+    Number = { ctermfg = 13 },
+    Boolean = { ctermfg = 13, bold = true },
+    Float = { ctermfg = 13 },
+    Identifier = { ctermfg = 15 },
+    Function = { ctermfg = 12 },
+    Statement = { ctermfg = 5 },
+    Conditional = { ctermfg = 5 },
+    Repeat = { ctermfg = 5 },
+    Label = { ctermfg = 5 },
+    Operator = { ctermfg = 6 },
+    Keyword = { ctermfg = 5 },
+    Exception = { ctermfg = 9 },
+    PreProc = { ctermfg = 13 },
+    Include = { ctermfg = 13, bold = true },
+    Define = { ctermfg = 13 },
+    Macro = { ctermfg = 13 },
+    Type = { ctermfg = 11 },
+    StorageClass = { ctermfg = 11 },
+    Structure = { ctermfg = 11, bold = true },
+    Typedef = { ctermfg = 11 },
+    Special = { ctermfg = 6 },
+    SpecialKey = { ctermfg = 8 },
+    Delimiter = { ctermfg = 7 },
+    Todo = { ctermfg = 11, bold = true },
+    Error = { ctermfg = 9, bold = true },
+    Underlined = { ctermfg = 12, underline = true },
 
-  LineNr = { ctermfg = 8 },
-  CursorLineNr = { ctermfg = 11, bold = true },
-  CursorLine = { ctermbg = 0 },
-  Whitespace = { ctermfg = 8 },
-  NonText = { ctermfg = 8 },
-  Visual = { reverse = true },
-  Search = { ctermfg = 0, ctermbg = 11 },
-  IncSearch = { ctermfg = 0, ctermbg = 9 },
-  MatchParen = { ctermfg = 14, bold = true, underline = true },
-  Pmenu = { ctermbg = 8 },
-  PmenuSel = { ctermbg = 4, ctermfg = 15, bold = true },
-  WinSeparator = { ctermfg = 8 },
-  Folded = { ctermfg = 8, italic = true },
+    LineNr = { ctermfg = 8 },
+    CursorLineNr = { ctermfg = 11, bold = true },
+    -- Vim's default fills these with grey.
+    SignColumn = {},
+    FoldColumn = { ctermfg = 8 },
+    Whitespace = { ctermfg = 8 },
+    NonText = { ctermfg = 8 },
+    Conceal = { ctermfg = 8 },
+    Visual = { reverse = true },
+    Search = { ctermfg = 0, ctermbg = 11 },
+    IncSearch = { ctermfg = 0, ctermbg = 9 },
+    MatchParen = { ctermfg = 14, bold = true, underline = true },
+    Pmenu = { ctermbg = 8 },
+    PmenuSel = { ctermbg = 4, ctermfg = 0, bold = true },
+    PmenuSbar = { ctermbg = 8 },
+    PmenuThumb = { ctermbg = 7 },
+    WinSeparator = { ctermfg = 8 },
+    Folded = { ctermfg = 8, italic = true },
+    ErrorMsg = { ctermfg = 9, bold = true },
+    TabLine = { ctermfg = 8 },
+    TabLineFill = {},
+    TabLineSel = { ctermfg = 4, bold = true },
 
-  DiagnosticError = { ctermfg = 9 },
-  DiagnosticWarn = { ctermfg = 11 },
-  DiagnosticInfo = { ctermfg = 12 },
-  DiagnosticHint = { ctermfg = 14 },
-  DiagnosticUnderlineError = { ctermfg = 9, undercurl = true },
-  DiagnosticUnderlineWarn = { ctermfg = 11, undercurl = true },
+    -- Vim's default is cterm=reverse, a solid slab.
+    StatusLine = { ctermfg = 7 },
+    StatusLineNC = { ctermfg = 8 },
+    StatusLineTerm = { ctermfg = 7 },
+    StatusLineTermNC = { ctermfg = 8 },
+    StlGit = { ctermfg = 5 },
+    StlErr = { ctermfg = 9 },
+    StlWarn = { ctermfg = 11 },
 
-  DiffAdd = { ctermfg = 2 },
-  DiffChange = { ctermfg = 3 },
-  DiffDelete = { ctermfg = 1 },
-  DiffText = { ctermfg = 11, bold = true },
-  GitSignsAdd = { ctermfg = 2 },
-  GitSignsChange = { ctermfg = 3 },
-  GitSignsDelete = { ctermfg = 1 },
+    DiagnosticError = { ctermfg = 9 },
+    DiagnosticWarn = { ctermfg = 11 },
+    DiagnosticInfo = { ctermfg = 12 },
+    DiagnosticHint = { ctermfg = 14 },
+    DiagnosticUnderlineError = { ctermfg = 9, undercurl = true },
+    DiagnosticUnderlineWarn = { ctermfg = 11, undercurl = true },
 
-  ["@variable"] = { ctermfg = 15 },
-  ["@variable.builtin"] = { ctermfg = 9, italic = true },
-  ["@variable.parameter"] = { ctermfg = 7, italic = true },
-  ["@variable.member"] = { ctermfg = 14 },
-  ["@function.builtin"] = { ctermfg = 12, bold = true },
-  ["@function.call"] = { ctermfg = 12 },
-  ["@function.method"] = { ctermfg = 12 },
-  ["@constructor"] = { ctermfg = 11, bold = true },
-  ["@type.builtin"] = { ctermfg = 3 },
-  ["@keyword.import"] = { ctermfg = 13, bold = true },
-  ["@keyword.return"] = { ctermfg = 5, bold = true },
-  ["@punctuation.bracket"] = { ctermfg = 7 },
-  ["@punctuation.delimiter"] = { ctermfg = 7 },
-  ["@comment.documentation"] = { ctermfg = 8, italic = true },
-  ["@markup.heading"] = { ctermfg = 12, bold = true },
-  ["@markup.link"] = { ctermfg = 14, underline = true },
-  ["@markup.raw"] = { ctermfg = 2 },
-  ["@diff.plus"] = { ctermfg = 2 },
-  ["@diff.minus"] = { ctermfg = 1 },
-}
+    DiffAdd = { ctermfg = 2 },
+    DiffChange = { ctermfg = 3 },
+    DiffDelete = { ctermfg = 1 },
+    DiffText = { ctermfg = 11, bold = true },
+    GitSignsAdd = { ctermfg = 2 },
+    GitSignsChange = { ctermfg = 3 },
+    GitSignsDelete = { ctermfg = 1 },
+
+    ["@variable"] = { ctermfg = 15 },
+    ["@variable.builtin"] = { ctermfg = 9, italic = true },
+    ["@variable.parameter"] = { ctermfg = 7, italic = true },
+    ["@variable.member"] = { ctermfg = 14 },
+    ["@function.builtin"] = { ctermfg = 12, bold = true },
+    ["@function.call"] = { ctermfg = 12 },
+    ["@function.method"] = { ctermfg = 12 },
+    ["@constructor"] = { ctermfg = 11, bold = true },
+    ["@type.builtin"] = { ctermfg = 3 },
+    ["@keyword.import"] = { ctermfg = 13, bold = true },
+    ["@keyword.return"] = { ctermfg = 5, bold = true },
+    ["@punctuation.bracket"] = { ctermfg = 7 },
+    ["@punctuation.delimiter"] = { ctermfg = 7 },
+    ["@comment.documentation"] = { ctermfg = 8, italic = true },
+    ["@markup.heading"] = { ctermfg = 12, bold = true },
+    ["@markup.link"] = { ctermfg = 14, underline = true },
+    ["@markup.raw"] = { ctermfg = 2 },
+    ["@diff.plus"] = { ctermfg = 2 },
+    ["@diff.minus"] = { ctermfg = 1 },
+  }
+
+  -- reverse, not ctermbg: the label wants the terminal's background colour, which has no palette index.
+  for color = 1, 6 do
+    hl["StlPill" .. color] = { ctermfg = color, reverse = true, bold = true }
+    hl["StlCap" .. color] = { ctermfg = color }
+  end
+
+  return hl
+end
 
 local function apply_highlights()
-  for group, spec in pairs(hl) do
+  for group, spec in pairs(build_highlights()) do
     vim.api.nvim_set_hl(0, group, spec)
   end
 end
@@ -134,6 +169,7 @@ vim.pack.add({
   { src = "https://github.com/ibhagwan/fzf-lua" },
   { src = "https://github.com/nvim-tree/nvim-tree.lua" },
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
+  { src = "https://github.com/windwp/nvim-autopairs" },
   -- The "main" rewrite has a different API than "master"; pin it so an upstream default-branch change cannot swap it silently.
   { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
 })
@@ -195,6 +231,8 @@ require("gitsigns").setup({
   end,
 })
 
+require("nvim-autopairs").setup({ check_ts = true })
+
 local fzf = require("fzf-lua")
 fzf.setup({})
 
@@ -246,10 +284,68 @@ vim.diagnostic.config({
   },
 })
 
+local modes = {
+  n = { "NORMAL", 4 }, i = { "INSERT", 2 }, v = { "VISUAL", 5 }, V = { "V-LINE", 5 },
+  ["\22"] = { "V-BLOCK", 5 }, s = { "SELECT", 5 }, S = { "S-LINE", 5 }, ["\19"] = { "S-BLOCK", 5 },
+  R = { "REPLACE", 1 }, c = { "COMMAND", 3 }, r = { "PROMPT", 3 },
+  ["!"] = { "SHELL", 6 }, t = { "TERMINAL", 6 },
+}
+
+-- The %{% %} wrapper re-parses this result, so interpolated text must escape %.
+local function pill(color, text)
+  local cap = "%#StlCap" .. color .. "#"
+  local open, close = "", ""
+  return cap .. open .. "%#StlPill" .. color .. "#" .. text .. cap .. close .. "%#StatusLine#"
+end
+
+function _G.CpsStatusline()
+  local mode = modes[vim.api.nvim_get_mode().mode:sub(1, 1)] or { "?", 4 }
+  local parts = { pill(mode[2], mode[1]) }
+
+  local head = vim.b.gitsigns_head
+  if head and head ~= "" then
+    parts[#parts + 1] = "%#StlGit# " .. head:gsub("%%", "%%%%") .. "%#StatusLine#"
+  end
+  local label
+  if vim.bo.filetype == "NvimTree" then
+    label = " explorer"
+  elseif vim.bo.buftype == "terminal" then
+    label = " terminal"
+  end
+  parts[#parts + 1] = label or " %f%m%r"
+  parts[#parts + 1] = "%="
+
+  local counts = vim.diagnostic.count(0)
+  local errors = counts[vim.diagnostic.severity.ERROR]
+  local warnings = counts[vim.diagnostic.severity.WARN]
+  if errors then
+    parts[#parts + 1] = "%#StlErr#E" .. errors .. " %#StatusLine#"
+  end
+  if warnings then
+    parts[#parts + 1] = "%#StlWarn#W" .. warnings .. " %#StatusLine#"
+  end
+  if not label and vim.bo.filetype ~= "" then
+    parts[#parts + 1] = pill(4, vim.bo.filetype) .. " "
+  end
+  parts[#parts + 1] = pill(2, "%l:%c") .. " %P "
+
+  return table.concat(parts)
+end
+
+vim.o.statusline = "%{%v:lua.CpsStatusline()%}"
+
 local map = vim.keymap.set
 
 map("n", "<Esc>", "<cmd>nohlsearch<cr>", { desc = "clear search highlight" })
 map("n", "<C-s>", "<cmd>write<cr>", { desc = "save file" })
+
+map("i", "<C-a>", "<Home>", { desc = "start of line" })
+map("i", "<C-e>", "<End>", { desc = "end of line" })
+
+-- The horizontal wheel is not clamped to the longest line, so it drags the view into empty space.
+map({ "n", "v", "i" }, "<ScrollWheelLeft>", "<Nop>")
+map({ "n", "v", "i" }, "<ScrollWheelRight>", "<Nop>")
+
 map("n", "<C-h>", "<C-w>h", { desc = "window left" })
 map("n", "<C-j>", "<C-w>j", { desc = "window down" })
 map("n", "<C-k>", "<C-w>k", { desc = "window up" })
