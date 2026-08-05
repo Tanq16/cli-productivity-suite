@@ -36,7 +36,7 @@ active_tab_foreground #d7dae0
 active_tab_background #282c34
 inactive_tab_foreground #828997
 inactive_tab_background #21252b
-tab_bar_background #21252b
+tab_bar_background #181a1f
 
 # Colors for marks (marked text in the terminal)
 mark1_foreground #282c34

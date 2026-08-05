@@ -34,9 +34,9 @@ macos_show_window_title_in none
 # Tab bar colors
 active_tab_foreground #5c6a72
 active_tab_background #fdf6e3
-inactive_tab_foreground #939f91
+inactive_tab_foreground #5c6a72
 inactive_tab_background #efebd4
-tab_bar_background #f4f0d9
+tab_bar_background #e6e2cc
 
 # Colors for marks (marked text in the terminal)
 mark1_foreground #fdf6e3
