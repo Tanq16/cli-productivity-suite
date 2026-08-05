@@ -1,0 +1,5 @@
+---
+# lsd ignores colors.yaml entirely unless the theme is set to custom here.
+color:
+  when: auto
+  theme: custom

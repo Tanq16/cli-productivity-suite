@@ -1,0 +1,41 @@
+---
+# lsd's defaults draw most of this table from the fixed 256-colour cube, which does not follow the
+# terminal palette. Every value here is an ANSI index so the listing tracks the active theme.
+user: 7
+group: 8
+permission:
+  read: 2
+  write: 3
+  exec: 1
+  exec-sticky: 5
+  no-access: 8
+  octal: 6
+  acl: 6
+  context: 14
+date:
+  hour-old: 2
+  day-old: 6
+  older: 8
+size:
+  none: 8
+  small: 6
+  medium: 3
+  large: 11
+inode:
+  valid: 13
+  invalid: 8
+links:
+  valid: 13
+  invalid: 8
+tree-edge: 8
+git-status:
+  default: 8
+  unmodified: 8
+  ignored: 8
+  new-in-index: 2
+  new-in-workdir: 10
+  typechange: 11
+  deleted: 1
+  renamed: 5
+  modified: 3
+  conflicted: 9

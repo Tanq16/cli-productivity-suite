@@ -48,6 +48,12 @@ var codeServerSettings []byte
 //go:embed nvim-init.lua
 var nvimInit []byte
 
+//go:embed lsd-colors.yaml
+var lsdColors []byte
+
+//go:embed lsd-config.yaml
+var lsdConfig []byte
+
 func TmuxConf() []byte           { return tmuxConf }
 func LinuxKittyConf() []byte     { return linuxKittyConf }
 func MacosKittyConf() []byte     { return macosKittyConf }
@@ -60,6 +66,8 @@ func StarshipToml() []byte       { return starshipToml }
 func CodeServerConfig() []byte   { return codeServerConfig }
 func CodeServerSettings() []byte { return codeServerSettings }
 func NvimInit() []byte           { return nvimInit }
+func LsdColors() []byte          { return lsdColors }
+func LsdConfig() []byte          { return lsdConfig }
 
 func Theme(name string) ([]byte, error) {
 	content, err := themeFS.ReadFile("themes/" + name + ".kittyconf")

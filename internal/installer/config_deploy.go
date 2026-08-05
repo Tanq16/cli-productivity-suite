@@ -48,6 +48,10 @@ func (c *ConfigDeployInstaller) resolveConfig(tool *registry.Tool, p platform.Pl
 			return nil, "", err
 		}
 
+	case "lsd-colors":
+		content = configs.LsdColors()
+		destPath = filepath.Join(p.HomeDir, ".config", "lsd", "colors.yaml")
+
 	case "aerospace-config":
 		if p.OS != platform.Darwin {
 			return nil, "", nil
@@ -89,6 +93,13 @@ func (c *ConfigDeployInstaller) Install(tool *registry.Tool, p platform.Platform
 
 	if err := os.WriteFile(destPath, content, 0644); err != nil {
 		return Result{Tool: tool.Name, Err: err}
+	}
+
+	if tool.Name == "lsd-colors" {
+		cfgPath := filepath.Join(filepath.Dir(destPath), "config.yaml")
+		if err := os.WriteFile(cfgPath, configs.LsdConfig(), 0644); err != nil {
+			return Result{Tool: tool.Name, Err: fmt.Errorf("write lsd config: %w", err)}
+		}
 	}
 
 	if tool.Name == "rcfile" {

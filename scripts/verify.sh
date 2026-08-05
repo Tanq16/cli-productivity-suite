@@ -39,6 +39,7 @@ for f in \
     .zshrc .zprofile .tmux.conf \
     .config/kitty/kitty.conf .config/kitty/current-theme.conf \
     .config/starship.toml .config/cps/state.json \
+    .config/lsd/colors.yaml .config/lsd/config.yaml \
     .config/nvim/init.lua \
     shell/apps/neovim/bin/nvim \
     shell/rc/00-base.zsh shell/rc/10-runtimes.zsh \
