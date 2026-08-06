@@ -81,6 +81,8 @@ local function build_highlights()
 
     LineNr = { ctermfg = 8 },
     CursorLineNr = { ctermfg = 11, bold = true },
+    -- Only nvim-tree draws this, forcing cursorlineopt=both over the global; vim's default there is an underline.
+    CursorLine = { ctermbg = 0 },
     -- Vim's default fills these with grey.
     SignColumn = {},
     FoldColumn = { ctermfg = 8 },

@@ -54,19 +54,19 @@ color8 #585b70
 
 # red
 color1 #f38ba8
-color9 #eba0ac
+color9 #f38ba8
 
 # green
 color2 #a6e3a1
-color10 #89d88b
+color10 #a6e3a1
 
 # yellow
 color3 #f9e2af
-color11 #fab387
+color11 #f9e2af
 
 # blue
 color4 #89b4fa
-color12 #74c7ec
+color12 #89b4fa
 
 # magenta
 color5 #f5c2e7
