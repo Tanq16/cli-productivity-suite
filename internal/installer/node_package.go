@@ -3,6 +3,7 @@ package installer
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/tanq16/cli-productivity-suite/internal/github"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
@@ -18,7 +19,8 @@ func (n *NodePackageInstaller) Install(tool *registry.Tool, p platform.Platform,
 		return Result{Tool: tool.Name, Err: errors.New("no npm package defined")}
 	}
 
-	cmd := envCommand(p.CustomScriptEnv(), "npm", "install", "-g", tool.NodePkg)
+	args := append([]string{"install", "-g"}, strings.Fields(tool.NodePkg)...)
+	cmd := envCommand(p.CustomScriptEnv(), "npm", args...)
 	if err := utils.RunCmd(cmd); err != nil {
 		return Result{Tool: tool.Name, Err: fmt.Errorf("npm install %s failed: %w", tool.NodePkg, err)}
 	}

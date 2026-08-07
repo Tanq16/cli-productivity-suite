@@ -270,6 +270,27 @@ var extensionPacks = []ExtensionPack{
 				PostInstall:  "neo4j",
 				Asset:        AssetPattern{ArchiveFormat: "tar.gz"},
 			},
+			{
+				Name: "gopls", Kind: CustomScript, Category: ExtMisc, Extension: true, Requires: "runtimes",
+				Description: "Go language server",
+				InstallCmd:  "go install golang.org/x/tools/gopls@latest",
+			},
+			{
+				Name: "pyright", Kind: NodePackage, Category: ExtMisc, Extension: true, Requires: "runtimes",
+				Description: "Python language server (type checking)",
+				NodePkg:     "pyright",
+			},
+			{
+				Name: "typescript-language-server", Kind: NodePackage, Category: ExtMisc, Extension: true, Requires: "runtimes",
+				Description: "TypeScript/JavaScript language server",
+				// typescript@7 dropped the tsserver binary this server drives, so the major is pinned rather than tracking latest.
+				NodePkg: "typescript-language-server typescript@5",
+			},
+			{
+				Name: "ruff", Kind: PythonTool, Category: ExtMisc, Extension: true, Requires: "runtimes",
+				Description: "Python linter and formatter with a language server",
+				PyTool:      "ruff",
+			},
 		},
 	},
 	{
