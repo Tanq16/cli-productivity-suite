@@ -244,6 +244,12 @@ local servers = {
     filetypes = { "go", "gomod", "gowork", "gotmpl" },
     root_markers = { "go.work", "go.mod", ".git" },
   },
+  -- ruff only lints and formats; type checking, hover and go-to-definition are what pyright adds alongside it.
+  pyright = {
+    cmd = { "pyright-langserver", "--stdio" },
+    filetypes = { "python" },
+    root_markers = { "pyproject.toml", "setup.py", "requirements.txt", ".git" },
+  },
   ruff = {
     cmd = { "ruff", "server" },
     filetypes = { "python" },

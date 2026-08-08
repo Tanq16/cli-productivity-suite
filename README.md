@@ -90,7 +90,7 @@ Neovim installs as an app bundle under `~/shell/apps/neovim`, with `~/shell/exte
 
 The config leans on Neovim 0.12 natives — `vim.pack`, the built-in LSP client and completion, `gc` comments, `]b`/`[b` and `]d`/`[d`, `listchars` indent guides — plus five plugins: `fzf-lua`, `nvim-tree`, `gitsigns`, `nvim-autopairs`, and `nvim-treesitter` (Go, Python, JavaScript, TypeScript, Bash, Lua, JSON, YAML, Markdown). Plugins and parsers install on first launch, in the background. Parser compilation needs the `tree-sitter` CLI from the `essentials` pack; without it Neovim falls back to bundled regex syntax.
 
-Colors are inherited from the terminal: `termguicolors` is off, so highlights resolve against ANSI 0–15 and follow your terminal theme. The statusline is hand-rolled from those same indices — mode, git branch, path, diagnostics, filetype and position — and capped with the glyphs the tmux bar uses, so the two read as one design. LSP is wired for `gopls`, `ruff`, and `ts_ls`, each enabled only when its binary is on `PATH`.
+Colors are inherited from the terminal: `termguicolors` is off, so highlights resolve against ANSI 0–15 and follow your terminal theme. The statusline is hand-rolled from those same indices — mode, git branch, path, diagnostics, filetype and position — and capped with the glyphs the tmux bar uses, so the two read as one design. LSP is wired for `gopls`, `pyright`, `ruff`, and `ts_ls`, each enabled only when its binary is on `PATH` — `cps extend misc` installs all four. Python gets two servers because they cover different ground: `ruff` lints and formats, `pyright` supplies types, hover and go-to-definition.
 
 #### tmux
 
@@ -120,7 +120,7 @@ cps extend security nuclei subfinder  # pick specific tools
 | security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, nuclei-templates |
 | cloudsec | terraform, kubectl, kubelogin, grpcurl, trivy, tofu, prowler¹, oci-cli¹ |
 | appsec | katana, ffuf, dalfox, gobuster, gau |
-| misc | gowitness, age, sq, neo4j¹ (app bundle) |
+| misc | gowitness, age, sq, neo4j¹ (app bundle), language servers (gopls¹, pyright¹, typescript-language-server¹, ruff¹) |
 | private | Personal tools — public subset (`nits`, `gcli`, `box`, `claudex`) installs as-is; the truly-private two (`toon`, `cybernest`) need `--gh-token` |
 | ai-tools | AI coding agents (antigravity, cursor-agent, claude-code¹, codex¹) |
 | homelab | Self-hosted services (caddy, linksnapper, kairo, raikiri, expenseowl) + app bundles (rinnegan, code-server) |
