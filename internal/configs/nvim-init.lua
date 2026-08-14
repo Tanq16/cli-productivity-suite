@@ -13,6 +13,8 @@ o.signcolumn = "yes"
 o.cursorline = true
 o.cursorlineopt = "number"
 o.mouse = "a"
+-- Routes plain y through the + register, which is what lets the provider fire — OSC 52 over SSH, pbcopy locally.
+o.clipboard = "unnamedplus"
 o.undofile = true
 o.swapfile = false
 o.ignorecase = true
