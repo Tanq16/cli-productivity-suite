@@ -10,6 +10,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/tanq16/cli-productivity-suite/internal/runner"
 	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
@@ -24,6 +25,7 @@ var rootCmd = &cobra.Command{
 	Version:           AppVersion,
 	CompletionOptions: cobra.CompletionOptions{HiddenDefaultCmd: true},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		runner.MigrationGate(AppVersion)
 		resolveGHToken()
 	},
 }

@@ -18,8 +18,28 @@ type State struct {
 	mu       sync.Mutex
 	Tools    map[string]ToolState `json:"tools"`
 	Theme    string               `json:"theme,omitempty"`
+	Version  string               `json:"cps_version,omitempty"`
 	LastInit time.Time            `json:"last_init"`
 	path     string
+}
+
+func (s *State) CPSVersion() string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.Version
+}
+
+func (s *State) SetCPSVersion(v string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.Version = v
+}
+
+// IsFresh reports a state that has never installed anything, which is a first run rather than an upgrade.
+func (s *State) IsFresh() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return len(s.Tools) == 0
 }
 
 func (s *State) CurrentTheme() string {

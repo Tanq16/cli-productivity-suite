@@ -3,6 +3,7 @@ module github.com/tanq16/cli-productivity-suite
 go 1.26.0
 
 require (
+	charm.land/bubbletea/v2 v2.0.9
 	charm.land/lipgloss/v2 v2.0.5
 	github.com/rs/zerolog v1.35.1
 	github.com/spf13/cobra v1.10.2
