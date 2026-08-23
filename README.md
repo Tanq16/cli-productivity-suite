@@ -1,5 +1,5 @@
 <div align="center">
-  <img src=".github/assets/logo.png" alt="CLI Productivity Suite Logo" width="200">
+  <img src=".github/assets/logo.svg" alt="CLI Productivity Suite Logo" width="200">
   <h1>CLI Productivity Suite</h1>
 
   <a href="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml"><img alt="Build Workflow" src="https://github.com/tanq16/cli-productivity-suite/actions/workflows/release.yaml/badge.svg"></a>&nbsp;<a href="https://github.com/tanq16/cli-productivity-suite/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/tanq16/cli-productivity-suite"></a><br><br>
@@ -242,6 +242,15 @@ docker build -t cps-sandbox .
 docker run -d --name cps-sandbox cps-sandbox
 docker exec -it cps-sandbox zsh -l
 ```
+
+Check a built image before relying on it:
+
+```bash
+docker run --rm -v "$PWD/scripts/verify.sh:/tmp/v.sh" \
+    tanq16/cps-sandbox:latest zsh -lc 'bash /tmp/v.sh'
+```
+
+`verify.sh` asserts the user and sudo setup, the `~/shell` tree, the rc fragments, env vars, PATH order, and one binary per pack. It stays silent on success and exits 1 listing whatever is missing. The `zsh -l` wrapper is required, since that is what sources the rc fragments it checks.
 
 The image is multi-arch (`linux/amd64` + `linux/arm64`) and large (multi-GB) — it carries full language runtimes, cloud CLIs, security tooling, the `ai-tools` and `homelab` packs, and the public-repo tools from the `private` pack (`nits`, `gcli`, `box`, `claudex`). The two truly-private tools (`toon`, `cybernest`) are skipped since they need an auth token.
 
