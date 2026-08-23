@@ -19,14 +19,15 @@ func ExtendList() {
 	packs := registry.AllExtensionPacks()
 	for _, pack := range packs {
 		tools := filterExtPackForPlatform(pack)
-		utils.PrintInfo(fmt.Sprintf("%s — %s (%d tools)", pack.Name, pack.Description, len(tools)))
+		summary := fmt.Sprintf("%d tools", len(tools))
+		if pack.Requires != "" {
+			summary += ", needs " + pack.Requires
+		}
+		utils.PrintInfo(fmt.Sprintf("%s — %s (%s)", pack.Name, pack.Description, summary))
 		if len(tools) > 0 {
 			names := make([]string, len(tools))
 			for i, t := range tools {
 				names[i] = t.Name
-				if t.Requires != "" {
-					names[i] += " (needs " + t.Requires + ")"
-				}
 			}
 			utils.PrintGeneric("    " + strings.Join(names, ", "))
 		}
@@ -206,9 +207,9 @@ func deployPackFragment(packName string, p platform.Platform) {
 	case "security":
 		content := []byte("export NUCLEI_TEMPLATES_DIR=\"$HOME/shell/nuclei-templates\"\n")
 		deployFragment(p, "30-security.zsh", content)
-	case "misc":
+	case "homelab":
 		content := []byte("export NEO4J_CONF=\"$HOME/.config/neo4j/conf\"\n")
-		deployFragment(p, "40-misc.zsh", content)
+		deployFragment(p, "50-homelab.zsh", content)
 	}
 }
 
