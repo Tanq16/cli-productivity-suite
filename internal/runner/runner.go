@@ -69,7 +69,7 @@ func Init(ghToken string) {
 	}
 	st.Save()
 
-	if runPhase("Phase 4: Shell plugins", filterBaseTools(reg.ByKind(registry.ShellPlugin)), p, gh, st) {
+	if runPhase("Phase 4: Shell plugins", filterBaseTools(reg.ByKind(registry.RepoSnapshot)), p, gh, st) {
 		hadErrors = true
 	}
 	st.Save()
