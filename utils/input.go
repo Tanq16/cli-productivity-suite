@@ -19,7 +19,6 @@ func getStdinScanner() *bufio.Scanner {
 	return stdinScanner
 }
 
-// ReadPipedLine returns one line, or "" when stdin is a terminal or exhausted.
 func ReadPipedLine() string {
 	fi, err := os.Stdin.Stat()
 	if err != nil || fi.Mode()&os.ModeCharDevice != 0 {
@@ -72,7 +71,6 @@ func (m selectModel) View() tea.View {
 	return tea.NewView(b.String())
 }
 
-// PromptSelect returns the chosen 0-based index, or -1 when the user cancels.
 func PromptSelect(label string, options []string) (int, error) {
 	if GlobalForAIFlag {
 		line := ReadPipedLine()

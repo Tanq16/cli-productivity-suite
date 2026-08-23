@@ -5,8 +5,6 @@ import (
 	"strings"
 )
 
-// Migration describes manual work a user must do when leaving From behind. It is keyed by the version
-// being upgraded away from, so an entry can be written before the release that carries it exists.
 type Migration struct {
 	From  string
 	Notes []string
@@ -25,8 +23,6 @@ var migrations = []Migration{
 	},
 }
 
-// Pending returns every migration left behind when a state recorded at stateVersion runs appVersion.
-// An absent or unparseable stateVersion predates version tracking, so everything below appVersion applies.
 func Pending(stateVersion, appVersion string) []Migration {
 	app, ok := parse(appVersion)
 	if !ok || stateVersion == appVersion {

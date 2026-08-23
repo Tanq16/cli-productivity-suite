@@ -35,7 +35,6 @@ func (s *State) SetCPSVersion(v string) {
 	s.Version = v
 }
 
-// IsFresh reports a state that has never installed anything, which is a first run rather than an upgrade.
 func (s *State) IsFresh() bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()

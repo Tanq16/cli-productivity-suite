@@ -9,8 +9,6 @@ import (
 	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
-// MigrationGate runs before every command. It blocks once per upgrade so a user cannot act on a new
-// cps against an environment the previous version laid out, and records the version once acknowledged.
 func MigrationGate(appVersion string) {
 	p, err := platform.Detect()
 	if err != nil {
@@ -24,7 +22,6 @@ func MigrationGate(appVersion string) {
 		return
 	}
 
-	// A first run has nothing laid out by an earlier version, so it records the version and never prompts.
 	pending := migration.Pending(st.CPSVersion(), appVersion)
 	if len(pending) == 0 || st.IsFresh() {
 		recordVersion(st, appVersion)
