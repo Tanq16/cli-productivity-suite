@@ -3,18 +3,17 @@ package registry
 type ExtensionPack struct {
 	Name        string
 	Description string
-	Category    ToolCategory
+	Requires    string // display-only prerequisite pack name; not enforced at install time
 	Tools       []Tool
 }
 
 var extensionPacks = []ExtensionPack{
 	{
 		Name:        "security",
-		Description: "General security tools",
-		Category:    ExtSecurity,
+		Description: "Security and application testing tools",
 		Tools: []Tool{
 			{
-				Name: "nuclei", BinaryName: "nuclei", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
+				Name: "nuclei", BinaryName: "nuclei", Kind: GitHubRelease, Extension: true,
 				Repo: "projectdiscovery/nuclei", Description: "Vulnerability scanner",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
@@ -24,7 +23,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "naabu", BinaryName: "naabu", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
+				Name: "naabu", BinaryName: "naabu", Kind: GitHubRelease, Extension: true,
 				Repo: "projectdiscovery/naabu", Description: "Port scanner",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
@@ -34,7 +33,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "subfinder", BinaryName: "subfinder", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
+				Name: "subfinder", BinaryName: "subfinder", Kind: GitHubRelease, Extension: true,
 				Repo: "projectdiscovery/subfinder", Description: "Subdomain discovery",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
@@ -44,7 +43,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "proxify", BinaryName: "proxify", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
+				Name: "proxify", BinaryName: "proxify", Kind: GitHubRelease, Extension: true,
 				Repo: "projectdiscovery/proxify", Description: "HTTP proxy",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
@@ -54,7 +53,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "trufflehog", BinaryName: "trufflehog", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
+				Name: "trufflehog", BinaryName: "trufflehog", Kind: GitHubRelease, Extension: true,
 				Repo: "trufflesecurity/trufflehog", Description: "Secret scanner",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -64,7 +63,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "httpx", BinaryName: "httpx", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
+				Name: "httpx", BinaryName: "httpx", Kind: GitHubRelease, Extension: true,
 				Repo: "projectdiscovery/httpx", Description: "HTTP toolkit",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
@@ -74,7 +73,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "dnsx", BinaryName: "dnsx", Kind: GitHubRelease, Category: ExtSecurity, Extension: true,
+				Name: "dnsx", BinaryName: "dnsx", Kind: GitHubRelease, Extension: true,
 				Repo: "projectdiscovery/dnsx", Description: "DNS toolkit",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
@@ -84,20 +83,82 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "nuclei-templates", Kind: ShellPlugin, Category: ExtSecurity, Extension: true,
+				Name: "nuclei-templates", Kind: RepoSnapshot, Extension: true,
 				Description: "Nuclei vulnerability templates",
-				CloneURL:    "https://github.com/projectdiscovery/nuclei-templates.git",
-				CloneDest:   "~/shell/nuclei-templates",
+				Repo:        "projectdiscovery/nuclei-templates",
+				Dest:        "~/shell/nuclei-templates",
+			},
+			{
+				Name: "katana", BinaryName: "katana", Kind: GitHubRelease, Extension: true,
+				Repo: "projectdiscovery/katana", Description: "Web crawler",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat:       "zip",
+					BinaryPathInArchive: "katana",
+				},
+			},
+			{
+				Name: "ffuf", BinaryName: "ffuf", Kind: GitHubRelease, Extension: true,
+				Repo: "ffuf/ffuf", Description: "Fast web fuzzer",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "ffuf",
+				},
+			},
+			{
+				Name: "dalfox", BinaryName: "dalfox", Kind: GitHubRelease, Extension: true,
+				Repo: "hahwul/dalfox", Description: "XSS scanner",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
+					ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "aarch64"},
+					ExcludeSubstrings:   []string{"windows", ".zip", ".sha256", "checksum", ".xml"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "*/dalfox",
+				},
+			},
+			{
+				Name: "gobuster", BinaryName: "gobuster", Kind: GitHubRelease, Extension: true,
+				Repo: "OJ/gobuster", Description: "Directory/DNS brute-forcer",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "Linux", "darwin": "Darwin"},
+					ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "arm64"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "gobuster",
+				},
+			},
+			{
+				Name: "gau", BinaryName: "gau", Kind: GitHubRelease, Extension: true,
+				Repo: "lc/gau", Description: "URL fetcher",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"checksums", "windows", ".zip"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "gau",
+				},
+			},
+			{
+				Name: "gowitness", BinaryName: "gowitness", Kind: GitHubRelease, Extension: true,
+				Repo: "sensepost/gowitness", Description: "Web screenshot tool",
+				Asset: AssetPattern{
+					OSPatterns:        map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:      map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings: []string{"windows"},
+					ArchiveFormat:     "none",
+				},
 			},
 		},
 	},
 	{
 		Name:        "cloudsec",
 		Description: "Cloud security and infrastructure tools",
-		Category:    ExtCloudSec,
+		Requires:    "runtimes",
 		Tools: []Tool{
 			{
-				Name: "kubelogin", BinaryName: "kubelogin", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
+				Name: "kubelogin", BinaryName: "kubelogin", Kind: GitHubRelease, Extension: true,
 				Repo: "Azure/kubelogin", Description: "Azure Kubernetes login",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -107,7 +168,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "grpcurl", BinaryName: "grpcurl", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
+				Name: "grpcurl", BinaryName: "grpcurl", Kind: GitHubRelease, Extension: true,
 				Repo: "fullstorydev/grpcurl", Description: "curl for gRPC",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "osx"},
@@ -117,7 +178,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "terraform", BinaryName: "terraform", Kind: DirectDownload, Category: ExtCloudSec, Extension: true,
+				Name: "terraform", BinaryName: "terraform", Kind: DirectDownload, Extension: true,
 				Repo: "hashicorp/terraform", Description: "Infrastructure as code",
 				URL: "https://releases.hashicorp.com/terraform/{version_bare}/terraform_{version_bare}_{os}_{arch}.zip",
 				Asset: AssetPattern{
@@ -126,13 +187,13 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "kubectl", BinaryName: "kubectl", Kind: DirectDownload, Category: ExtCloudSec, Extension: true,
+				Name: "kubectl", BinaryName: "kubectl", Kind: DirectDownload, Extension: true,
 				Description: "Kubernetes CLI",
 				StableURL:   "https://dl.k8s.io/release/stable.txt",
 				URL:         "https://dl.k8s.io/release/{version}/bin/{os}/{arch}/kubectl",
 			},
 			{
-				Name: "trivy", BinaryName: "trivy", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
+				Name: "trivy", BinaryName: "trivy", Kind: GitHubRelease, Extension: true,
 				Repo: "aquasecurity/trivy", Description: "Vulnerability and misconfiguration scanner",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "Linux", "darwin": "macOS"},
@@ -143,17 +204,17 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "prowler", Kind: PythonTool, Category: ExtCloudSec, Extension: true,
+				Name: "prowler", Kind: PythonTool, Extension: true,
 				Description: "Cloud security posture scanner",
-				PyTool:      "prowler", Requires: "runtimes",
+				PyTool:      "prowler",
 			},
 			{
-				Name: "oci-cli", Kind: PythonTool, Category: ExtCloudSec, Extension: true,
+				Name: "oci-cli", Kind: PythonTool, Extension: true,
 				Description: "Oracle Cloud Infrastructure CLI",
-				PyTool:      "oci-cli", Requires: "runtimes",
+				PyTool:      "oci-cli",
 			},
 			{
-				Name: "tofu", BinaryName: "tofu", Kind: GitHubRelease, Category: ExtCloudSec, Extension: true,
+				Name: "tofu", BinaryName: "tofu", Kind: GitHubRelease, Extension: true,
 				Repo: "opentofu/opentofu", Description: "OpenTofu infrastructure as code",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -166,140 +227,11 @@ var extensionPacks = []ExtensionPack{
 		},
 	},
 	{
-		Name:        "appsec",
-		Description: "Application security tools",
-		Category:    ExtAppSec,
-		Tools: []Tool{
-			{
-				Name: "katana", BinaryName: "katana", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
-				Repo: "projectdiscovery/katana", Description: "Web crawler",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat:       "zip",
-					BinaryPathInArchive: "katana",
-				},
-			},
-			{
-				Name: "ffuf", BinaryName: "ffuf", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
-				Repo: "ffuf/ffuf", Description: "Fast web fuzzer",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "ffuf",
-				},
-			},
-			{
-				Name: "dalfox", BinaryName: "dalfox", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
-				Repo: "hahwul/dalfox", Description: "XSS scanner",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
-					ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "aarch64"},
-					ExcludeSubstrings:   []string{"windows", ".zip", ".sha256", "checksum", ".xml"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "*/dalfox",
-				},
-			},
-			{
-				Name: "gobuster", BinaryName: "gobuster", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
-				Repo: "OJ/gobuster", Description: "Directory/DNS brute-forcer",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "Linux", "darwin": "Darwin"},
-					ArchPatterns:        map[string]string{"amd64": "x86_64", "arm64": "arm64"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "gobuster",
-				},
-			},
-			{
-				Name: "gau", BinaryName: "gau", Kind: GitHubRelease, Category: ExtAppSec, Extension: true,
-				Repo: "lc/gau", Description: "URL fetcher",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"checksums", "windows", ".zip"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "gau",
-				},
-			},
-		},
-	},
-	{
-		Name:        "misc",
-		Description: "Miscellaneous utility tools",
-		Category:    ExtMisc,
-		Tools: []Tool{
-			{
-				Name: "gowitness", BinaryName: "gowitness", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
-				Repo: "sensepost/gowitness", Description: "Web screenshot tool",
-				Asset: AssetPattern{
-					OSPatterns:        map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:      map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings: []string{"windows"},
-					ArchiveFormat:     "none",
-				},
-			},
-			{
-				Name: "age", BinaryName: "age", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
-				Repo: "FiloSottile/age", Description: "File encryption tool",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"windows", "freebsd"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "age/age",
-				},
-			},
-			{
-				Name: "sq", BinaryName: "sq", Kind: GitHubRelease, Category: ExtMisc, Extension: true,
-				Repo: "neilotoole/sq", Description: "jq-like data wrangler for databases",
-				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ExcludeSubstrings:   []string{"windows", ".deb", ".rpm", ".apk", ".zst", "checksums"},
-					ArchiveFormat:       "tar.gz",
-					BinaryPathInArchive: "sq",
-				},
-			},
-			{
-				Name: "neo4j", Kind: AppBundle, Category: ExtMisc, Extension: true, Requires: "runtimes",
-				Description:  "Graph database with cypher-shell and browser UI",
-				URL:          "https://dist.neo4j.org/neo4j-community-{version}-unix.tar.gz",
-				StableURL:    "https://repo1.maven.org/maven2/org/neo4j/neo4j/maven-metadata.xml",
-				VersionRegex: `<release>([^<]+)</release>`,
-				PostInstall:  "neo4j",
-				Asset:        AssetPattern{ArchiveFormat: "tar.gz"},
-			},
-			{
-				Name: "gopls", Kind: CustomScript, Category: ExtMisc, Extension: true, Requires: "runtimes",
-				Description: "Go language server",
-				InstallCmd:  "go install golang.org/x/tools/gopls@latest",
-			},
-			{
-				Name: "pyright", Kind: NodePackage, Category: ExtMisc, Extension: true, Requires: "runtimes",
-				Description: "Python language server (type checking)",
-				NodePkg:     "pyright",
-			},
-			{
-				Name: "typescript-language-server", Kind: NodePackage, Category: ExtMisc, Extension: true, Requires: "runtimes",
-				Description: "TypeScript/JavaScript language server",
-				// typescript@7 dropped the tsserver binary this server drives, so the major is pinned rather than tracking latest.
-				NodePkg: "typescript-language-server typescript@5",
-			},
-			{
-				Name: "ruff", Kind: PythonTool, Category: ExtMisc, Extension: true, Requires: "runtimes",
-				Description: "Python linter and formatter with a language server",
-				PyTool:      "ruff",
-			},
-		},
-	},
-	{
 		Name:        "private",
 		Description: "Private tools (requires --gh-token)",
-		Category:    ExtPrivate,
 		Tools: []Tool{
 			{
-				Name: "nits", BinaryName: "nits", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
+				Name: "nits", BinaryName: "nits", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/nits", Description: "Nits tool",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -308,7 +240,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "gcli", BinaryName: "gcli", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
+				Name: "gcli", BinaryName: "gcli", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/gcli", Description: "Gcli tool",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -317,7 +249,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "box", BinaryName: "box", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
+				Name: "box", BinaryName: "box", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/box-cli", Description: "Box CLI tool",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -326,7 +258,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "claudex", BinaryName: "claudex", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
+				Name: "claudex", BinaryName: "claudex", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/claudex", Description: "Claudex tool",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -335,7 +267,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "toon", BinaryName: "toon", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
+				Name: "toon", BinaryName: "toon", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/toon", Description: "Private Toon tool", IsPrivate: true,
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -345,7 +277,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "cybernest", BinaryName: "cybernest", Kind: GitHubRelease, Category: ExtPrivate, Extension: true,
+				Name: "cybernest", BinaryName: "cybernest", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/cybernest", Description: "Private Cybernest tool", IsPrivate: true,
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -358,10 +290,9 @@ var extensionPacks = []ExtensionPack{
 	{
 		Name:        "essentials",
 		Description: "Core CLI binaries and starship prompt config",
-		Category:    ExtEssentials,
 		Tools: []Tool{
 			{
-				Name: "bat", BinaryName: "bat", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "bat", BinaryName: "bat", Kind: GitHubRelease, Extension: true,
 				Repo: "sharkdp/bat", Description: "Cat clone with syntax highlighting",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -372,7 +303,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "fd", BinaryName: "fd", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "fd", BinaryName: "fd", Kind: GitHubRelease, Extension: true,
 				Repo: "sharkdp/fd", Description: "Simple fast alternative to find",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -383,7 +314,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "ripgrep", BinaryName: "rg", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "ripgrep", BinaryName: "rg", Kind: GitHubRelease, Extension: true,
 				Repo: "BurntSushi/ripgrep", Description: "Fast recursive grep",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -393,7 +324,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "lsd", BinaryName: "lsd", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "lsd", BinaryName: "lsd", Kind: GitHubRelease, Extension: true,
 				Repo: "lsd-rs/lsd", Description: "Next gen ls command",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -404,7 +335,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "jq", BinaryName: "jq", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "jq", BinaryName: "jq", Kind: GitHubRelease, Extension: true,
 				Repo: "jqlang/jq", Description: "Command-line JSON processor",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "macos"},
@@ -413,7 +344,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "yq", BinaryName: "yq", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "yq", BinaryName: "yq", Kind: GitHubRelease, Extension: true,
 				Repo: "mikefarah/yq", Description: "YAML processor",
 				Asset: AssetPattern{
 					OSPatterns:        map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -423,7 +354,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "fzf", BinaryName: "fzf", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "fzf", BinaryName: "fzf", Kind: GitHubRelease, Extension: true,
 				Repo: "junegunn/fzf", Description: "Fuzzy finder",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -433,7 +364,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "gh", BinaryName: "gh", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "gh", BinaryName: "gh", Kind: GitHubRelease, Extension: true,
 				Repo: "cli/cli", Description: "GitHub CLI",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macOS"},
@@ -443,7 +374,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "tree-sitter", BinaryName: "tree-sitter", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "tree-sitter", BinaryName: "tree-sitter", Kind: GitHubRelease, Extension: true,
 				Repo: "tree-sitter/tree-sitter", Description: "Tree-sitter CLI (builds Neovim parsers)",
 				Asset: AssetPattern{
 					OSPatterns:         map[string]string{"linux": "linux", "darwin": "macos"},
@@ -453,7 +384,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "gron", BinaryName: "gron", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "gron", BinaryName: "gron", Kind: GitHubRelease, Extension: true,
 				Repo: "tomnomnom/gron", Description: "Make JSON greppable",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -463,7 +394,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "zoxide", BinaryName: "zoxide", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "zoxide", BinaryName: "zoxide", Kind: GitHubRelease, Extension: true,
 				Repo: "ajeetdsouza/zoxide", Description: "Smarter cd command",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -474,7 +405,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "sd", BinaryName: "sd", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "sd", BinaryName: "sd", Kind: GitHubRelease, Extension: true,
 				Repo: "chmln/sd", Description: "Find and replace CLI tool",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -485,7 +416,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "starship", BinaryName: "starship", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "starship", BinaryName: "starship", Kind: GitHubRelease, Extension: true,
 				Repo: "starship/starship", Description: "Minimal, fast, cross-shell prompt",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "apple"},
@@ -496,7 +427,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "anbu", BinaryName: "anbu", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "anbu", BinaryName: "anbu", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/anbu", Description: "Anbu tool",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -506,7 +437,7 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "danzo", BinaryName: "danzo", Kind: GitHubRelease, Category: ExtEssentials, Extension: true,
+				Name: "danzo", BinaryName: "danzo", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/danzo", Description: "Danzo tool",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -515,34 +446,55 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "starship-config", Kind: ConfigFile, Category: ExtEssentials, Extension: true,
+				Name: "starship-config", Kind: ConfigFile, Extension: true,
 				Description: "Starship prompt configuration",
+			},
+			{
+				Name: "age", BinaryName: "age", Kind: GitHubRelease, Extension: true,
+				Repo: "FiloSottile/age", Description: "File encryption tool",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows", "freebsd"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "age/age",
+				},
+			},
+			{
+				Name: "sq", BinaryName: "sq", Kind: GitHubRelease, Extension: true,
+				Repo: "neilotoole/sq", Description: "jq-like data wrangler for databases",
+				Asset: AssetPattern{
+					OSPatterns:          map[string]string{"linux": "linux", "darwin": "macos"},
+					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ExcludeSubstrings:   []string{"windows", ".deb", ".rpm", ".apk", ".zst", "checksums"},
+					ArchiveFormat:       "tar.gz",
+					BinaryPathInArchive: "sq",
+				},
 			},
 		},
 	},
 	{
 		Name:        "core",
 		Description: "Dev tools, network utils, and media packages",
-		Category:    ExtSystem,
 		Tools: []Tool{
 			{
-				Name: "dev-tools", Kind: SystemPackage, Category: ExtSystem, Extension: true,
+				Name: "dev-tools", Kind: SystemPackage, Extension: true,
 				Description: "Development build tools",
 				Platforms:   []string{"linux"},
 				BrewPkgs:    []string{"cmake", "gcc", "make", "ninja", "gettext"},
 			},
 			{
-				Name: "network-tools", Kind: SystemPackage, Category: ExtSystem, Extension: true,
+				Name: "network-tools", Kind: SystemPackage, Extension: true,
 				Description: "Network utilities",
 				BrewPkgs:    []string{"nmap", "openssl"},
 			},
 			{
-				Name: "media-tools", Kind: SystemPackage, Category: ExtSystem, Extension: true,
+				Name: "media-tools", Kind: SystemPackage, Extension: true,
 				Description: "Media and monitoring tools",
 				BrewPkgs:    []string{"ffmpeg"},
 			},
 			{
-				Name: "aerospace", Kind: SystemPackage, Category: ExtSystem, Extension: true,
+				Name: "aerospace", Kind: SystemPackage, Extension: true,
 				Description: "macOS tiling window manager",
 				Platforms:   []string{"darwin"},
 				BrewCasks:   []string{"nikitabobko/tap/aerospace"},
@@ -552,20 +504,19 @@ var extensionPacks = []ExtensionPack{
 	{
 		Name:        "cloud",
 		Description: "Cloud CLIs (AWS, Azure, GCP)",
-		Category:    ExtCloud,
 		Tools: []Tool{
 			{
-				Name: "aws-cli", Kind: SystemPackage, Category: ExtCloud, Extension: true,
+				Name: "aws-cli", Kind: SystemPackage, Extension: true,
 				Description: "AWS CLI v2",
 				BrewPkgs:    []string{"awscli"},
 			},
 			{
-				Name: "azure-cli", Kind: SystemPackage, Category: ExtCloud, Extension: true,
+				Name: "azure-cli", Kind: SystemPackage, Extension: true,
 				Description: "Azure CLI",
 				BrewPkgs:    []string{"azure-cli"},
 			},
 			{
-				Name: "gcloud-cli", Kind: SystemPackage, Category: ExtCloud, Extension: true,
+				Name: "gcloud-cli", Kind: SystemPackage, Extension: true,
 				Description: "Google Cloud CLI",
 				BrewCasks:   []string{"gcloud-cli"},
 			},
@@ -573,19 +524,18 @@ var extensionPacks = []ExtensionPack{
 	},
 	{
 		Name:        "runtimes",
-		Description: "Language runtimes (Go, Rust, Python, Node)",
-		Category:    ExtRuntimes,
+		Description: "Language runtimes and language servers",
 		Tools: []Tool{
 			{
-				Name: "uv", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Name: "uv", Kind: LanguageRuntime, Extension: true,
 				Description: "Python package manager (binary only)",
 			},
 			{
-				Name: "fnm", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Name: "fnm", Kind: LanguageRuntime, Extension: true,
 				Description: "Node version manager (binary only)",
 			},
 			{
-				Name: "bun", BinaryName: "bun", Kind: GitHubRelease, Category: ExtRuntimes, Extension: true,
+				Name: "bun", BinaryName: "bun", Kind: GitHubRelease, Extension: true,
 				Repo: "oven-sh/bun", Description: "JavaScript runtime",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -596,39 +546,60 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
-				Name: "go-sdk", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Name: "go-sdk", Kind: LanguageRuntime, Extension: true,
 				Description: "Go programming language SDK",
 			},
 			{
-				Name: "java-sdk", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Name: "java-sdk", Kind: LanguageRuntime, Extension: true,
 				Description: "Eclipse Temurin JDK (latest LTS)",
 			},
 			{
-				Name: "python", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Name: "python", Kind: LanguageRuntime, Extension: true,
 				Description: "Python via uv + py-default venv",
 			},
 			{
-				Name: "rust", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Name: "rust", Kind: LanguageRuntime, Extension: true,
 				Description: "Rust toolchain via rustup",
 			},
 			{
-				Name: "node", Kind: LanguageRuntime, Category: ExtRuntimes, Extension: true,
+				Name: "node", Kind: LanguageRuntime, Extension: true,
 				Description: "Node.js LTS via fnm",
+			},
+			{
+				Name: "gopls", Kind: CustomScript, Extension: true,
+				Description: "Go language server",
+				InstallCmd:  "go install golang.org/x/tools/gopls@latest",
+			},
+			{
+				Name: "pyright", Kind: NodePackage, Extension: true,
+				Description: "Python language server (type checking)",
+				NodePkg:     "pyright",
+			},
+			{
+				Name: "typescript-language-server", Kind: NodePackage, Extension: true,
+				Description: "TypeScript/JavaScript language server",
+				// typescript@7 dropped the tsserver binary this server drives, so the major is pinned rather than tracking latest.
+				NodePkg: "typescript-language-server typescript@5",
+			},
+			{
+				Name: "ruff", Kind: PythonTool, Extension: true,
+				Description: "Python linter and formatter with a language server",
+				PyTool:      "ruff",
 			},
 		},
 	},
 	{
 		Name:        "ai-tools",
 		Description: "AI coding agents and LLM CLIs",
-		Category:    ExtAITools,
+		Requires:    "runtimes",
 		Tools: []Tool{
 			{
-				Name: "claude-code", Kind: NodePackage, Category: ExtAITools, Extension: true,
+				Name: "claude-code", Kind: NodePackage, Extension: true,
 				Description: "Anthropic Claude Code CLI agent",
-				NodePkg:     "@anthropic-ai/claude-code", Requires: "runtimes",
+				NodePkg:     "@anthropic-ai/claude-code",
 			},
 			{
-				Name: "antigravity", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Name: "antigravity", Kind: CustomScript, Extension: true,
 				Description: "Google Antigravity CLI agent",
 				InstallCmd: `set -eo pipefail
 DEST_DIR="$HOME/shell/extensions"
@@ -655,12 +626,12 @@ install -m 0755 "$TMP/antigravity" "$DEST_DIR/agy"
 `,
 			},
 			{
-				Name: "codex", Kind: NodePackage, Category: ExtAITools, Extension: true,
+				Name: "codex", Kind: NodePackage, Extension: true,
 				Description: "OpenAI Codex CLI agent",
-				NodePkg:     "@openai/codex", Requires: "runtimes",
+				NodePkg:     "@openai/codex",
 			},
 			{
-				Name: "cursor-agent", Kind: CustomScript, Category: ExtAITools, Extension: true,
+				Name: "cursor-agent", Kind: CustomScript, Extension: true,
 				Description: "Cursor headless coding agent",
 				InstallCmd: `set -eo pipefail
 DEST_DIR="$HOME/shell/extensions"
@@ -694,10 +665,10 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 	{
 		Name:        "homelab",
 		Description: "Self-hosted homelab services",
-		Category:    ExtHomelab,
+		Requires:    "runtimes",
 		Tools: []Tool{
 			{
-				Name: "caddy", BinaryName: "caddy", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Name: "caddy", BinaryName: "caddy", Kind: GitHubRelease, Extension: true,
 				Repo: "caddyserver/caddy", Description: "Web server / reverse proxy",
 				Asset: AssetPattern{
 					OSPatterns:          map[string]string{"linux": "linux", "darwin": "mac"},
@@ -708,7 +679,7 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 				},
 			},
 			{
-				Name: "linksnapper", BinaryName: "linksnapper", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Name: "linksnapper", BinaryName: "linksnapper", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/linksnapper", Description: "LinkSnapper bookmark manager",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -717,7 +688,7 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 				},
 			},
 			{
-				Name: "kairo", BinaryName: "kairo", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Name: "kairo", BinaryName: "kairo", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/kairo", Description: "Kairo markdown note-taking app",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -726,7 +697,7 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 				},
 			},
 			{
-				Name: "raikiri", BinaryName: "raikiri", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Name: "raikiri", BinaryName: "raikiri", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/raikiri", Description: "Self-hosted media and music server",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -735,7 +706,7 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 				},
 			},
 			{
-				Name: "expenseowl", BinaryName: "expenseowl", Kind: GitHubRelease, Category: ExtHomelab, Extension: true,
+				Name: "expenseowl", BinaryName: "expenseowl", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/expenseowl", Description: "Self-hosted expense tracker",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -744,7 +715,7 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 				},
 			},
 			{
-				Name: "rinnegan", Kind: AppBundle, Category: ExtHomelab, Extension: true,
+				Name: "rinnegan", Kind: AppBundle, Extension: true,
 				Repo: "Tanq16/rinnegan", Description: "Self-contained PTY web terminal",
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
@@ -753,7 +724,7 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 				},
 			},
 			{
-				Name: "code-server", Kind: AppBundle, Category: ExtHomelab, Extension: true,
+				Name: "code-server", Kind: AppBundle, Extension: true,
 				Repo: "coder/code-server", Description: "VS Code in the browser",
 				PostInstall: "code-server",
 				Asset: AssetPattern{
@@ -762,6 +733,15 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 					ExcludeSubstrings: []string{".deb", ".rpm"},
 					ArchiveFormat:     "tar.gz",
 				},
+			},
+			{
+				Name: "neo4j", Kind: AppBundle, Extension: true,
+				Description:  "Graph database with cypher-shell and browser UI",
+				URL:          "https://dist.neo4j.org/neo4j-community-{version}-unix.tar.gz",
+				StableURL:    "https://repo1.maven.org/maven2/org/neo4j/neo4j/maven-metadata.xml",
+				VersionRegex: `<release>([^<]+)</release>`,
+				PostInstall:  "neo4j",
+				Asset:        AssetPattern{ArchiveFormat: "tar.gz"},
 			},
 		},
 	},
