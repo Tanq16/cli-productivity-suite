@@ -8,7 +8,7 @@ const (
 	SystemPackage
 	LanguageRuntime
 	ConfigFile
-	ShellPlugin
+	RepoSnapshot
 	CustomScript
 	NodePackage
 	PythonTool
@@ -27,8 +27,8 @@ func (k ToolKind) String() string {
 		return "language-runtime"
 	case ConfigFile:
 		return "config-file"
-	case ShellPlugin:
-		return "shell-plugin"
+	case RepoSnapshot:
+		return "repo-snapshot"
 	case CustomScript:
 		return "custom-script"
 	case NodePackage:
@@ -37,69 +37,6 @@ func (k ToolKind) String() string {
 		return "python-tool"
 	case AppBundle:
 		return "app-bundle"
-	default:
-		return "unknown"
-	}
-}
-
-type ToolCategory int
-
-const (
-	Core ToolCategory = iota
-	Private
-	System
-	Runtime
-	Config
-	Shell
-	ExtEssentials
-	ExtSecurity
-	ExtCloudSec
-	ExtAppSec
-	ExtMisc
-	ExtPrivate
-	ExtSystem
-	ExtCloud
-	ExtRuntimes
-	ExtAITools
-	ExtHomelab
-)
-
-func (c ToolCategory) String() string {
-	switch c {
-	case Core:
-		return "core"
-	case Private:
-		return "private"
-	case System:
-		return "system"
-	case Runtime:
-		return "runtime"
-	case Config:
-		return "config"
-	case Shell:
-		return "shell"
-	case ExtEssentials:
-		return "ext-essentials"
-	case ExtSecurity:
-		return "ext-security"
-	case ExtCloudSec:
-		return "ext-cloud-sec"
-	case ExtAppSec:
-		return "ext-app-sec"
-	case ExtMisc:
-		return "ext-misc"
-	case ExtPrivate:
-		return "ext-private"
-	case ExtSystem:
-		return "ext-system"
-	case ExtCloud:
-		return "ext-cloud"
-	case ExtRuntimes:
-		return "ext-runtimes"
-	case ExtAITools:
-		return "ext-ai-tools"
-	case ExtHomelab:
-		return "ext-homelab"
 	default:
 		return "unknown"
 	}
@@ -119,7 +56,6 @@ type Tool struct {
 	Name        string
 	BinaryName  string // name of the installed binary in ~/shell/extensions/
 	Kind        ToolKind
-	Category    ToolCategory
 	Extension   bool   // false = base tool installed by cps init; true = installed by cps extend
 	Repo        string // "owner/repo" for GitHub tools
 	Asset       AssetPattern
@@ -130,12 +66,10 @@ type Tool struct {
 	Description string
 	URL         string // for DirectDownload and URL-sourced AppBundle: URL template with {version}, {os}, {arch}
 	StableURL   string // for DirectDownload: URL to fetch latest stable version string
-	CloneURL    string // for ShellPlugin: full git clone URL
-	CloneDest   string // for ShellPlugin: destination path (can use ~ for home)
+	Dest        string // for RepoSnapshot: destination directory (can use ~ for home)
 	InstallCmd  string // for CustomScript: shell command run via bash -c
 	NodePkg     string // for NodePackage: npm package spec, e.g. "@openai/codex"
 	PyTool      string // for PythonTool: uv tool name, e.g. "prowler"
-	Requires    string // display-only prerequisite pack name; not enforced at install time
 
 	VersionRegex string // applied to a StableURL body that is not a bare version string; first capture group wins
 	PostInstall  string // for AppBundle: identifier for post-install hook logic
