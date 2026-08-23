@@ -20,8 +20,8 @@ func buildCPSSheet() string {
 	b.WriteString(cmdStyle.Render("  cps extend list") + "                 List available packs\n")
 	b.WriteString(cmdStyle.Render("  cps extend <pack>") + "               Install entire extension pack\n")
 	b.WriteString(cmdStyle.Render("  cps extend <pack> <tool> ...") + "    Install specific tools from a pack\n")
-	b.WriteString(noteStyle.Render("  Packs: essentials, core, cloud, runtimes, security, cloudsec, appsec,") + "\n")
-	b.WriteString(noteStyle.Render("         misc, private, ai-tools, homelab") + "\n")
+	b.WriteString(noteStyle.Render("  Packs: essentials, core, cloud, runtimes, security, cloudsec,") + "\n")
+	b.WriteString(noteStyle.Render("         private, ai-tools, homelab") + "\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Shell Integration — RC Fragments") + "\n")
@@ -30,7 +30,7 @@ func buildCPSSheet() string {
 	b.WriteString(noteStyle.Render("  10-runtimes.zsh    deployed by cps extend runtimes") + "\n")
 	b.WriteString(noteStyle.Render("  20-cloud.zsh       deployed by cps extend cloud") + "\n")
 	b.WriteString(noteStyle.Render("  30-security.zsh    deployed by cps extend security") + "\n")
-	b.WriteString(noteStyle.Render("  40-misc.zsh        deployed by cps extend misc") + "\n")
+	b.WriteString(noteStyle.Render("  50-homelab.zsh     deployed by cps extend homelab") + "\n")
 	b.WriteString(noteStyle.Render("  custom/*.zsh       user-managed fragments") + "\n")
 	b.WriteString(divider + "\n")
 

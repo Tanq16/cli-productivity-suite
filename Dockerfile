@@ -90,12 +90,6 @@ RUN cps extend security \
 RUN cps extend cloudsec \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
  && sleep 20
-RUN cps extend appsec \
- && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
- && sleep 20
-RUN cps extend misc \
- && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \
- && sleep 20
 
 RUN cps extend ai-tools \
  && sudo rm -rf ~/.cache ~/shell/npm-cache ~/shell/go/cache \

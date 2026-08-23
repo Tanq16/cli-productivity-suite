@@ -19,7 +19,7 @@ A single Go binary (`cps`) that sets up and manages a complete CLI development e
 | Extensions | `extend <pack>`, `extend <pack> <tool>`, `extend list` | Install tool packs or individual tools — CLI binaries, language runtimes, cloud CLIs, security tooling, self-hosted services |
 | Appearance | `theme`, `theme <name>` | Switch the terminal colour palette — 15 themes, re-colouring kitty, tmux, Neovim and the CLI tools at once |
 | Reference | `cheat <topic>` | Terminal cheat sheets for `cps`, Go, Java, uv, fnm, bun, Rust, tmux, nvim, fzf, jq, regex |
-| Maintenance | `self-update` | Update the `cps` binary in place |
+| Maintenance | `self-update` | Update the `cps` binary in place, prompting for any migration the new version needs |
 
 ## Prerequisites
 
@@ -90,7 +90,7 @@ Neovim installs as an app bundle under `~/shell/apps/neovim`, with `~/shell/exte
 
 The config leans on Neovim 0.12 natives — `vim.pack`, the built-in LSP client and completion, `gc` comments, `]b`/`[b` and `]d`/`[d`, `listchars` indent guides — plus five plugins: `fzf-lua`, `nvim-tree`, `gitsigns`, `nvim-autopairs`, and `nvim-treesitter` (Go, Python, JavaScript, TypeScript, Bash, Lua, JSON, YAML, Markdown). Plugins and parsers install on first launch, in the background. Parser compilation needs the `tree-sitter` CLI from the `essentials` pack; without it Neovim falls back to bundled regex syntax.
 
-Colors are inherited from the terminal: `termguicolors` is off, so highlights resolve against ANSI 0–15 and follow your terminal theme. The statusline is hand-rolled from those same indices — mode, git branch, path, diagnostics, filetype and position — and capped with the glyphs the tmux bar uses, so the two read as one design. LSP is wired for `gopls`, `pyright`, `ruff`, and `ts_ls`, each enabled only when its binary is on `PATH` — `cps extend misc` installs all four. Python gets two servers because they cover different ground: `ruff` lints and formats, `pyright` supplies types, hover and go-to-definition.
+Colors are inherited from the terminal: `termguicolors` is off, so highlights resolve against ANSI 0–15 and follow your terminal theme. The statusline is hand-rolled from those same indices — mode, git branch, path, diagnostics, filetype and position — and capped with the glyphs the tmux bar uses, so the two read as one design. LSP is wired for `gopls`, `pyright`, `ruff`, and `ts_ls`, each enabled only when its binary is on `PATH` — `cps extend runtimes` installs all four. Python gets two servers because they cover different ground: `ruff` lints and formats, `pyright` supplies types, hover and go-to-definition.
 
 #### tmux
 
@@ -98,7 +98,7 @@ tmux runs with no plugins and no plugin manager — `.tmux.conf` is the whole co
 
 Everything else via `cps extend` is optional — install what you need.
 
-> **Pack ordering for runtime-backed extensions.** A few tools install *through* a runtime rather than downloading a binary, so they need `cps extend runtimes` first. `cps extend list` marks each one `(needs runtimes)`. The npm-backed CLIs (`claude-code`, `codex`) need fnm's node on PATH — install `runtimes`, then re-source your shell (or open a new one) so `fnm env` has run, otherwise CPS reports `npm install <pkg> failed`. The uv-backed Python CLIs (`prowler`, `oci-cli`) resolve `uv` automatically once it is installed. Everything else, including `antigravity` and `cursor-agent`, downloads a standalone binary and has no runtime dependency.
+> **Pack ordering for runtime-backed extensions.** A few tools install *through* a runtime rather than downloading a binary, so they need `cps extend runtimes` first. `cps extend list` marks their pack `(needs runtimes)`. The npm-backed CLIs (`claude-code`, `codex`) need fnm's node on PATH — install `runtimes`, then re-source your shell (or open a new one) so `fnm env` has run, otherwise CPS reports `npm install <pkg> failed`. The uv-backed Python CLIs (`prowler`, `oci-cli`) resolve `uv` automatically once it is installed, and neo4j needs the JVM that `runtimes` installs. Everything else, including `antigravity` and `cursor-agent`, downloads a standalone binary and has no runtime dependency.
 
 ### `cps extend <pack> [tools...]`
 
@@ -113,21 +113,19 @@ cps extend security nuclei subfinder  # pick specific tools
 
 | Pack | Contents |
 |---|---|
-| essentials | Everyday CLI binaries (bat, fd, ripgrep, lsd, jq, yq, fzf, gh, gron, zoxide, sd, starship, tree-sitter, anbu, danzo) + starship.toml |
+| essentials | Everyday CLI binaries (bat, fd, ripgrep, lsd, jq, yq, fzf, gh, gron, zoxide, sd, starship, tree-sitter, anbu, danzo, age, sq) + starship.toml |
 | core | Dev tools, network utils, media packages (cmake, nmap, ffmpeg, aerospace) |
-| runtimes | uv, fnm, bun, Go, Java (Temurin LTS), Python (via uv), Rust, Node.js LTS (via fnm) |
+| runtimes | uv, fnm, bun, Go, Java (Temurin LTS), Python (via uv), Rust, Node.js LTS (via fnm) + language servers (gopls, pyright, typescript-language-server, ruff) |
 | cloud | AWS CLI, Azure CLI, gcloud CLI |
-| security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, nuclei-templates |
+| security | nuclei, naabu, subfinder, proxify, httpx, dnsx, trufflehog, nuclei-templates, katana, ffuf, dalfox, gobuster, gau, gowitness |
 | cloudsec | terraform, kubectl, kubelogin, grpcurl, trivy, tofu, prowler¹, oci-cli¹ |
-| appsec | katana, ffuf, dalfox, gobuster, gau |
-| misc | gowitness, age, sq, neo4j¹ (app bundle), language servers (gopls¹, pyright¹, typescript-language-server¹, ruff¹) |
 | private | Personal tools — public subset (`nits`, `gcli`, `box`, `claudex`) installs as-is; the truly-private two (`toon`, `cybernest`) need `--gh-token` |
 | ai-tools | AI coding agents (antigravity, cursor-agent, claude-code¹, codex¹) |
-| homelab | Self-hosted services (caddy, linksnapper, kairo, raikiri, expenseowl) + app bundles (rinnegan, code-server) |
+| homelab | Self-hosted services (caddy, linksnapper, kairo, raikiri, expenseowl) + app bundles (rinnegan, code-server, neo4j¹) |
 
-¹ Needs `cps extend runtimes` first — `cps extend list` marks these as `(needs runtimes)`.
+¹ Needs `cps extend runtimes` first — `cps extend list` marks the whole pack `(needs runtimes)`.
 
-Packs with shell integration (`runtimes`, `cloud`, `security`, `misc`) deploy RC fragments automatically.
+Packs with shell integration (`runtimes`, `cloud`, `security`, `homelab`) deploy RC fragments automatically.
 
 ### `cps theme [name]`
 
@@ -170,7 +168,7 @@ CPS uses a modular fragment system instead of a monolithic `.zshrc`:
 | `~/shell/rc/10-runtimes.zsh` | `cps extend runtimes` |
 | `~/shell/rc/20-cloud.zsh` | `cps extend cloud` |
 | `~/shell/rc/30-security.zsh` | `cps extend security` |
-| `~/shell/rc/40-misc.zsh` | `cps extend misc` |
+| `~/shell/rc/50-homelab.zsh` | `cps extend homelab` |
 | `~/shell/rc/custom/*.zsh` | User-managed |
 
 `~/.zshrc` is a thin loader that sources all fragments in order.
@@ -193,8 +191,10 @@ Both `~/shell/rc/custom/` and `~/shell/custom-bin/` are created by `cps init` an
 - CPS-installed binaries all land in `~/shell/extensions/` (on PATH)
 - User-owned binaries live in `~/shell/custom-bin/` (also on PATH, prepended ahead of the CPS-managed dirs, so yours wins on a name collision)
 - App bundles (`rinnegan`, `code-server`, `neo4j`) unpack to `~/shell/apps/<name>/` instead — they are multi-file trees, not single binaries, so they are **not** on PATH. Launch them by full path (see below). `rinnegan` and `code-server` carry their own Node runtime; `neo4j` does not ship a JVM and runs on the `JAVA_HOME` that `cps extend runtimes` sets up
-- Upgrading an app bundle replaces the whole tree, so nothing user-owned may live inside one. Neo4j would otherwise keep its databases in `~/shell/apps/neo4j/data/`, so `cps extend misc` relocates them: it seeds `~/.config/neo4j/conf/` once (never overwriting it afterwards) with absolute `server.directories.*` paths, and `40-misc.zsh` exports `NEO4J_CONF` so Neo4j reads that conf instead of the bundle's. Your graph, plugins, and tuning live in `~/.config/neo4j/` and survive every upgrade — and `deep-removal.sh` leaves them alone
+- Upgrading an app bundle replaces the whole tree, so nothing user-owned may live inside one. Neo4j would otherwise keep its databases in `~/shell/apps/neo4j/data/`, so `cps extend homelab` relocates them: it seeds `~/.config/neo4j/conf/` once (never overwriting it afterwards) with absolute `server.directories.*` paths, and `50-homelab.zsh` exports `NEO4J_CONF` so Neo4j reads that conf instead of the bundle's. Your graph, plugins, and tuning live in `~/.config/neo4j/` and survive every upgrade — and `deep-removal.sh` leaves them alone
 - State tracked in `~/.config/cps/state.json` — runs are idempotent, already-current tools are skipped
+- The zsh plugins and `nuclei-templates` are snapshots, not clones: CPS downloads the default branch as a tarball, unpacks it, and swaps it into place with no `.git` at all. An update replaces the directory wholesale, so keep nothing of your own in `~/shell/plugins/` or `~/shell/nuclei-templates`. Custom nuclei templates belong in a directory of your own that you pass with `-t`
+- After an upgrade, the first `cps` command checks the version recorded in `state.json` and prints any manual migration steps that release needs, then asks whether you have run them. Answering no exits without doing anything; answering yes records the new version so the prompt does not return
 - If `gh` CLI is authenticated, CPS uses its token automatically — no need for `--gh-token`
 - `00-base.zsh` exports `HOMEBREW_NO_AUTO_UPDATE=1` so `brew install` stays fast and deterministic. If you want brew to auto-update on every invocation, drop `unset HOMEBREW_NO_AUTO_UPDATE` into a file under `~/shell/rc/custom/`
 
@@ -252,7 +252,7 @@ The prebuilt image is intentionally a **drop-in toolkit for AI coding agents** �
 - **The agent CLIs themselves** — `claude`, `codex`, `cursor-agent`, `agy` (antigravity) (the `ai-tools` pack is pre-installed)
 - **Language runtimes the agent will reach for** — Go, Node (via fnm), Bun, Python (via uv), Rust, Java (Temurin LTS), all on PATH with no further setup
 - **Everyday CLI building blocks** — bat, fd, ripgrep, lsd, jq, yq, fzf, gh, zoxide, gron, sd, starship, tree-sitter, plus tmux + neovim
-- **Cloud + security tooling** — aws/azure/gcloud CLIs, kubectl, terraform, trivy, nuclei, httpx, dnsx, subfinder, ffuf, katana, and the rest of the security/cloudsec/appsec packs
+- **Cloud + security tooling** — aws/azure/gcloud CLIs, kubectl, terraform, trivy, nuclei, httpx, dnsx, subfinder, ffuf, katana, and the rest of the security and cloudsec packs
 - **Sandbox isolation** — everything runs as the non-root `cps` user inside a disposable container; `sudo` is available for ad-hoc package installs without polluting your host
 
 ```bash

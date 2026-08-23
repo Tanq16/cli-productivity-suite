@@ -43,7 +43,7 @@ for f in \
     .config/nvim/init.lua \
     shell/apps/neovim/bin/nvim \
     shell/rc/00-base.zsh shell/rc/10-runtimes.zsh \
-    shell/rc/20-cloud.zsh shell/rc/30-security.zsh shell/rc/40-misc.zsh \
+    shell/rc/20-cloud.zsh shell/rc/30-security.zsh shell/rc/50-homelab.zsh \
     shell/env/brew.zsh \
     shell/completions/fzf.zsh shell/completions/uv.zsh \
     shell/completions/fnm.zsh shell/completions/zoxide.zsh \
@@ -100,23 +100,24 @@ done
 for t in kubelogin grpcurl terraform kubectl trivy prowler oci tofu; do
     check_bin "$t" "cloudsec"
 done
-# appsec
+# appsec tools now ship in security
 for t in katana ffuf dalfox gobuster gau; do
-    check_bin "$t" "appsec"
+    check_bin "$t" "security"
 done
-# misc
-for t in gowitness age sq; do check_bin "$t" "misc"; done
-# misc app bundle — neo4j needs a JVM, so check the launcher and that JAVA_HOME resolves one
-[ -x "$HOME/shell/apps/neo4j/bin/neo4j" ] || fail "misc: ~/shell/apps/neo4j/bin/neo4j"
-[ -x "$HOME/shell/apps/neo4j/bin/cypher-shell" ] || fail "misc: ~/shell/apps/neo4j/bin/cypher-shell"
-[ -x "$JAVA_HOME/bin/java" ] || fail "misc: neo4j has no JVM at \$JAVA_HOME/bin/java"
+# gowitness moved to security; age and sq to essentials
+check_bin gowitness "security"
+for t in age sq; do check_bin "$t" "essentials"; done
+# homelab app bundle — neo4j needs a JVM, so check the launcher and that JAVA_HOME resolves one
+[ -x "$HOME/shell/apps/neo4j/bin/neo4j" ] || fail "homelab: ~/shell/apps/neo4j/bin/neo4j"
+[ -x "$HOME/shell/apps/neo4j/bin/cypher-shell" ] || fail "homelab: ~/shell/apps/neo4j/bin/cypher-shell"
+[ -x "$JAVA_HOME/bin/java" ] || fail "homelab: neo4j has no JVM at \$JAVA_HOME/bin/java"
 # neo4j state must live outside the bundle, or an upgrade destroys the databases
-[ -n "$NEO4J_CONF" ] || fail "misc: NEO4J_CONF unset — neo4j would use the bundle's own conf"
-[ -f "$NEO4J_CONF/neo4j.conf" ] || fail "misc: no neo4j.conf at \$NEO4J_CONF"
+[ -n "$NEO4J_CONF" ] || fail "homelab: NEO4J_CONF unset — neo4j would use the bundle's own conf"
+[ -f "$NEO4J_CONF/neo4j.conf" ] || fail "homelab: no neo4j.conf at \$NEO4J_CONF"
 for d in data plugins import logs run licenses; do
-    [ -d "$HOME/.config/neo4j/$d" ] || fail "misc: ~/.config/neo4j/$d missing"
+    [ -d "$HOME/.config/neo4j/$d" ] || fail "homelab: ~/.config/neo4j/$d missing"
     grep -q "^server.directories.$d=$HOME/.config/neo4j/$d\$" "$NEO4J_CONF/neo4j.conf" 2>/dev/null || \
-        fail "misc: neo4j.conf does not relocate $d"
+        fail "homelab: neo4j.conf does not relocate $d"
 done
 # ai-tools
 for t in claude codex cursor-agent agy; do check_bin "$t" "ai-tools"; done
