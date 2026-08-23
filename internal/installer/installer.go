@@ -31,8 +31,8 @@ func Dispatch(kind registry.ToolKind) Installer {
 		return &LanguageRuntimeInstaller{}
 	case registry.ConfigFile:
 		return &ConfigDeployInstaller{}
-	case registry.ShellPlugin:
-		return &ShellPluginInstaller{}
+	case registry.RepoSnapshot:
+		return &RepoSnapshotInstaller{}
 	case registry.CustomScript:
 		return &CustomScriptInstaller{}
 	case registry.NodePackage:
