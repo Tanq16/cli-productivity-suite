@@ -120,7 +120,7 @@ cps extend security nuclei subfinder  # several
 | `security` | nuclei, nuclei-templates, naabu, subfinder, proxify, httpx, dnsx, trufflehog, katana, ffuf, dalfox, gobuster, gau, gowitness |
 | `cloudsec` | terraform, tofu, kubectl, kubelogin, grpcurl, trivy, prowler, oci-cli |
 | `ai-tools` | antigravity, cursor-agent, claude-code, codex |
-| `homelab` | caddy, yt-dlp, linksnapper, kairo, raikiri, expenseowl, telly, and the rinnegan, code-server and neo4j app bundles. telly needs `--gh-token` |
+| `homelab` | caddy, yt-dlp, goff, backhub, local-content-share, linksnapper, kairo, raikiri, expenseowl, telly, and the rinnegan, code-server and neo4j app bundles. telly needs `--gh-token` |
 | `private` | nits, gcli, box, claudex and sharingan install as-is; toon and cybernest need `--gh-token` |
 
 `cps extend list` marks `cloudsec`, `ai-tools` and `homelab` as needing `runtimes`, because a few of their tools install through a runtime instead of downloading a binary. The npm-backed ones (`claude-code`, `codex`) also need a shell in which `fnm env` has already run, so open a new shell after installing `runtimes` or the install fails with `npm install <pkg> failed`.
