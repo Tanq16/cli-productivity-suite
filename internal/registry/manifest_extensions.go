@@ -267,6 +267,15 @@ var extensionPacks = []ExtensionPack{
 				},
 			},
 			{
+				Name: "sharingan", BinaryName: "sharingan", Kind: GitHubRelease, Extension: true,
+				Repo: "Tanq16/sharingan", Description: "EC2 workstation manager",
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
 				Name: "toon", BinaryName: "toon", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/toon", Description: "Private Toon tool", IsPrivate: true,
 				Asset: AssetPattern{
@@ -711,6 +720,28 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 				Asset: AssetPattern{
 					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
+				Name: "telly", BinaryName: "telly", Kind: GitHubRelease, Extension: true,
+				Repo: "Tanq16/telly", Description: "Private Telly tool", IsPrivate: true,
+				Asset: AssetPattern{
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
+				},
+			},
+			{
+				Name: "yt-dlp", BinaryName: "yt-dlp", Kind: GitHubRelease, Extension: true,
+				Repo: "yt-dlp/yt-dlp", Description: "Media downloader",
+				Asset: AssetPattern{
+					AssetNames: map[string]string{
+						"linux/amd64":  "yt-dlp_linux",
+						"linux/arm64":  "yt-dlp_linux_aarch64",
+						"darwin/amd64": "yt-dlp_macos",
+						"darwin/arm64": "yt-dlp_macos",
+					},
 					ArchiveFormat: "none",
 				},
 			},

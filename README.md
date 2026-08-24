@@ -67,7 +67,7 @@ docker run -d --name cps-sandbox tanq16/cps-sandbox:latest
 docker exec -it cps-sandbox zsh -l
 ```
 
-The image runs `sleep infinity`, so it stays up and you `docker exec` into it whenever you need it. It is multi-arch and several GB, since it carries every pack except the two token-gated private tools. [docs/sandbox.md](docs/sandbox.md) covers what is inside, how to build it locally, and how to verify a build.
+The image runs `sleep infinity`, so it stays up and you `docker exec` into it whenever you need it. It is multi-arch and several GB, since it carries every pack except the tools that need a GitHub token. [docs/sandbox.md](docs/sandbox.md) covers what is inside, how to build it locally, and how to verify a build.
 
 ### From source
 
@@ -120,8 +120,8 @@ cps extend security nuclei subfinder  # several
 | `security` | nuclei, nuclei-templates, naabu, subfinder, proxify, httpx, dnsx, trufflehog, katana, ffuf, dalfox, gobuster, gau, gowitness |
 | `cloudsec` | terraform, tofu, kubectl, kubelogin, grpcurl, trivy, prowler, oci-cli |
 | `ai-tools` | antigravity, cursor-agent, claude-code, codex |
-| `homelab` | caddy, linksnapper, kairo, raikiri, expenseowl, and the rinnegan, code-server and neo4j app bundles |
-| `private` | nits, gcli, box and claudex install as-is; toon and cybernest need `--gh-token` |
+| `homelab` | caddy, yt-dlp, linksnapper, kairo, raikiri, expenseowl, telly, and the rinnegan, code-server and neo4j app bundles. telly needs `--gh-token` |
+| `private` | nits, gcli, box, claudex and sharingan install as-is; toon and cybernest need `--gh-token` |
 
 `cps extend list` marks `cloudsec`, `ai-tools` and `homelab` as needing `runtimes`, because a few of their tools install through a runtime instead of downloading a binary. The npm-backed ones (`claude-code`, `codex`) also need a shell in which `fnm env` has already run, so open a new shell after installing `runtimes` or the install fails with `npm install <pkg> failed`.
 

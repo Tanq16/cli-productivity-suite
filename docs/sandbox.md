@@ -11,7 +11,7 @@ The default command is `sleep infinity`, so the container stays up and you `dock
 
 ## What is inside
 
-Every extension pack is pre-installed, so nothing bootstraps at first use. Only the two token-gated tools in the `private` pack, `toon` and `cybernest`, are missing, since they need `--gh-token` at build time.
+Every extension pack is pre-installed, so nothing bootstraps at first use. Only the token-gated tools are missing, since they need `--gh-token` at build time: `toon` and `cybernest` from `private`, and `telly` from `homelab`.
 
 The user is a non-root `cps` at UID and GID 1000, with passwordless sudo for ad-hoc installs. Homebrew is installed as Linuxbrew.
 
