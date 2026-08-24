@@ -122,7 +122,7 @@ done
 # ai-tools
 for t in claude codex cursor-agent agy; do check_bin "$t" "ai-tools"; done
 # homelab
-for t in caddy linksnapper kairo raikiri expenseowl; do check_bin "$t" "homelab"; done
+for t in caddy linksnapper kairo raikiri expenseowl backhub local-content-share goff yt-dlp; do check_bin "$t" "homelab"; done
 # homelab app bundles — not on PATH, so check the launcher inside the bundle
 for b in rinnegan/bin/rinnegan code-server/bin/code-server; do
     [ -x "$HOME/shell/apps/$b" ] || fail "homelab: ~/shell/apps/$b"
@@ -134,7 +134,7 @@ grep -q '^auth: none$' "$HOME/.config/code-server/config.yaml" 2>/dev/null || \
 [ -f "$HOME/.local/share/code-server/User/settings.json" ] || \
     fail "homelab: code-server settings.json missing"
 # private (public subset)
-for t in nits gcli box claudex; do check_bin "$t" "private"; done
+for t in nits gcli box claudex sharingan; do check_bin "$t" "private"; done
 
 # --- nuclei templates non-empty ---
 [ -n "$(ls -A "$HOME/shell/nuclei-templates" 2>/dev/null)" ] || \
