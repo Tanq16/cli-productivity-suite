@@ -41,6 +41,16 @@ func (c *Client) LatestRelease(repo string) (*Release, error) {
 }
 
 func MatchAsset(release *Release, pattern registry.AssetPattern, osName, archName string) (*Asset, error) {
+	// Substring matching cannot separate an asset whose name is a strict prefix of another's, so exact names win outright.
+	if name, ok := pattern.AssetNames[osName+"/"+archName]; ok {
+		for _, asset := range release.Assets {
+			if asset.Name == name {
+				return &asset, nil
+			}
+		}
+		return nil, fmt.Errorf("asset %q not found in release %s", name, release.TagName)
+	}
+
 	osPattern, ok := pattern.OSPatterns[osName]
 	if !ok {
 		return nil, fmt.Errorf("no OS pattern for %s", osName)

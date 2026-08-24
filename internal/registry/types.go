@@ -43,6 +43,7 @@ func (k ToolKind) String() string {
 }
 
 type AssetPattern struct {
+	AssetNames          map[string]string // exact asset name keyed "<os>/<arch>"; a platform found here wins over every pattern below
 	OSPatterns          map[string]string // "linux" -> "linux", "darwin" -> "apple" etc.
 	ArchPatterns        map[string]string // "amd64" -> "x86_64", "arm64" -> "aarch64" etc.
 	RequiredSubstrings  []string
