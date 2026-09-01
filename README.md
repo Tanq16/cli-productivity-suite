@@ -58,20 +58,9 @@ chmod +x "$HOME/.local/bin/cps"
 
 Every release carries `linux` and `darwin` builds for `amd64` and `arm64`. On a fresh macOS `~/.local/bin` is not on PATH yet, so run the first command by full path as `~/.local/bin/cps init`; the rc fragment that `init` deploys adds the directory for every session after that.
 
-### Sandbox container
-
-A prebuilt Ubuntu image with the whole environment already built, for a machine you would rather not install CPS on directly.
-
-```bash
-docker run -d --name cps-sandbox tanq16/cps-sandbox:latest
-docker exec -it cps-sandbox zsh -l
-```
-
-The image runs `sleep infinity`, so it stays up and you `docker exec` into it whenever you need it. It is multi-arch and several GB, since it carries every pack except the tools that need a GitHub token. [docs/sandbox.md](docs/sandbox.md) covers what is inside, how to build it locally, and how to verify a build.
-
 ### From source
 
-Needs Go 1.26.
+Needs Go 1.27.
 
 ```bash
 git clone https://github.com/tanq16/cli-productivity-suite && cd cli-productivity-suite
@@ -82,13 +71,14 @@ make build
 
 Every command is idempotent. Installed versions are tracked in `~/.config/cps/state.json` and anything already current is skipped, so re-running a command is how you update. Binaries land in `~/shell/extensions/`, which `init` puts on PATH.
 
-Three global flags apply to every command:
+Two flags apply to every command:
 
 | Flag | Description |
 |---|---|
-| `--gh-token` | GitHub PAT for private repos. Falls back to `gh auth token` when `gh` is authenticated |
-| `--debug` | Verbose debug logging |
-| `--for-ai` | Markdown tables, no colour. Mutually exclusive with `--debug` |
+| `--debug` | Verbose debug logging. Piped output is JSON rather than console text |
+| `--migration-acknowledged` | Confirm an upgrade's manual migration steps have been run, instead of answering the prompt |
+
+`init` and `extend` also take `--gh-token`, a GitHub PAT for private repos. It defaults to `GITHUB_TOKEN` or `GH_TOKEN`, then falls back to `gh auth token` when `gh` is authenticated.
 
 ### First run
 
@@ -151,6 +141,6 @@ Downloads the latest release and replaces the running binary in place, at whatev
 - **Binaries and app bundles land in different places.** Single binaries go to `~/shell/extensions/`, which is on PATH. The multi-file trees (rinnegan, code-server, neo4j) unpack to `~/shell/apps/<name>/` and are not on PATH, so you launch them by full path. [docs/app-bundles.md](docs/app-bundles.md) covers running them and where each keeps its data.
 - **Your own aliases and binaries have two drop-zones.** `.zsh` files in `~/shell/rc/custom/` are sourced after every CPS fragment, so they can override anything CPS set, and `~/shell/custom-bin/` is prepended to PATH ahead of the CPS-managed directories, so your binary wins a name collision. `cps init` creates both and never touches them again.
 - **Snapshot directories are replaced wholesale.** The zsh plugins and `nuclei-templates` are downloaded as tarballs of the default branch with no `.git` at all, and an update swaps the whole directory. Keep nothing of your own in `~/shell/plugins/` or `~/shell/nuclei-templates`; custom nuclei templates belong in a directory of your own that you pass with `-t`.
-- **An upgrade can ask for manual steps before it runs.** The first `cps` command after an upgrade compares the version in `state.json` against the binary and prints whatever manual migration the intervening releases need, then asks whether you have run them. Answering no exits without doing anything, and answering yes records the version so the prompt does not return. CPS never performs the migration itself.
+- **An upgrade can ask for manual steps before it runs.** The first `cps` command after an upgrade compares the version in `state.json` against the binary and prints whatever manual migration the intervening releases need, then asks whether you have run them. Answering no exits without doing anything, and answering yes records the version so the prompt does not return. Pass `--migration-acknowledged` to answer yes without the prompt, which is what a script or a machine with no terminal needs. CPS never performs the migration itself.
 - **Homebrew auto-update is off.** `00-base.zsh` exports `HOMEBREW_NO_AUTO_UPDATE=1` so `brew install` stays fast and deterministic. Drop `unset HOMEBREW_NO_AUTO_UPDATE` into a file under `~/shell/rc/custom/` to get the default behaviour back.
 - **Removal is a script, not a command.** `./scripts/deep-removal.sh` wipes the `cps` binary, the whole `~/shell/` tree, the CPS-deployed configs, and the brew packages CPS installed. Homebrew itself, `~/.zsh_history` and `~/.config/neo4j/` are left alone.

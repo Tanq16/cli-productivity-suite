@@ -1,7 +1,7 @@
 package github
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 	"io"
 	"strings"
@@ -34,7 +34,7 @@ func (c *Client) LatestRelease(repo string) (*Release, error) {
 	}
 
 	var release Release
-	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
+	if err := json.UnmarshalRead(resp.Body, &release); err != nil {
 		return nil, fmt.Errorf("failed to decode release for %s: %w", repo, err)
 	}
 	return &release, nil

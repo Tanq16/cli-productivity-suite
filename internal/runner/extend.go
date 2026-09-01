@@ -23,7 +23,7 @@ func ExtendList() {
 		if pack.Requires != "" {
 			summary += ", needs " + pack.Requires
 		}
-		utils.PrintInfo(fmt.Sprintf("%s — %s (%s)", pack.Name, pack.Description, summary))
+		utils.PrintInfo(fmt.Sprintf("%s - %s (%s)", pack.Name, pack.Description, summary))
 		if len(tools) > 0 {
 			names := make([]string, len(tools))
 			for i, t := range tools {

@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	ColorBlue   = lipgloss.ANSIColor(12) // Bright Blue
-	ColorGreen  = lipgloss.ANSIColor(10) // Bright Green
-	ColorRed    = lipgloss.ANSIColor(9)  // Bright Red
-	ColorYellow = lipgloss.ANSIColor(11) // Bright Yellow
+	ColorBlue   = lipgloss.ANSIColor(12)
+	ColorGreen  = lipgloss.ANSIColor(10)
+	ColorRed    = lipgloss.ANSIColor(9)
+	ColorYellow = lipgloss.ANSIColor(11)
 
 	infoStyle    = lipgloss.NewStyle().Foreground(ColorBlue)
 	successStyle = lipgloss.NewStyle().Foreground(ColorGreen)
@@ -24,21 +24,17 @@ var (
 func PrintInfo(msg string) {
 	if GlobalDebugFlag {
 		log.Info().Msg(msg)
-	} else if GlobalForAIFlag {
-		fmt.Println("[INFO] " + msg)
-	} else {
-		fmt.Println(infoStyle.Render("→ " + msg))
+		return
 	}
+	lipgloss.Println(infoStyle.Render("→ " + msg))
 }
 
 func PrintSuccess(msg string) {
 	if GlobalDebugFlag {
 		log.Info().Msg(msg)
-	} else if GlobalForAIFlag {
-		fmt.Println("[OK] " + msg)
-	} else {
-		fmt.Println(successStyle.Render("✓ " + msg))
+		return
 	}
+	lipgloss.Println(successStyle.Render("✓ " + msg))
 }
 
 func PrintError(msg string, err error) {
@@ -48,25 +44,13 @@ func PrintError(msg string, err error) {
 		} else {
 			log.Error().Msg(msg)
 		}
-	} else if GlobalForAIFlag {
-		fmt.Println("[ERROR] " + msg)
-	} else {
-		fmt.Println(errorStyle.Render("✗ " + msg))
+		return
 	}
+	lipgloss.Println(errorStyle.Render("✗ " + msg))
 }
 
 func PrintFatal(msg string, err error) {
-	if GlobalDebugFlag {
-		if err != nil {
-			log.Error().Err(err).Msg(msg)
-		} else {
-			log.Error().Msg(msg)
-		}
-	} else if GlobalForAIFlag {
-		fmt.Println("[ERROR] " + msg)
-	} else {
-		fmt.Println(errorStyle.Render("✗ " + msg))
-	}
+	PrintError(msg, err)
 	os.Exit(1)
 }
 
@@ -77,35 +61,29 @@ func PrintWarn(msg string, err error) {
 		} else {
 			log.Warn().Msg(msg)
 		}
-	} else if GlobalForAIFlag {
-		fmt.Println("[WARN] " + msg)
-	} else {
-		fmt.Println(warnStyle.Render("! " + msg))
+		return
 	}
+	lipgloss.Println(warnStyle.Render("! " + msg))
 }
 
 func PrintGeneric(msg string) {
-	fmt.Println(msg)
+	lipgloss.Println(msg)
 }
 
 func PrintRunning(msg string) {
 	if GlobalDebugFlag {
 		log.Info().Msg(msg)
-	} else if GlobalForAIFlag {
-		fmt.Println("[RUNNING] " + msg)
-	} else {
-		fmt.Println(infoStyle.Render("↻ " + msg))
+		return
 	}
+	lipgloss.Println(infoStyle.Render("↻ " + msg))
 }
 
 func PrintIndentedSuccess(msg string) {
 	if GlobalDebugFlag {
 		log.Info().Msg(msg)
-	} else if GlobalForAIFlag {
-		fmt.Println("[OK] " + msg)
-	} else {
-		fmt.Println(successStyle.Render("  ✓ " + msg))
+		return
 	}
+	lipgloss.Println(successStyle.Render("  ✓ " + msg))
 }
 
 func PrintIndentedError(msg string, err error) {
@@ -115,11 +93,9 @@ func PrintIndentedError(msg string, err error) {
 		} else {
 			log.Error().Msg(msg)
 		}
-	} else if GlobalForAIFlag {
-		fmt.Println("[ERROR] " + msg)
-	} else {
-		fmt.Println(errorStyle.Render("  ✗ " + msg))
+		return
 	}
+	lipgloss.Println(errorStyle.Render("  ✗ " + msg))
 }
 
 func PrintIndentedWarn(msg string, err error) {
@@ -129,25 +105,21 @@ func PrintIndentedWarn(msg string, err error) {
 		} else {
 			log.Warn().Msg(msg)
 		}
-	} else if GlobalForAIFlag {
-		fmt.Println("[WARN] " + msg)
-	} else {
-		fmt.Println(warnStyle.Render("  ! " + msg))
+		return
 	}
+	lipgloss.Println(warnStyle.Render("  ! " + msg))
 }
 
 func PrintIndentedRunning(msg string) {
 	if GlobalDebugFlag {
 		log.Info().Msg(msg)
-	} else if GlobalForAIFlag {
-		fmt.Println("[RUNNING] " + msg)
-	} else {
-		fmt.Println(infoStyle.Render("  ↻ " + msg))
+		return
 	}
+	lipgloss.Println(infoStyle.Render("  ↻ " + msg))
 }
 
 func ClearLines(n int) {
-	if GlobalDebugFlag || GlobalForAIFlag {
+	if GlobalDebugFlag || !StdoutIsTerminal {
 		return
 	}
 	for range n {
@@ -156,31 +128,23 @@ func ClearLines(n int) {
 }
 
 func ClearPreviousLine() {
-	if GlobalDebugFlag || GlobalForAIFlag {
-		return
-	}
-	fmt.Print("\033[A\033[2K")
+	ClearLines(1)
 }
 
 func PrintProgress(label string, percent int) {
-	if percent > 100 {
-		percent = 100
-	}
+	percent = min(percent, 100)
 
 	if GlobalDebugFlag {
 		log.Info().Int("percent", percent).Msg(label)
 		return
 	}
-
-	if GlobalForAIFlag {
-		fmt.Printf("[PROGRESS] %s: %d%%\n", label, percent)
+	if !StdoutIsTerminal {
+		lipgloss.Println(fmt.Sprintf("  ↻ %s: %d%%", label, percent))
 		return
 	}
 
 	const barWidth = 10
 	filled := barWidth * percent / 100
-	empty := barWidth - filled
-
-	bar := strings.Repeat("⣿", filled) + strings.Repeat("⣀", empty)
-	fmt.Println(infoStyle.Render(fmt.Sprintf("  ↻ %s: %s %d%%", label, bar, percent)))
+	bar := strings.Repeat("⣿", filled) + strings.Repeat("⣀", barWidth-filled)
+	lipgloss.Println(infoStyle.Render(fmt.Sprintf("  ↻ %s: %s %d%%", label, bar, percent)))
 }

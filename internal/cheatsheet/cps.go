@@ -9,14 +9,14 @@ func buildCPSSheet() string {
 	b.WriteString(titleStyle.Render("CPS Cheat Sheet") + "\n")
 	b.WriteString(noteStyle.Render("  Tools: ~/shell/extensions/       User binaries: ~/shell/custom-bin/") + "\n")
 	b.WriteString(noteStyle.Render("  RC fragments: ~/shell/rc/") + "\n")
-	b.WriteString(noteStyle.Render("  App bundles: ~/shell/apps/ (not on PATH — run by full path)") + "\n\n")
+	b.WriteString(noteStyle.Render("  App bundles: ~/shell/apps/ (not on PATH - run by full path)") + "\n\n")
 
 	b.WriteString(headingStyle.Render("Core Commands") + "\n")
 	b.WriteString(cmdStyle.Render("  cps init") + "                        Base shell environment setup\n")
 	b.WriteString(cmdStyle.Render("  cps self-update") + "                 Update cps binary itself\n")
 	b.WriteString(divider + "\n")
 
-	b.WriteString(headingStyle.Render("Extend — Extension Packs") + "\n")
+	b.WriteString(headingStyle.Render("Extend - Extension Packs") + "\n")
 	b.WriteString(cmdStyle.Render("  cps extend list") + "                 List available packs\n")
 	b.WriteString(cmdStyle.Render("  cps extend <pack>") + "               Install entire extension pack\n")
 	b.WriteString(cmdStyle.Render("  cps extend <pack> <tool> ...") + "    Install specific tools from a pack\n")
@@ -24,7 +24,7 @@ func buildCPSSheet() string {
 	b.WriteString(noteStyle.Render("         private, ai-tools, homelab") + "\n")
 	b.WriteString(divider + "\n")
 
-	b.WriteString(headingStyle.Render("Shell Integration — RC Fragments") + "\n")
+	b.WriteString(headingStyle.Render("Shell Integration - RC Fragments") + "\n")
 	b.WriteString(noteStyle.Render("  ~/.zshrc sources ~/shell/rc/*.zsh and ~/shell/rc/custom/*.zsh") + "\n")
 	b.WriteString(noteStyle.Render("  00-base.zsh        deployed by cps init") + "\n")
 	b.WriteString(noteStyle.Render("  10-runtimes.zsh    deployed by cps extend runtimes") + "\n")
@@ -42,14 +42,13 @@ func buildCPSSheet() string {
 	b.WriteString(headingStyle.Render("Theme") + "\n")
 	b.WriteString(cmdStyle.Render("  cps theme") + "                       List themes, marking the active one\n")
 	b.WriteString(cmdStyle.Render("  cps theme <name>") + "                Switch the terminal palette\n")
-	b.WriteString(noteStyle.Render("  Repaints kitty, tmux and nvim at once — nothing restarts") + "\n")
+	b.WriteString(noteStyle.Render("  Repaints kitty, tmux and nvim at once - nothing restarts") + "\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Other") + "\n")
 	b.WriteString(cmdStyle.Render("  cps cheat <topic>") + "               Cheat sheets (go, java, uv, fnm, bun, rust, tmux, nvim, fzf, jq, regex)\n")
-	b.WriteString(cmdStyle.Render("  --gh-token <token>") + "              GitHub PAT for private repos\n")
+	b.WriteString(cmdStyle.Render("  --gh-token <token>") + "              GitHub PAT, on init and extend (or GITHUB_TOKEN / GH_TOKEN)\n")
 	b.WriteString(cmdStyle.Render("  --debug") + "                         Verbose debug logging\n")
-	b.WriteString(cmdStyle.Render("  --for-ai") + "                        AI-friendly output (no color)\n")
 
 	return b.String()
 }

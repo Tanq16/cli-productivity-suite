@@ -55,10 +55,10 @@ func buildBunSheet() string {
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Key Concepts") + "\n")
-	b.WriteString("  • " + cmdStyle.Render("bun") + " runs .ts/.tsx/.jsx natively — no tsc/ts-node needed\n")
+	b.WriteString("  • " + cmdStyle.Render("bun") + " runs .ts/.tsx/.jsx natively - no tsc/ts-node needed\n")
 	b.WriteString("  • " + cmdStyle.Render("bun install") + " is a drop-in for npm/yarn/pnpm; reads package.json, writes bun.lockb\n")
-	b.WriteString("  • " + cmdStyle.Render("bun.lockb") + " is binary — diff with 'bun pm ls' or set bun.lockb=binary in .gitattributes\n")
-	b.WriteString("  • " + cmdStyle.Render("Node compat") + " is good but not 100% — some native modules and rare APIs still differ\n")
+	b.WriteString("  • " + cmdStyle.Render("bun.lockb") + " is binary - diff with 'bun pm ls' or set bun.lockb=binary in .gitattributes\n")
+	b.WriteString("  • " + cmdStyle.Render("Node compat") + " is good but not 100% - some native modules and rare APIs still differ\n")
 	b.WriteString("  • " + cmdStyle.Render("Global installs") + " land in $BUN_INSTALL/bin, which CPS adds to PATH\n")
 
 	return b.String()

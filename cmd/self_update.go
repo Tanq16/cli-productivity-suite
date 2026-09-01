@@ -9,6 +9,7 @@ import (
 var selfUpdateCmd = &cobra.Command{
 	Use:   "self-update",
 	Short: "Update cps itself to the latest release",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		runner.SelfUpdate(AppVersion)
 	},

@@ -44,7 +44,7 @@ autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^X^E' edit-command-line
 
-# Frees Ctrl+S — terminal driver swallows it as XOFF without both of these
+# Frees Ctrl+S - terminal driver swallows it as XOFF without both of these
 setopt NO_FLOW_CONTROL
 stty -ixon
 

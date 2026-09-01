@@ -1,6 +1,11 @@
 package cheatsheet
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/tanq16/cli-productivity-suite/utils"
+)
 
 type Sheet struct {
 	Name        string
@@ -67,6 +72,6 @@ func Print(name string) error {
 	if sheet == nil {
 		return fmt.Errorf("unknown cheat sheet: %s (available: %s)", name, AvailableList())
 	}
-	fmt.Print(sheet.Content)
+	utils.PrintGeneric(strings.TrimRight(sheet.Content, "\n"))
 	return nil
 }

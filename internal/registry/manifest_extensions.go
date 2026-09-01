@@ -3,7 +3,7 @@ package registry
 type ExtensionPack struct {
 	Name        string
 	Description string
-	Requires    string // display-only prerequisite pack name; not enforced at install time
+	Requires    string
 	Tools       []Tool
 }
 
@@ -439,10 +439,9 @@ var extensionPacks = []ExtensionPack{
 				Name: "anbu", BinaryName: "anbu", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/anbu", Description: "Anbu tool",
 				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat:       "zip",
-					BinaryPathInArchive: "anbu*",
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
 				},
 			},
 			{

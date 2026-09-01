@@ -1,7 +1,7 @@
 package installer
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 	"io"
 	"net/http"
@@ -141,7 +141,7 @@ func (l *LanguageRuntimeInstaller) installJava(p platform.Platform, st *state.St
 	var info struct {
 		MostRecentLTS int `json:"most_recent_lts"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
+	if err := json.UnmarshalRead(resp.Body, &info); err != nil {
 		resp.Body.Close()
 		return Result{Tool: "java-sdk", Err: err}
 	}
@@ -164,7 +164,7 @@ func (l *LanguageRuntimeInstaller) installJava(p platform.Platform, st *state.St
 		} `json:"binary"`
 		ReleaseName string `json:"release_name"`
 	}
-	if err := json.NewDecoder(assetResp.Body).Decode(&assets); err != nil {
+	if err := json.UnmarshalRead(assetResp.Body, &assets); err != nil {
 		assetResp.Body.Close()
 		return Result{Tool: "java-sdk", Err: err}
 	}
@@ -298,7 +298,7 @@ func (l *LanguageRuntimeInstaller) latestPythonCycle() (string, error) {
 		Cycle string `json:"cycle"`
 		EOL   any    `json:"eol"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
+	if err := json.UnmarshalRead(resp.Body, &releases); err != nil {
 		return "", err
 	}
 	now := time.Now().Format("2006-01-02")

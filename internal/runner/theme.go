@@ -41,7 +41,7 @@ func ThemeList() {
 func Theme(name string) {
 	content, err := configs.Theme(name)
 	if err != nil {
-		utils.PrintFatal(fmt.Sprintf("unknown theme %q — run `cps theme` to list them", name), err)
+		utils.PrintFatal(fmt.Sprintf("unknown theme %q - run `cps theme` to list them", name), err)
 	}
 	p, err := platform.Detect()
 	if err != nil {

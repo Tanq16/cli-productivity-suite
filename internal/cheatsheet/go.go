@@ -28,7 +28,7 @@ func buildGoSheet() string {
 	b.WriteString(cmdStyle.Render("  go install <pkg>@latest") + "         Install a Go binary tool\n")
 	b.WriteString(divider + "\n")
 
-	b.WriteString(headingStyle.Render("Go Tool — Built-in Analyzers") + "\n")
+	b.WriteString(headingStyle.Render("Go Tool - Built-in Analyzers") + "\n")
 	b.WriteString(cmdStyle.Render("  go tool pprof <profile>") + "         Analyze CPU/memory profiles\n")
 	b.WriteString(cmdStyle.Render("  go tool nm <binary>") + "             List symbols in a binary\n")
 	b.WriteString(cmdStyle.Render("  go tool objdump <binary>") + "        Disassemble a binary\n")

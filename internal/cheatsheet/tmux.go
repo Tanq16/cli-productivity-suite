@@ -8,7 +8,7 @@ func buildTmuxSheet() string {
 
 	b.WriteString(titleStyle.Render("Tmux Cheat Sheet") + "\n")
 	b.WriteString(noteStyle.Render("  CPS config: mouse on, emacs copy-mode, status top, no plugins") + "\n")
-	b.WriteString(noteStyle.Render("  Colors inherited from terminal — session glyph turns red on prefix") + "\n")
+	b.WriteString(noteStyle.Render("  Colors inherited from terminal - session glyph turns red on prefix") + "\n")
 	b.WriteString(noteStyle.Render("  Windows/panes start at 1, auto-rename on, history 99999 lines") + "\n\n")
 
 	b.WriteString(headingStyle.Render("Shell Aliases") + "\n")
@@ -28,7 +28,7 @@ func buildTmuxSheet() string {
 	b.WriteString(cmdStyle.Render("  Alt+v") + "                           Paste buffer\n")
 	b.WriteString(divider + "\n")
 
-	b.WriteString(headingStyle.Render("Copy Mode (Emacs) — Mouse & Keyboard") + "\n")
+	b.WriteString(headingStyle.Render("Copy Mode (Emacs) - Mouse & Keyboard") + "\n")
 	b.WriteString(noteStyle.Render("  Scroll up with mouse to enter copy mode automatically.") + "\n")
 	b.WriteString(noteStyle.Render("  Mouse drag selects text, releasing auto-copies it.") + "\n\n")
 
@@ -53,7 +53,7 @@ func buildTmuxSheet() string {
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Prefix Commands (C-b)") + "\n")
-	b.WriteString(noteStyle.Render("  Rarely needed — most ops have direct bindings above.") + "\n\n")
+	b.WriteString(noteStyle.Render("  Rarely needed - most ops have direct bindings above.") + "\n\n")
 	b.WriteString(cmdStyle.Render("  C-b c") + "                           Create new window\n")
 	b.WriteString(cmdStyle.Render("  C-b ,") + "                           Rename window\n")
 	b.WriteString(cmdStyle.Render("  C-b w") + "                           List all windows\n")

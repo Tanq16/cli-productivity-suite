@@ -1,7 +1,8 @@
 package state
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"os"
 	"path/filepath"
 	"sync"
@@ -78,14 +79,14 @@ func Load(path string) (*State, error) {
 }
 
 func (s *State) Save() error {
-	if err := os.MkdirAll(filepath.Dir(s.path), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(s.path), 0700); err != nil {
 		return err
 	}
-	data, err := json.MarshalIndent(s, "", "  ")
+	data, err := json.Marshal(s, jsontext.WithIndent("  "))
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(s.path, data, 0644)
+	return os.WriteFile(s.path, data, 0600)
 }
 
 func (s *State) ToolVersion(name string) string {
