@@ -439,10 +439,9 @@ var extensionPacks = []ExtensionPack{
 				Name: "anbu", BinaryName: "anbu", Kind: GitHubRelease, Extension: true,
 				Repo: "Tanq16/anbu", Description: "Anbu tool",
 				Asset: AssetPattern{
-					OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-					ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-					ArchiveFormat:       "zip",
-					BinaryPathInArchive: "anbu*",
+					OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+					ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+					ArchiveFormat: "none",
 				},
 			},
 			{
