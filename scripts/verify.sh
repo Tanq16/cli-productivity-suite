@@ -1,16 +1,12 @@
 #!/usr/bin/env bash
-# verify.sh — sanity check for a built cps environment.
+# verify.sh - sanity check for a built cps environment.
 #
 # Verifies identity, rc loading, directories, files, env vars, PATH segments,
 # and binaries across every pack. Silent on success; prints only failures.
 # Exits 0 if all good, 1 otherwise.
 #
-# Usage (against a running container):
-#   docker exec -it <container> zsh -lc 'bash /path/to/verify.sh'
-#
-# Usage (one-shot against an image):
-#   docker run --rm -v "$PWD/scripts/verify.sh:/tmp/v.sh" \
-#       tanq16/cps-sandbox:latest zsh -lc 'bash /tmp/v.sh'
+# Usage:
+#   zsh -lc 'bash scripts/verify.sh'
 #
 # The zsh -l wrapper is required: it sources ~/.zprofile, which loads the cps
 # rc fragments and exports the env vars this script checks.
@@ -51,7 +47,7 @@ for f in \
     [ -f "$HOME/$f" ] || fail "file missing: ~/$f"
 done
 
-# brew.zsh must be non-empty — guards against the cold-shellenv early-return bug.
+# brew.zsh must be non-empty - guards against the cold-shellenv early-return bug.
 [ -s "$HOME/shell/env/brew.zsh" ] || fail "~/shell/env/brew.zsh is empty (cold brew shellenv)"
 
 # --- env vars ---
@@ -82,7 +78,7 @@ check_bin() { command -v "$1" >/dev/null 2>&1 || fail "$2: $1"; }
 for t in bat fd rg lsd jq yq fzf gh gron zoxide sd starship anbu danzo; do
     check_bin "$t" "essentials"
 done
-# base app bundle — nvim reaches PATH via a symlink; the bundle itself must stay intact
+# base app bundle - nvim reaches PATH via a symlink; the bundle itself must stay intact
 check_bin nvim "base"
 [ "$(readlink "$HOME/shell/extensions/nvim")" = "$HOME/shell/apps/neovim/bin/nvim" ] || \
     fail "base: ~/shell/extensions/nvim does not point at the neovim bundle"
@@ -107,12 +103,12 @@ done
 # gowitness moved to security; age and sq to essentials
 check_bin gowitness "security"
 for t in age sq; do check_bin "$t" "essentials"; done
-# homelab app bundle — neo4j needs a JVM, so check the launcher and that JAVA_HOME resolves one
+# homelab app bundle - neo4j needs a JVM, so check the launcher and that JAVA_HOME resolves one
 [ -x "$HOME/shell/apps/neo4j/bin/neo4j" ] || fail "homelab: ~/shell/apps/neo4j/bin/neo4j"
 [ -x "$HOME/shell/apps/neo4j/bin/cypher-shell" ] || fail "homelab: ~/shell/apps/neo4j/bin/cypher-shell"
 [ -x "$JAVA_HOME/bin/java" ] || fail "homelab: neo4j has no JVM at \$JAVA_HOME/bin/java"
 # neo4j state must live outside the bundle, or an upgrade destroys the databases
-[ -n "$NEO4J_CONF" ] || fail "homelab: NEO4J_CONF unset — neo4j would use the bundle's own conf"
+[ -n "$NEO4J_CONF" ] || fail "homelab: NEO4J_CONF unset - neo4j would use the bundle's own conf"
 [ -f "$NEO4J_CONF/neo4j.conf" ] || fail "homelab: no neo4j.conf at \$NEO4J_CONF"
 for d in data plugins import logs run licenses; do
     [ -d "$HOME/.config/neo4j/$d" ] || fail "homelab: ~/.config/neo4j/$d missing"
@@ -123,7 +119,7 @@ done
 for t in claude codex cursor-agent agy; do check_bin "$t" "ai-tools"; done
 # homelab
 for t in caddy linksnapper kairo raikiri expenseowl backhub local-content-share goff yt-dlp; do check_bin "$t" "homelab"; done
-# homelab app bundles — not on PATH, so check the launcher inside the bundle
+# homelab app bundles - not on PATH, so check the launcher inside the bundle
 for b in rinnegan/bin/rinnegan code-server/bin/code-server; do
     [ -x "$HOME/shell/apps/$b" ] || fail "homelab: ~/shell/apps/$b"
 done
