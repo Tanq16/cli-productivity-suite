@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"fmt"
+	"cmp"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -17,22 +18,21 @@ import (
 var AppVersion = "dev-build"
 
 var ghToken string
-var debugFlag, forAIFlag bool
+var debugFlag, migrationAcknowledged bool
 
 var rootCmd = &cobra.Command{
 	Use:               "cps",
-	Short:             "CLI Productivity Suite — manage your dev environment",
+	Short:             "Manage your CLI dev environment",
 	Version:           AppVersion,
 	CompletionOptions: cobra.CompletionOptions{HiddenDefaultCmd: true},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		runner.MigrationGate(AppVersion)
+		runner.MigrationGate(AppVersion, migrationAcknowledged)
 		resolveGHToken()
 	},
 }
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
@@ -40,10 +40,12 @@ func Execute() {
 func init() {
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.PersistentFlags().BoolVar(&debugFlag, "debug", false, "Enable debug logging")
-	rootCmd.PersistentFlags().BoolVar(&forAIFlag, "for-ai", false, "AI-friendly output (markdown tables, no color)")
-	rootCmd.MarkFlagsMutuallyExclusive("debug", "for-ai")
+	rootCmd.PersistentFlags().BoolVar(&migrationAcknowledged, "migration-acknowledged", false, "Confirm the manual migration steps an upgrade printed have been run")
 
-	rootCmd.PersistentFlags().StringVar(&ghToken, "gh-token", "", "GitHub PAT for private repos")
+	defaultGHToken := cmp.Or(os.Getenv("GITHUB_TOKEN"), os.Getenv("GH_TOKEN"))
+	for _, c := range []*cobra.Command{initCmd, extendCmd} {
+		c.Flags().StringVar(&ghToken, "gh-token", defaultGHToken, "GitHub PAT for private repos (or GITHUB_TOKEN / GH_TOKEN env)")
+	}
 
 	rootCmd.AddCommand(cheatCmd)
 	rootCmd.AddCommand(extendCmd)
@@ -67,20 +69,15 @@ func resolveGHToken() {
 
 func setupLogs() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	output := zerolog.ConsoleWriter{
-		Out:        os.Stdout,
-		TimeFormat: time.DateTime,
-		NoColor:    false,
+	var out io.Writer = os.Stdout
+	if utils.StdoutIsTerminal {
+		out = zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.DateTime}
 	}
-	log.Logger = zerolog.New(output).With().Timestamp().Logger()
+	log.Logger = zerolog.New(out).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
 	if debugFlag {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		utils.GlobalDebugFlag = true
-	}
-	if forAIFlag {
-		utils.GlobalForAIFlag = true
-		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}
 }

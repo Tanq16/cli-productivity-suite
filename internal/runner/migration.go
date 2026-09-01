@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/tanq16/cli-productivity-suite/internal/migration"
@@ -9,7 +10,7 @@ import (
 	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
-func MigrationGate(appVersion string) {
+func MigrationGate(appVersion string, acknowledged bool) {
 	p, err := platform.Detect()
 	if err != nil {
 		return
@@ -36,12 +37,17 @@ func MigrationGate(appVersion string) {
 		}
 	}
 
-	choice, err := utils.PromptSelect("Have you completed the steps above?", []string{"No, exit so I can run them", "Yes, continue"})
-	if err != nil {
-		utils.PrintFatal("could not read your answer", err)
-	}
-	if choice != 1 {
-		utils.PrintFatal("run the steps above, then re-run this command", nil)
+	if !acknowledged {
+		choice, err := utils.PromptSelect("Have you completed the steps above?", []string{"No, exit so I can run them", "Yes, continue"})
+		if errors.Is(err, utils.ErrNoTerminal) {
+			utils.PrintFatal("run the steps above, then pass --migration-acknowledged", nil)
+		}
+		if err != nil {
+			utils.PrintFatal("could not read your answer", err)
+		}
+		if choice != 1 {
+			utils.PrintFatal("run the steps above, then re-run this command", nil)
+		}
 	}
 
 	recordVersion(st, appVersion)

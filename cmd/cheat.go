@@ -23,7 +23,7 @@ var cheatCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if args[0] == "list" {
 			for _, s := range cheatsheet.List() {
-				utils.PrintInfo(fmt.Sprintf("%s — %s", s.Name, s.Description))
+				utils.PrintInfo(fmt.Sprintf("%s - %s", s.Name, s.Description))
 			}
 			return
 		}
