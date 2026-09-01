@@ -1,34 +1,13 @@
 package utils
 
 import (
-	"bufio"
-	"fmt"
-	"os"
-	"strconv"
+	"errors"
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
 )
 
-var stdinScanner *bufio.Scanner
-
-func getStdinScanner() *bufio.Scanner {
-	if stdinScanner == nil {
-		stdinScanner = bufio.NewScanner(os.Stdin)
-	}
-	return stdinScanner
-}
-
-func ReadPipedLine() string {
-	fi, err := os.Stdin.Stat()
-	if err != nil || fi.Mode()&os.ModeCharDevice != 0 {
-		return ""
-	}
-	if s := getStdinScanner(); s.Scan() {
-		return strings.TrimSpace(s.Text())
-	}
-	return ""
-}
+var ErrNoTerminal = errors.New("no interactive terminal")
 
 type selectModel struct {
 	label    string
@@ -72,18 +51,9 @@ func (m selectModel) View() tea.View {
 }
 
 func PromptSelect(label string, options []string) (int, error) {
-	if GlobalForAIFlag {
-		line := ReadPipedLine()
-		if line == "" {
-			return -1, nil
-		}
-		n, err := strconv.Atoi(line)
-		if err != nil || n < 1 || n > len(options) {
-			return -1, fmt.Errorf("expected a number between 1 and %d, got %q", len(options), line)
-		}
-		return n - 1, nil
+	if !StdinIsTerminal {
+		return -1, ErrNoTerminal
 	}
-
 	final, err := tea.NewProgram(selectModel{label: label, options: options}).Run()
 	if err != nil {
 		return -1, err
