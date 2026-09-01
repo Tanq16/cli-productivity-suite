@@ -6,19 +6,28 @@ on:
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
-  # ===========================================================================
-  # Step 1: Calculate version and create draft release
-  # ===========================================================================
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27'
+
+      - name: Run tests
+        run: go test ./...
+
   create-release:
+    needs: test
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
       release_created: ${{ steps.create_release.outputs.release_created }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -41,9 +50,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
-  # ===========================================================================
-  # Step 2: Build binaries (matrix)
-  # ===========================================================================
   binaries:
     needs: create-release
     runs-on: ubuntu-latest
@@ -52,12 +58,12 @@ jobs:
         os: [linux, darwin]
         arch: [amd64, arm64]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
-          go-version: '1.26'
+          go-version: '1.27'
 
       - name: Build Binary
         run: make build-for GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} VERSION=${{ needs.create-release.outputs.version }}
@@ -71,23 +77,17 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
-  # ===========================================================================
-  # Step 3: Publish release
-  # ===========================================================================
   publish:
     needs: [create-release, binaries]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Publish Release
         run: gh release edit "${{ needs.create-release.outputs.version }}" --draft=false
         env:
           GH_TOKEN: ${{ github.token }}
 
-  # ===========================================================================
-  # Cleanup on failure
-  # ===========================================================================
   cleanup-on-failure:
     needs: [create-release, binaries, publish]
     if: always() && (needs.binaries.result == 'failure' || needs.publish.result == 'failure') && needs.create-release.outputs.release_created == 'true'
