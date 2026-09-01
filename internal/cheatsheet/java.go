@@ -8,7 +8,7 @@ func buildJavaSheet() string {
 
 	b.WriteString(titleStyle.Render("Java Cheat Sheet") + "\n")
 	b.WriteString(noteStyle.Render("  CPS paths: JAVA_HOME=~/shell/java-sdk  (Eclipse Temurin LTS)") + "\n")
-	b.WriteString(noteStyle.Render("  $JAVA_HOME/bin is on PATH — java, javac, jar, jshell, jlink, etc.") + "\n\n")
+	b.WriteString(noteStyle.Render("  $JAVA_HOME/bin is on PATH - java, javac, jar, jshell, jlink, etc.") + "\n\n")
 
 	b.WriteString(headingStyle.Render("Compile & Run") + "\n")
 	b.WriteString(cmdStyle.Render("  javac Foo.java") + "                  Compile to Foo.class\n")
@@ -56,7 +56,7 @@ func buildJavaSheet() string {
 	b.WriteString(cmdStyle.Render("  brew install gradle") + "             Gradle (build.gradle[.kts])\n")
 	b.WriteString(cmdStyle.Render("  mvn package    mvn test") + "         Maven lifecycle\n")
 	b.WriteString(cmdStyle.Render("  gradle build   gradle test") + "      Gradle tasks\n")
-	b.WriteString(noteStyle.Render("  Wrapper scripts (mvnw / gradlew) ship with most projects — prefer them") + "\n")
+	b.WriteString(noteStyle.Render("  Wrapper scripts (mvnw / gradlew) ship with most projects - prefer them") + "\n")
 
 	return b.String()
 }

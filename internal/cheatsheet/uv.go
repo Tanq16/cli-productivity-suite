@@ -25,7 +25,7 @@ func buildUVSheet() string {
 	b.WriteString(cmdStyle.Render("  uv python list [--only-installed]") + "  List available/installed versions\n")
 	b.WriteString(divider + "\n")
 
-	b.WriteString(headingStyle.Render("Global (Default) Venv — ~/shell/py-default") + "\n")
+	b.WriteString(headingStyle.Render("Global (Default) Venv - ~/shell/py-default") + "\n")
 	b.WriteString(noteStyle.Render("  CPS sets VIRTUAL_ENV=$HOME/shell/py-default in .zshrc") + "\n")
 	b.WriteString(noteStyle.Render("  Commands below use this venv when not inside a project.") + "\n\n")
 	b.WriteString(cmdStyle.Render("  uv pip install <pkg>") + "            Install into default venv\n")
@@ -34,7 +34,7 @@ func buildUVSheet() string {
 	b.WriteString(noteStyle.Render("  Also: uv pip show, freeze, uninstall") + "\n")
 	b.WriteString(divider + "\n")
 
-	b.WriteString(headingStyle.Render("Project Venvs — Local .venv + pyproject.toml") + "\n")
+	b.WriteString(headingStyle.Render("Project Venvs - Local .venv + pyproject.toml") + "\n")
 	b.WriteString(noteStyle.Render("  uv project commands auto-discover pyproject.toml in cwd.") + "\n")
 	b.WriteString(noteStyle.Render("  They create/use .venv/ in the project dir, NOT py-default.") + "\n")
 	b.WriteString(noteStyle.Render("  Bare 'python' still points to py-default (VIRTUAL_ENV).") + "\n\n")
@@ -45,7 +45,7 @@ func buildUVSheet() string {
 	b.WriteString(cmdStyle.Render("  uv run <cmd>") + "                    Run command in project venv\n")
 	b.WriteString(divider + "\n")
 
-	b.WriteString(headingStyle.Render("Tool Install — Isolated CLI Tools") + "\n")
+	b.WriteString(headingStyle.Render("Tool Install - Isolated CLI Tools") + "\n")
 	b.WriteString(noteStyle.Render("  Each tool gets its own isolated venv (~/shell/uv-tools/<name>/).") + "\n")
 	b.WriteString(noteStyle.Render("  CLI entry points are symlinked to ~/shell/uv-tool-executables/.") + "\n")
 	b.WriteString(noteStyle.Render("  Only works for packages with console_scripts entry points.") + "\n\n")

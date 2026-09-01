@@ -6,7 +6,7 @@ func buildRegexSheet() string {
 	var b strings.Builder
 	divider := dividerStyle.Render(strings.Repeat("─", 60))
 
-	b.WriteString(titleStyle.Render("String Processing Cheat Sheet — grep, ripgrep, awk") + "\n")
+	b.WriteString(titleStyle.Render("String Processing Cheat Sheet - grep, ripgrep, awk") + "\n")
 
 	b.WriteString(headingStyle.Render("Ripgrep (rg)") + "\n")
 	b.WriteString(cmdStyle.Render("  rg <pattern>") + "                    Search recursively\n")
@@ -28,7 +28,7 @@ func buildRegexSheet() string {
 	b.WriteString(cmdStyle.Render("  rg --files") + "                      List files rg would search\n")
 	b.WriteString(divider + "\n")
 
-	b.WriteString(headingStyle.Render("Grep — When rg Isn't Available") + "\n")
+	b.WriteString(headingStyle.Render("Grep - When rg Isn't Available") + "\n")
 	b.WriteString(noteStyle.Render("  rg replaces grep for daily use. Grep for remote boxes or PCRE.") + "\n\n")
 	b.WriteString(cmdStyle.Render("  grep -P <pattern> <file>") + "        Perl regex (backrefs \\1, lookbehind)\n")
 	b.WriteString(cmdStyle.Render("  grep -r <pattern> <dir>") + "         Recursive (no .gitignore filtering)\n")
@@ -45,7 +45,7 @@ func buildRegexSheet() string {
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Awk") + "\n")
-	b.WriteString(noteStyle.Render("  awk '<pattern> { <action> }' — runs action on matching lines") + "\n\n")
+	b.WriteString(noteStyle.Render("  awk '<pattern> { <action> }' - runs action on matching lines") + "\n\n")
 	b.WriteString(cmdStyle.Render("  awk '{print}' file") + "              Print all lines\n")
 	b.WriteString(cmdStyle.Render("  awk '{print $1}' file") + "           Print first field\n")
 	b.WriteString(cmdStyle.Render("  awk '{print $1, $3}' file") + "       Print fields 1 and 3\n")

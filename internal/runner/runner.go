@@ -183,7 +183,7 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 		lineCount++
 	}
 
-	utils.ClearLines(lineCount + 1) // tool lines + running header
+	utils.ClearLines(lineCount + 1)
 	if len(errors) > 0 {
 		utils.PrintError(phaseName+": partially completed with errors", nil)
 		for _, e := range errors {
@@ -204,7 +204,7 @@ func runPostInstall(p platform.Platform) {
 	generateShellEnv(p, &errors, &lineCount)
 	generateCompletions(p, &errors, &lineCount)
 
-	utils.ClearLines(lineCount + 1) // sub-lines + running header
+	utils.ClearLines(lineCount + 1)
 	if len(errors) > 0 {
 		utils.PrintError("Phase 6: partially completed with errors", nil)
 		for _, e := range errors {
@@ -230,8 +230,7 @@ func generateShellEnv(p platform.Platform, errors *[]jobResult, lineCount *int) 
 	utils.PrintIndentedRunning("shell-env: brew")
 	*lineCount++
 	cmd := exec.Command(brewBin, "shellenv")
-	// brew shellenv returns empty if its own bin is at the front of PATH —
-	// prepend $HOME so the subprocess sees a non-brew-prefixed PATH.
+	// brew shellenv returns empty if its own bin is at the front of PATH, so $HOME is prepended to hide brew's own prefix from the subprocess.
 	env := os.Environ()
 	for i, kv := range env {
 		if strings.HasPrefix(kv, "PATH=") {

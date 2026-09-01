@@ -10,7 +10,7 @@ echo "CPS deep removal"
 echo ""
 echo "Will remove:"
 echo "  - cps binary (~/.local/bin/cps)"
-echo "  - CPS directories (~/shell — includes go-sdk, java-sdk, rust, fnm, py-default,"
+echo "  - CPS directories (~/shell - includes go-sdk, java-sdk, rust, fnm, py-default,"
 echo "    uv tools, all installed binaries; plus ~/.tmux, ~/.config/nvim, ~/.config/cps)"
 echo "  - Neovim caches/state (~/.local/share/nvim, ~/.local/state/nvim, ~/.cache/nvim)"
 echo "  - Legacy pre-v1.3 paths (~/.nvm, ~/google-cloud-sdk, ~/nuclei-templates)"
@@ -27,7 +27,7 @@ echo "  - Broadly-useful brew formulas (wget, zip, unzip, file, tmux, htop)"
 echo "  - Linux dev toolchain (cmake, gcc, make, ninja, gettext)"
 echo "  - Aerospace (macOS tiling WM cask)"
 echo "  - Extension-pack state outside ~/shell (~/.local/share/cursor-agent, ~/.config/antigravity)"
-echo "  - Neo4j databases and config (~/.config/neo4j) — delete it by hand if you want them gone"
+echo "  - Neo4j databases and config (~/.config/neo4j) - delete it by hand if you want them gone"
 echo ""
 read -rp "Continue? [y/N] " ans
 case "$ans" in
@@ -41,7 +41,7 @@ rm -f "$HOME/.local/bin/cps"
 
 echo "==> removing CPS-managed directories"
 rm -rf "$HOME/shell"
-# ~/.tmux is legacy — CPS cloned TPM there before tmux dropped its plugins
+# ~/.tmux is legacy - CPS cloned TPM there before tmux dropped its plugins
 rm -rf "$HOME/.tmux"
 rm -rf "$HOME/.config/nvim"
 rm -rf "$HOME/.config/cps"
@@ -77,7 +77,7 @@ if command -v brew >/dev/null 2>&1; then
   echo "==> uninstalling CPS-installed brew formulas"
   # Kept (broadly useful, not CPS-specific): wget zip unzip file tmux htop
   # Kept (Linux dev-tools group): cmake gcc make ninja gettext
-  # neovim is legacy here — CPS installed it via brew before it became an app bundle.
+  # neovim is legacy here - CPS installed it via brew before it became an app bundle.
   brew uninstall \
     neovim \
     nmap openssl ffmpeg \

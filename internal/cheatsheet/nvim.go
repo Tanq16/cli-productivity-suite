@@ -22,7 +22,7 @@ func buildNvimSheet() string {
 	b.WriteString(cmdStyle.Render("  gg / G") + "                         Top / bottom of file\n")
 	b.WriteString(cmdStyle.Render("  Ctrl+d / Ctrl+u") + "                Half-page down / up\n")
 	b.WriteString(cmdStyle.Render("  Ctrl+f / Ctrl+b") + "                Full-page down / up\n")
-	b.WriteString(noteStyle.Render("  In tmux: Ctrl+b is prefix — press C-b C-b to send to nvim") + "\n")
+	b.WriteString(noteStyle.Render("  In tmux: Ctrl+b is prefix - press C-b C-b to send to nvim") + "\n")
 	b.WriteString(cmdStyle.Render("  { / }") + "                          Prev / next paragraph\n")
 	b.WriteString(cmdStyle.Render("  % / :<number>") + "                  Matching bracket / go to line\n")
 	b.WriteString(divider + "\n")
@@ -75,7 +75,7 @@ func buildNvimSheet() string {
 	b.WriteString(cmdStyle.Render("  ]d / [d") + "                        Next / prev diagnostic\n")
 	b.WriteString("  " + leader + " " + cmdStyle.Render("ds") + "                      Diagnostics to loclist\n")
 	b.WriteString("  " + leader + " " + cmdStyle.Render("fm") + "                      Format buffer\n")
-	b.WriteString(noteStyle.Render("  Servers: gopls, ruff, ts_ls — enabled only when on PATH") + "\n")
+	b.WriteString(noteStyle.Render("  Servers: gopls, ruff, ts_ls - enabled only when on PATH") + "\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Git (gitsigns)") + "\n")

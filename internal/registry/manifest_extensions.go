@@ -3,7 +3,7 @@ package registry
 type ExtensionPack struct {
 	Name        string
 	Description string
-	Requires    string // display-only prerequisite pack name; not enforced at install time
+	Requires    string
 	Tools       []Tool
 }
 

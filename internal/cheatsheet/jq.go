@@ -7,15 +7,15 @@ func buildJqSheet() string {
 	divider := dividerStyle.Render(strings.Repeat("─", 60))
 
 	b.WriteString(titleStyle.Render("jq Cheat Sheet") + "\n")
-	b.WriteString(noteStyle.Render("  jq is a streaming JSON processor — filters are composed with | pipes") + "\n")
+	b.WriteString(noteStyle.Render("  jq is a streaming JSON processor - filters are composed with | pipes") + "\n")
 	b.WriteString(noteStyle.Render("  Reads JSON from stdin or files, writes JSON to stdout") + "\n\n")
 
 	b.WriteString(headingStyle.Render("Invocation Flags") + "\n")
 	b.WriteString(cmdStyle.Render("  jq '.' file.json") + "                Pretty-print JSON\n")
-	b.WriteString(cmdStyle.Render("  jq -r '.'") + "                       Raw output — strip quotes from strings\n")
+	b.WriteString(cmdStyle.Render("  jq -r '.'") + "                       Raw output - strip quotes from strings\n")
 	b.WriteString(cmdStyle.Render("  jq -c '.'") + "                       Compact output (one line per value)\n")
-	b.WriteString(cmdStyle.Render("  jq -s '.'") + "                       Slurp — read entire input into a single array\n")
-	b.WriteString(cmdStyle.Render("  jq -n '<expr>'") + "                  No input — useful with --arg for building JSON\n")
+	b.WriteString(cmdStyle.Render("  jq -s '.'") + "                       Slurp - read entire input into a single array\n")
+	b.WriteString(cmdStyle.Render("  jq -n '<expr>'") + "                  No input - useful with --arg for building JSON\n")
 	b.WriteString(cmdStyle.Render("  jq -R '.'") + "                       Read raw input (lines as strings, not JSON)\n")
 	b.WriteString(cmdStyle.Render("  jq -e '<filter>'") + "                Exit non-zero if result is null/false (scripting)\n")
 	b.WriteString(cmdStyle.Render("  jq --arg name val '<expr>'") + "      Inject string variable $name\n")
@@ -26,7 +26,7 @@ func buildJqSheet() string {
 	b.WriteString(cmdStyle.Render("  .") + "                               The whole input\n")
 	b.WriteString(cmdStyle.Render("  .foo") + "                            Field access\n")
 	b.WriteString(cmdStyle.Render("  .foo.bar") + "                        Nested field\n")
-	b.WriteString(cmdStyle.Render("  .foo?") + "                           Optional — null instead of error if missing\n")
+	b.WriteString(cmdStyle.Render("  .foo?") + "                           Optional - null instead of error if missing\n")
 	b.WriteString(cmdStyle.Render("  .[\"foo bar\"]") + "                    Field name with spaces / special chars\n")
 	b.WriteString(cmdStyle.Render("  .[0]") + "                            Array index (negative allowed: .[-1])\n")
 	b.WriteString(cmdStyle.Render("  .[]") + "                             Iterate array or object values (stream)\n")
@@ -40,13 +40,13 @@ func buildJqSheet() string {
 	b.WriteString(cmdStyle.Render("  .users | map(select(.active))") + "    Filter array by predicate\n")
 	b.WriteString(cmdStyle.Render("  select(.age > 21)") + "               Keep values matching predicate\n")
 	b.WriteString(cmdStyle.Render("  select(.tags | contains([\"x\"]))") + "  Predicate on nested array\n")
-	b.WriteString(cmdStyle.Render("  recurse | select(.id?)") + "          Recursive descent — find any node with .id\n")
+	b.WriteString(cmdStyle.Render("  recurse | select(.id?)") + "          Recursive descent - find any node with .id\n")
 	b.WriteString(cmdStyle.Render("  .. | .name? // empty") + "            Same idea, idiomatic deep scan for .name\n")
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Constructing Output") + "\n")
 	b.WriteString(cmdStyle.Render("  {name: .name, id: .id}") + "          Build an object\n")
-	b.WriteString(cmdStyle.Render("  {name, id}") + "                      Shorthand — same as above\n")
+	b.WriteString(cmdStyle.Render("  {name, id}") + "                      Shorthand - same as above\n")
 	b.WriteString(cmdStyle.Render("  [.[] | .id]") + "                     Collect stream into array\n")
 	b.WriteString(cmdStyle.Render("  to_entries") + "                      Object → array of {key, value}\n")
 	b.WriteString(cmdStyle.Render("  from_entries") + "                    Array of {key, value} → object\n")
@@ -92,9 +92,9 @@ func buildJqSheet() string {
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Key Concepts") + "\n")
-	b.WriteString("  • Filters are " + cmdStyle.Render("composed with |") + " — each filter consumes the previous output\n")
+	b.WriteString("  • Filters are " + cmdStyle.Render("composed with |") + " - each filter consumes the previous output\n")
 	b.WriteString("  • " + cmdStyle.Render(".[]") + " produces a stream; wrap in " + cmdStyle.Render("[ ... ]") + " to collect back into an array\n")
-	b.WriteString("  • " + cmdStyle.Render("-r") + " strips JSON quoting — almost always what you want for shell pipelines\n")
+	b.WriteString("  • " + cmdStyle.Render("-r") + " strips JSON quoting - almost always what you want for shell pipelines\n")
 	b.WriteString("  • Use " + cmdStyle.Render("--arg") + " / " + cmdStyle.Render("--argjson") + " instead of string-interpolating shell vars into the filter\n")
 	b.WriteString("  • " + cmdStyle.Render("?") + " suppresses errors on missing fields; " + cmdStyle.Render("//") + " supplies defaults on null\n")
 
@@ -104,6 +104,6 @@ func buildJqSheet() string {
 var jqSheet = Sheet{
 	Name:        "jq",
 	Aliases:     []string{},
-	Description: "jq JSON processor — filters, selection, recipes",
+	Description: "jq JSON processor - filters, selection, recipes",
 	Content:     buildJqSheet(),
 }

@@ -43,35 +43,35 @@ func (k ToolKind) String() string {
 }
 
 type AssetPattern struct {
-	AssetNames          map[string]string // exact asset name keyed "<os>/<arch>"; a platform found here wins over every pattern below
-	OSPatterns          map[string]string // "linux" -> "linux", "darwin" -> "apple" etc.
-	ArchPatterns        map[string]string // "amd64" -> "x86_64", "arm64" -> "aarch64" etc.
+	AssetNames          map[string]string
+	OSPatterns          map[string]string
+	ArchPatterns        map[string]string
 	RequiredSubstrings  []string
 	ExcludeSubstrings   []string
-	ArchiveFormat       string            // "tar.gz", "tar.xz", "zip", "none" (raw binary)
-	OSArchiveFormats    map[string]string // per-OS override, e.g. "linux" -> "tar.gz", "darwin" -> "zip"
-	BinaryPathInArchive string            // glob pattern to find binary in extracted archive, e.g. "*/bat"
+	ArchiveFormat       string
+	OSArchiveFormats    map[string]string
+	BinaryPathInArchive string
 }
 
 type Tool struct {
 	Name        string
-	BinaryName  string // name of the installed binary in ~/shell/extensions/
+	BinaryName  string
 	Kind        ToolKind
-	Extension   bool   // false = base tool installed by cps init; true = installed by cps extend
-	Repo        string // "owner/repo" for GitHub tools
+	Extension   bool
+	Repo        string
 	Asset       AssetPattern
 	IsPrivate   bool
-	BrewPkgs    []string // Homebrew packages (Linux + macOS)
-	BrewCasks   []string // macOS brew cask packages
-	Platforms   []string // "linux", "darwin", or both; empty means both
+	BrewPkgs    []string
+	BrewCasks   []string
+	Platforms   []string
 	Description string
-	URL         string // for DirectDownload and URL-sourced AppBundle: URL template with {version}, {os}, {arch}
-	StableURL   string // for DirectDownload: URL to fetch latest stable version string
-	Dest        string // for RepoSnapshot: destination directory (can use ~ for home)
-	InstallCmd  string // for CustomScript: shell command run via bash -c
-	NodePkg     string // for NodePackage: npm package spec, e.g. "@openai/codex"
-	PyTool      string // for PythonTool: uv tool name, e.g. "prowler"
+	URL         string
+	StableURL   string
+	Dest        string
+	InstallCmd  string
+	NodePkg     string
+	PyTool      string
 
-	VersionRegex string // applied to a StableURL body that is not a bare version string; first capture group wins
-	PostInstall  string // for AppBundle: identifier for post-install hook logic
+	VersionRegex string
+	PostInstall  string
 }
