@@ -5,9 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"slices"
 	"strings"
-	"time"
 
 	"github.com/tanq16/cli-productivity-suite/internal/github"
 	"github.com/tanq16/cli-productivity-suite/internal/installer"
@@ -17,80 +15,16 @@ import (
 	"github.com/tanq16/cli-productivity-suite/utils"
 )
 
-func Init(ghToken string) {
+func platformAndState() (platform.Platform, *state.State) {
 	p, err := platform.Detect()
 	if err != nil {
 		utils.PrintFatal("platform detection failed", err)
 	}
-
 	st, err := state.Load(p.StatePath())
 	if err != nil {
 		utils.PrintFatal("failed to load state", err)
 	}
-
-	gh := github.NewClient(ghToken)
-	reg := registry.New()
-
-	utils.PrintRunning("(Running) Phase 1: Checking prerequisites")
-	if _, err := exec.LookPath("git"); err != nil {
-		utils.PrintFatal("git not found in PATH", err)
-	}
-	if _, err := exec.LookPath("brew"); err != nil {
-		msg := "Homebrew not found in PATH\nInstall it first: /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
-		utils.PrintFatal(msg, err)
-	}
-	for _, dir := range []string{
-		p.ShellDir(),
-		filepath.Join(p.ShellDir(), "rc"),
-		filepath.Join(p.ShellDir(), "rc", "custom"),
-		filepath.Join(p.ShellDir(), "env"),
-		filepath.Join(p.ShellDir(), "plugins"),
-		filepath.Join(p.ShellDir(), "custom-bin"),
-		p.ShellAppsDir(),
-	} {
-		if err := os.MkdirAll(dir, 0755); err != nil {
-			utils.PrintFatal(fmt.Sprintf("failed to create %s", dir), err)
-		}
-	}
-	utils.ClearLines(1)
-	utils.PrintInfo("Phase 1: Checking prerequisites")
-
-	var hadErrors bool
-
-	sysPkgs := filterBaseTools(filterPlatformTools(reg.ByKind(registry.SystemPackage), p))
-
-	if runPhase("Phase 2: System packages", sysPkgs, p, gh, st) {
-		hadErrors = true
-	}
-	st.Save()
-
-	if runPhase("Phase 3: Applications", filterBaseTools(reg.ByKind(registry.AppBundle)), p, gh, st) {
-		hadErrors = true
-	}
-	st.Save()
-
-	if runPhase("Phase 4: Shell plugins", filterBaseTools(reg.ByKind(registry.RepoSnapshot)), p, gh, st) {
-		hadErrors = true
-	}
-	st.Save()
-
-	if runPhase("Phase 5: Config files", filterPlatformTools(reg.ByKind(registry.ConfigFile), p), p, gh, st) {
-		hadErrors = true
-	}
-	st.Save()
-
-	runPostInstall(p)
-
-	st.LastInit = time.Now()
-	if err := st.Save(); err != nil {
-		utils.PrintError("failed to save state", err)
-	}
-
-	if hadErrors {
-		utils.PrintWarn("init finished with errors", nil)
-	} else {
-		utils.PrintSuccess("init complete!")
-	}
+	return p, st
 }
 
 func SelfUpdate(appVersion string) {
@@ -196,25 +130,6 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 	return len(errors) > 0
 }
 
-func runPostInstall(p platform.Platform) {
-	utils.PrintRunning("(Running) Phase 6: Post-install tasks")
-	var lineCount int
-	var errors []jobResult
-
-	generateShellEnv(p, &errors, &lineCount)
-	generateCompletions(p, &errors, &lineCount)
-
-	utils.ClearLines(lineCount + 1)
-	if len(errors) > 0 {
-		utils.PrintError("Phase 6: partially completed with errors", nil)
-		for _, e := range errors {
-			utils.PrintIndentedError(e.name, e.err)
-		}
-	} else {
-		utils.PrintInfo("Phase 6: Post-install tasks")
-	}
-}
-
 func generateShellEnv(p platform.Platform, errors *[]jobResult, lineCount *int) {
 	envDir := filepath.Join(p.ShellDir(), "env")
 	if err := os.MkdirAll(envDir, 0755); err != nil {
@@ -307,24 +222,41 @@ func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *in
 	}
 }
 
-func toolForPlatform(tool registry.Tool, p platform.Platform) bool {
-	return len(tool.Platforms) == 0 || slices.Contains(tool.Platforms, p.OS.String())
+func runPostInstall(phaseName string, p platform.Platform, withShellEnv bool) {
+	utils.PrintRunning("(Running) " + phaseName)
+	var lineCount int
+	var errors []jobResult
+
+	if withShellEnv {
+		generateShellEnv(p, &errors, &lineCount)
+	}
+	generateCompletions(p, &errors, &lineCount)
+
+	utils.ClearLines(lineCount + 1)
+	if len(errors) > 0 {
+		utils.PrintError(phaseName+": partially completed with errors", nil)
+		for _, e := range errors {
+			utils.PrintIndentedError(e.name, e.err)
+		}
+		return
+	}
+	utils.PrintInfo(phaseName)
 }
 
 func filterPlatformTools(tools []registry.Tool, p platform.Platform) []registry.Tool {
 	var result []registry.Tool
 	for _, t := range tools {
-		if toolForPlatform(t, p) {
+		if t.SupportsPlatform(p.OS.String()) {
 			result = append(result, t)
 		}
 	}
 	return result
 }
 
-func filterBaseTools(tools []registry.Tool) []registry.Tool {
+func filterKind(tools []registry.Tool, kind registry.ToolKind) []registry.Tool {
 	var result []registry.Tool
 	for _, t := range tools {
-		if !t.Extension {
+		if t.Kind == kind {
 			result = append(result, t)
 		}
 	}

@@ -58,8 +58,8 @@ func (r *RepoSnapshotInstaller) Install(tool *registry.Tool, p platform.Platform
 	return Result{Tool: tool.Name, Version: version, WasUpdated: currentVersion != "" && currentVersion != version}
 }
 
-// A GitHub branch archive roots at <repo>-<full sha>, which is the only place the snapshot's commit is recorded.
 func snapshotVersion(srcDir string) string {
+	// A GitHub branch archive roots at <repo>-<full sha>, the only place the snapshot records its commit.
 	base := filepath.Base(srcDir)
 	i := strings.LastIndex(base, "-")
 	if i < 0 {

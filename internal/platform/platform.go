@@ -105,6 +105,10 @@ func (p Platform) CustomScriptEnv() []string {
 	prefix := strings.Join([]string{
 		filepath.Join(p.HomeDir, "shell", "custom-bin"),
 		p.ShellExtDir(),
+		filepath.Join(p.ShellDir(), "go-sdk", "bin"),
+		filepath.Join(p.ShellDir(), "go", "bin"),
+		filepath.Join(p.ShellDir(), "fnm", "aliases", "lts-latest", "bin"),
+		filepath.Join(p.ShellDir(), "uv-tool-executables"),
 	}, ":")
 	for i, kv := range env {
 		if strings.HasPrefix(kv, "PATH=") {
