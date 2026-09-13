@@ -75,6 +75,28 @@ func PrintIndentedGeneric(msg string) {
 	lipgloss.Println("    " + msg)
 }
 
+func PrintIndentedList(items []string) {
+	width := max(TermWidth()-4, 1)
+	var line string
+	for i, item := range items {
+		if i < len(items)-1 {
+			item += ","
+		}
+		switch {
+		case line == "":
+			line = item
+		case lipgloss.Width(line)+1+lipgloss.Width(item) <= width:
+			line += " " + item
+		default:
+			PrintIndentedGeneric(line)
+			line = item
+		}
+	}
+	if line != "" {
+		PrintIndentedGeneric(line)
+	}
+}
+
 func PrintRunning(msg string) {
 	if GlobalDebugFlag {
 		log.Info().Msg(msg)

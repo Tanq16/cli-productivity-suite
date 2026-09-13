@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"charm.land/lipgloss/v2"
-	"github.com/charmbracelet/x/term"
 	"github.com/rs/zerolog/log"
 )
 
@@ -20,8 +19,6 @@ type Unit string
 const UnitBytes Unit = ""
 
 const (
-	meterMinWidth     = 24
-	meterDefaultWidth = 80
 	barFloor          = 8
 	barCeiling        = 30
 	rateWindowSpan    = 800 * time.Millisecond
@@ -249,7 +246,7 @@ func (m *Meter) render() {
 		return
 	}
 
-	fields, bar := m.frame(termWidth())
+	fields, bar := m.frame(TermWidth())
 	lines := []string{m.header(), "  " + strings.TrimLeft(bar+"  "+strings.Join(fields, "  "), " ")}
 
 	var b strings.Builder
@@ -387,16 +384,6 @@ func (m *Meter) settledLine() string {
 		parts = append(parts, "avg "+formatRate(rate, m.unit))
 	}
 	return strings.Join(parts, "  ")
-}
-
-func termWidth() int {
-	if w, _, err := term.GetSize(os.Stdout.Fd()); err == nil && w > 0 {
-		return w
-	}
-	if n, err := strconv.Atoi(os.Getenv("COLUMNS")); err == nil && n >= meterMinWidth {
-		return n
-	}
-	return meterDefaultWidth
 }
 
 func oneLine(err error) string {

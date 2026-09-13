@@ -21,7 +21,7 @@ func PackageList() {
 		utils.PrintInfo(fmt.Sprintf("%s - %s (%d packages)", g.Name, g.Description, len(tools)))
 
 		if g.Name != registry.GroupRuntime {
-			utils.PrintGeneric("    " + strings.Join(toolNames(tools), ", "))
+			utils.PrintIndentedList(toolNames(tools))
 			continue
 		}
 		for _, s := range registry.Suites() {
