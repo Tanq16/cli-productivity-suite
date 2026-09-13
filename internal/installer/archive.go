@@ -37,12 +37,12 @@ func ExtractArchive(archivePath, destDir, format string) error {
 	}
 }
 
-// Bundle archive roots are named per tool and version, so unwrap to keep the install path stable.
 func unwrapSingleDir(dir string) string {
 	entries, err := os.ReadDir(dir)
 	if err != nil || len(entries) != 1 || !entries[0].IsDir() {
 		return dir
 	}
+	// Bundle archive roots are named per tool and version, so the install path is only stable one level down.
 	return filepath.Join(dir, entries[0].Name())
 }
 

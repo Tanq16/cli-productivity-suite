@@ -1,5 +1,7 @@
 package registry
 
+import "slices"
+
 type ToolKind int
 
 const (
@@ -42,6 +44,27 @@ func (k ToolKind) String() string {
 	}
 }
 
+const (
+	GroupShell        = "shell"
+	GroupBrew         = "brew"
+	GroupMacOSDesktop = "macos-desktop"
+	GroupRuntime      = "runtime"
+	GroupAI           = "ai"
+	GroupBinaries     = "binaries"
+	GroupHomelab      = "homelab"
+	GroupPrivate      = "private"
+)
+
+type Group struct {
+	Name        string
+	Description string
+}
+
+type Suite struct {
+	Name        string
+	Description string
+}
+
 type AssetPattern struct {
 	AssetNames          map[string]string
 	OSPatterns          map[string]string
@@ -57,7 +80,9 @@ type Tool struct {
 	Name        string
 	BinaryName  string
 	Kind        ToolKind
-	Extension   bool
+	Group       string
+	Suite       string
+	Requires    []string
 	Repo        string
 	Asset       AssetPattern
 	IsPrivate   bool
@@ -74,4 +99,8 @@ type Tool struct {
 
 	VersionRegex string
 	PostInstall  string
+}
+
+func (t Tool) SupportsPlatform(osName string) bool {
+	return len(t.Platforms) == 0 || slices.Contains(t.Platforms, osName)
 }

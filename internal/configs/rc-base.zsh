@@ -48,9 +48,6 @@ bindkey '^X^E' edit-command-line
 setopt NO_FLOW_CONTROL
 stty -ixon
 
-# syntax-highlighting must be sourced LAST per upstream README
-[ -f "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && source "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-
 # --- PATH ---
 # custom-bin first so user-dropped binaries win over CPS-managed ones on name collision
 export PATH="$HOME/shell/custom-bin:$HOME/shell/extensions:$HOME/.local/bin:$PATH"
@@ -97,7 +94,6 @@ alias gitn='git --no-pager'
 alias tt='tmux -u new -s default'
 alias t='tmux -u a -t default'
 alias tree='lsd --tree'
-alias a=anbu
 alias ts='tmux -u new -s'
 alias ta='tmux -u a -t'
 alias tls='tmux list-sessions'

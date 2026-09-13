@@ -24,6 +24,10 @@ func NewClient(token string) *Client {
 	}
 }
 
+func (c *Client) HasToken() bool {
+	return c.token != ""
+}
+
 func (c *Client) do(req *http.Request) (*http.Response, error) {
 	if c.token != "" {
 		req.Header.Set("Authorization", "token "+c.token)

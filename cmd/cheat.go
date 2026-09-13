@@ -10,16 +10,10 @@ import (
 )
 
 var cheatCmd = &cobra.Command{
-	Use:   "cheat <topic>",
-	Short: "Print cheat sheets for common tools",
-	Args:  cobra.ExactArgs(1),
-	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		if len(args) > 0 {
-			return nil, cobra.ShellCompDirectiveNoFileComp
-		}
-		suggestions := append([]string{"list"}, cheatsheet.AllNames()...)
-		return suggestions, cobra.ShellCompDirectiveNoFileComp
-	},
+	Use:       "cheat <topic>",
+	Short:     "Print cheat sheets for common tools",
+	Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
+	ValidArgs: append([]string{"list"}, cheatsheet.AllNames()...),
 	Run: func(cmd *cobra.Command, args []string) {
 		if args[0] == "list" {
 			for _, s := range cheatsheet.List() {

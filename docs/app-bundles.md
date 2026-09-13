@@ -1,6 +1,6 @@
 # App bundles
 
-Three tools in the `homelab` pack are multi-file trees rather than single binaries, so they unpack to `~/shell/apps/<name>/` and are not on PATH. Run them by full path.
+Three packages in the `homelab` group are multi-file trees rather than single binaries, so they unpack to `~/shell/apps/<name>/` and are not on PATH. Run them by full path.
 
 ```bash
 ~/shell/apps/rinnegan/bin/rinnegan serve            # PTY web terminal
@@ -27,15 +27,15 @@ That also keeps the browser on `localhost`, which is a secure context. Over a pl
 
 To add authentication, replace `auth: none` with `auth: password` plus either `password:` or `hashed-password:`, the argon2 hash winning if both are set. Neither can be passed as a CLI flag by design, so they go in the config file or in the `PASSWORD` and `HASHED_PASSWORD` environment variables.
 
-Eight extensions are installed on first seeding, from Open VSX: Catppuccin theme and icons, EditorConfig, Error Lens, Go, Python, Ruff, and Claude Code. Seeding only happens while the extensions directory is empty, so adding or removing one by hand sticks, and a failed install retries on the next `cps extend homelab`.
+Eight extensions are installed on first seeding, from Open VSX: Catppuccin theme and icons, EditorConfig, Error Lens, Go, Python, Ruff, and Claude Code. Seeding only happens while the extensions directory is empty, so adding or removing one by hand sticks, and a failed install retries on the next `cps package install code-server`.
 
-The Go extension will offer to install `gopls` on first use, which needs `cps extend runtimes`. Pylance is not on Open VSX, so Python IntelliSense is weaker than desktop VS Code and Ruff covers linting and formatting. The Claude Code panel runs on top of the `claude` CLI and shares its login, so it uses an existing Claude subscription rather than a metered API key. Install that CLI with `cps extend ai-tools` and authenticate once on the host.
+The Go extension will offer to install `gopls` on first use, which needs `cps package install go-suite`. Pylance is not on Open VSX, so Python IntelliSense is weaker than desktop VS Code and Ruff covers linting and formatting. The Claude Code panel runs on top of the `claude` CLI and shares its login, so it uses an existing Claude subscription rather than a metered API key. Install that CLI with `cps package install claude-code` and authenticate once on the host.
 
 ## neo4j
 
-The bundle ships no JVM. It runs on the `JAVA_HOME` that `cps extend runtimes` sets up, which is why `homelab` is marked as needing that pack.
+The bundle ships no JVM. It runs on the `JAVA_HOME` that `cps package install java-suite` sets up.
 
-Neo4j would otherwise keep its databases inside the bundle, where an upgrade would destroy them. `cps extend homelab` seeds `~/.config/neo4j/conf/` once, never overwriting it afterwards, with absolute `server.directories.*` paths pointing at `~/.config/neo4j/`, and `50-homelab.zsh` exports `NEO4J_CONF` so Neo4j reads that conf instead of the bundle's. Your graph, plugins and tuning survive every upgrade, and `scripts/deep-removal.sh` leaves them alone.
+Neo4j would otherwise keep its databases inside the bundle, where an upgrade would destroy them. `cps package install neo4j` seeds `~/.config/neo4j/conf/` once, never overwriting it afterwards, with absolute `server.directories.*` paths pointing at `~/.config/neo4j/`, and the generated `cps.zsh` exports `NEO4J_CONF` so Neo4j reads that conf instead of the bundle's. Your graph, plugins and tuning survive every upgrade, and `scripts/deep-removal.sh` leaves them alone.
 
 Set a password before the first start:
 

@@ -88,7 +88,7 @@ func bundleSourceFor(tool *registry.Tool, p platform.Platform, gh *github.Client
 			version: version,
 			fetch: func(tmpDir string) (string, error) {
 				archivePath := filepath.Join(tmpDir, tool.Name+"-archive")
-				return archivePath, DownloadToFile(url, archivePath)
+				return archivePath, DownloadToFile(url, archivePath, nil)
 			},
 		}, nil
 	}

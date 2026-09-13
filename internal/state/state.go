@@ -98,6 +98,10 @@ func (s *State) ToolVersion(name string) string {
 	return ""
 }
 
+func (s *State) Installed(name string) bool {
+	return s.ToolVersion(name) != ""
+}
+
 func (s *State) SetToolVersion(name, version string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()

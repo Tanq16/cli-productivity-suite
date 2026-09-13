@@ -13,6 +13,7 @@ type Asset struct {
 	Name               string `json:"name"`
 	BrowserDownloadURL string `json:"browser_download_url"`
 	URL                string `json:"url"`
+	Size               int64  `json:"size"`
 }
 
 type Release struct {

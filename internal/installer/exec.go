@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-// exec.Command ignores cmd.Env when resolving the program, so resolve against the augmented PATH here.
 func envCommand(env []string, name string, args ...string) *exec.Cmd {
+	// exec.Command resolves the program against the process PATH, never cmd.Env.
 	cmd := exec.Command(lookPathIn(env, name), args...)
 	cmd.Env = env
 	return cmd

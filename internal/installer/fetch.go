@@ -13,7 +13,7 @@ func httpGet(url string) (*http.Response, error) {
 	return utils.HTTPClient.Get(url)
 }
 
-func DownloadToFile(url, destPath string) error {
+func DownloadToFile(url, destPath string, progress io.Writer) error {
 	resp, err := httpGet(url)
 	if err != nil {
 		return err
@@ -29,7 +29,11 @@ func DownloadToFile(url, destPath string) error {
 		return err
 	}
 
-	if _, err := io.Copy(f, resp.Body); err != nil {
+	var body io.Reader = resp.Body
+	if progress != nil {
+		body = io.TeeReader(resp.Body, progress)
+	}
+	if _, err := io.Copy(f, body); err != nil {
 		f.Close()
 		return err
 	}

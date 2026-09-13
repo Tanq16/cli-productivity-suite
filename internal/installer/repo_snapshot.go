@@ -30,7 +30,7 @@ func (r *RepoSnapshotInstaller) Install(tool *registry.Tool, p platform.Platform
 	// GitHub resolves HEAD to the repo's own default branch, so no branch name is pinned here.
 	url := fmt.Sprintf("https://github.com/%s/archive/HEAD.tar.gz", tool.Repo)
 	archivePath := filepath.Join(tmpDir, "snapshot.tar.gz")
-	if err := DownloadToFile(url, archivePath); err != nil {
+	if err := DownloadToFile(url, archivePath, nil); err != nil {
 		return Result{Tool: tool.Name, Err: fmt.Errorf("download failed: %w", err)}
 	}
 
@@ -58,8 +58,8 @@ func (r *RepoSnapshotInstaller) Install(tool *registry.Tool, p platform.Platform
 	return Result{Tool: tool.Name, Version: version, WasUpdated: currentVersion != "" && currentVersion != version}
 }
 
-// A GitHub branch archive roots at <repo>-<full sha>, which is the only place the snapshot's commit is recorded.
 func snapshotVersion(srcDir string) string {
+	// A GitHub branch archive roots at <repo>-<full sha>, the only place the snapshot records its commit.
 	base := filepath.Base(srcDir)
 	i := strings.LastIndex(base, "-")
 	if i < 0 {

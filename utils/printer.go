@@ -3,7 +3,6 @@ package utils
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"charm.land/lipgloss/v2"
 	"github.com/rs/zerolog/log"
@@ -14,6 +13,8 @@ var (
 	ColorGreen  = lipgloss.ANSIColor(10)
 	ColorRed    = lipgloss.ANSIColor(9)
 	ColorYellow = lipgloss.ANSIColor(11)
+	ColorMuted  = lipgloss.ANSIColor(7)
+	ColorChrome = lipgloss.ANSIColor(8)
 
 	infoStyle    = lipgloss.NewStyle().Foreground(ColorBlue)
 	successStyle = lipgloss.NewStyle().Foreground(ColorGreen)
@@ -68,6 +69,10 @@ func PrintWarn(msg string, err error) {
 
 func PrintGeneric(msg string) {
 	lipgloss.Println(msg)
+}
+
+func PrintIndentedGeneric(msg string) {
+	lipgloss.Println("    " + msg)
 }
 
 func PrintRunning(msg string) {
@@ -129,22 +134,4 @@ func ClearLines(n int) {
 
 func ClearPreviousLine() {
 	ClearLines(1)
-}
-
-func PrintProgress(label string, percent int) {
-	percent = min(percent, 100)
-
-	if GlobalDebugFlag {
-		log.Info().Int("percent", percent).Msg(label)
-		return
-	}
-	if !StdoutIsTerminal {
-		lipgloss.Println(fmt.Sprintf("  ↻ %s: %d%%", label, percent))
-		return
-	}
-
-	const barWidth = 10
-	filled := barWidth * percent / 100
-	bar := strings.Repeat("⣿", filled) + strings.Repeat("⣀", barWidth-filled)
-	lipgloss.Println(infoStyle.Render(fmt.Sprintf("  ↻ %s: %s %d%%", label, bar, percent)))
 }

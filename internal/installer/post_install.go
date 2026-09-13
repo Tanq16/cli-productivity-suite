@@ -29,7 +29,6 @@ func runPostInstall(tool *registry.Tool, p platform.Platform, destDir string) er
 	}
 }
 
-// Neo4j defaults these under its install root, which an upgrade replaces wholesale; they are the directory settings that accept an absolute path.
 var neo4jRelocatedDirs = []string{"data", "plugins", "import", "logs", "run", "licenses"}
 
 func seedNeo4jConfig(p platform.Platform, bundleDir string) error {
@@ -118,7 +117,6 @@ func seedCodeServerConfig(p platform.Platform, bundleDir string) error {
 	return nil
 }
 
-// Neovim locates its own runtime relative to the resolved executable, so the bundle stays intact in ~/shell/apps and only a symlink goes on PATH.
 func linkNeovimBinary(p platform.Platform, bundleDir string) error {
 	if err := os.MkdirAll(p.ShellExtDir(), 0755); err != nil {
 		return err
@@ -127,6 +125,7 @@ func linkNeovimBinary(p platform.Platform, bundleDir string) error {
 	if err := os.Remove(link); err != nil && !os.IsNotExist(err) {
 		return err
 	}
+	// Neovim locates its runtime relative to the resolved executable, so only a symlink may go on PATH.
 	return os.Symlink(filepath.Join(bundleDir, "bin", "nvim"), link)
 }
 

@@ -3,7 +3,6 @@ package installer
 import (
 	"encoding/json/v2"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -16,6 +15,11 @@ import (
 	"github.com/tanq16/cli-productivity-suite/internal/registry"
 	"github.com/tanq16/cli-productivity-suite/internal/state"
 	"github.com/tanq16/cli-productivity-suite/utils"
+)
+
+const (
+	uvRepo  = "astral-sh/uv"
+	fnmRepo = "Schniz/fnm"
 )
 
 type LanguageRuntimeInstaller struct{}
@@ -41,7 +45,7 @@ func (l *LanguageRuntimeInstaller) Install(tool *registry.Tool, p platform.Platf
 	}
 }
 
-func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.State) Result {
+func goLatest(p platform.Platform) (version, downloadURL string, err error) {
 	type goDL struct {
 		Version string `json:"version"`
 		Stable  bool   `json:"stable"`
@@ -55,43 +59,36 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 
 	resp, err := httpGet("https://go.dev/dl/?mode=json")
 	if err != nil {
-		return Result{Tool: "go-sdk", Err: err}
+		return "", "", err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return Result{Tool: "go-sdk", Err: fmt.Errorf("go.dev/dl API returned HTTP %d", resp.StatusCode)}
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return Result{Tool: "go-sdk", Err: err}
+		return "", "", fmt.Errorf("go.dev/dl API returned HTTP %d", resp.StatusCode)
 	}
 
 	var releases []goDL
-	if err := json.Unmarshal(body, &releases); err != nil {
-		return Result{Tool: "go-sdk", Err: err}
+	if err := json.UnmarshalRead(resp.Body, &releases); err != nil {
+		return "", "", err
 	}
 
-	var downloadURL, version string
 	for _, r := range releases {
 		if !r.Stable {
 			continue
 		}
 		for _, f := range r.Files {
 			if f.OS == p.OS.String() && f.Arch == p.Arch.String() && f.Kind == "archive" {
-				downloadURL = fmt.Sprintf("https://go.dev/dl/%s", f.Filename)
-				version = r.Version
-				break
+				return r.Version, fmt.Sprintf("https://go.dev/dl/%s", f.Filename), nil
 			}
 		}
-		if downloadURL != "" {
-			break
-		}
 	}
+	return "", "", fmt.Errorf("no Go download found for %s/%s", p.OS, p.Arch)
+}
 
-	if downloadURL == "" {
-		return Result{Tool: "go-sdk", Err: fmt.Errorf("no Go download found for %s/%s", p.OS, p.Arch)}
+func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.State) Result {
+	version, downloadURL, err := goLatest(p)
+	if err != nil {
+		return Result{Tool: "go-sdk", Err: err}
 	}
 
 	// Temp dir inside p.ShellDir() so os.Rename stays on the same filesystem (avoids EXDEV on Linux tmpfs /tmp).
@@ -102,7 +99,7 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 	defer os.RemoveAll(tmpDir)
 
 	tarPath := filepath.Join(tmpDir, "go.tar.gz")
-	if err := DownloadToFile(downloadURL, tarPath); err != nil {
+	if err := DownloadToFile(downloadURL, tarPath, nil); err != nil {
 		return Result{Tool: "go-sdk", Err: err}
 	}
 
@@ -119,7 +116,7 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 	return Result{Tool: "go-sdk", Version: version}
 }
 
-func (l *LanguageRuntimeInstaller) installJava(p platform.Platform, st *state.State) Result {
+func javaLatest(p platform.Platform) (version, downloadURL string, err error) {
 	var osStr, archStr string
 	switch p.OS {
 	case platform.Darwin:
@@ -136,25 +133,25 @@ func (l *LanguageRuntimeInstaller) installJava(p platform.Platform, st *state.St
 
 	resp, err := httpGet("https://api.adoptium.net/v3/info/available_releases")
 	if err != nil {
-		return Result{Tool: "java-sdk", Err: err}
+		return "", "", err
 	}
 	var info struct {
 		MostRecentLTS int `json:"most_recent_lts"`
 	}
 	if err := json.UnmarshalRead(resp.Body, &info); err != nil {
 		resp.Body.Close()
-		return Result{Tool: "java-sdk", Err: err}
+		return "", "", err
 	}
 	resp.Body.Close()
 	if info.MostRecentLTS == 0 {
-		return Result{Tool: "java-sdk", Err: fmt.Errorf("no LTS version returned from Adoptium")}
+		return "", "", fmt.Errorf("no LTS version returned from Adoptium")
 	}
 
 	assetURL := fmt.Sprintf("https://api.adoptium.net/v3/assets/latest/%d/hotspot?architecture=%s&image_type=jdk&os=%s&vendor=eclipse",
 		info.MostRecentLTS, archStr, osStr)
 	assetResp, err := httpGet(assetURL)
 	if err != nil {
-		return Result{Tool: "java-sdk", Err: err}
+		return "", "", err
 	}
 	var assets []struct {
 		Binary struct {
@@ -166,14 +163,20 @@ func (l *LanguageRuntimeInstaller) installJava(p platform.Platform, st *state.St
 	}
 	if err := json.UnmarshalRead(assetResp.Body, &assets); err != nil {
 		assetResp.Body.Close()
-		return Result{Tool: "java-sdk", Err: err}
+		return "", "", err
 	}
 	assetResp.Body.Close()
 	if len(assets) == 0 || assets[0].Binary.Package.Link == "" {
-		return Result{Tool: "java-sdk", Err: fmt.Errorf("no Adoptium asset for %s/%s JDK %d", osStr, archStr, info.MostRecentLTS)}
+		return "", "", fmt.Errorf("no Adoptium asset for %s/%s JDK %d", osStr, archStr, info.MostRecentLTS)
 	}
-	downloadURL := assets[0].Binary.Package.Link
-	version := assets[0].ReleaseName
+	return assets[0].ReleaseName, assets[0].Binary.Package.Link, nil
+}
+
+func (l *LanguageRuntimeInstaller) installJava(p platform.Platform, st *state.State) Result {
+	version, downloadURL, err := javaLatest(p)
+	if err != nil {
+		return Result{Tool: "java-sdk", Err: err}
+	}
 
 	// Temp dir inside p.ShellDir() so rename stays on the same filesystem (avoids EXDEV on Linux tmpfs /tmp).
 	tmpDir, err := os.MkdirTemp(p.ShellDir(), "cps-java-*")
@@ -183,7 +186,7 @@ func (l *LanguageRuntimeInstaller) installJava(p platform.Platform, st *state.St
 	defer os.RemoveAll(tmpDir)
 
 	tarPath := filepath.Join(tmpDir, "jdk.tar.gz")
-	if err := DownloadToFile(downloadURL, tarPath); err != nil {
+	if err := DownloadToFile(downloadURL, tarPath, nil); err != nil {
 		return Result{Tool: "java-sdk", Err: err}
 	}
 
@@ -252,7 +255,7 @@ func (l *LanguageRuntimeInstaller) installRust(p platform.Platform, st *state.St
 	defer os.RemoveAll(tmpDir)
 
 	initPath := filepath.Join(tmpDir, "rustup-init")
-	if err := DownloadToFile(url, initPath); err != nil {
+	if err := DownloadToFile(url, initPath, nil); err != nil {
 		return Result{Tool: "rust", Err: fmt.Errorf("download rustup-init failed: %w", err)}
 	}
 	if err := os.Chmod(initPath, 0755); err != nil {
@@ -275,19 +278,20 @@ func (l *LanguageRuntimeInstaller) installRust(p platform.Platform, st *state.St
 		"CARGO_HOME="+cargoHome,
 	)
 	out, err := verCmd.Output()
-	version := "stable"
-	if err == nil {
-		parts := strings.Fields(strings.TrimSpace(string(out)))
-		if len(parts) >= 2 {
-			version = parts[1]
-		}
+	if err != nil {
+		return Result{Tool: "rust", Err: fmt.Errorf("rustc --version failed after install: %w", err)}
 	}
+	parts := strings.Fields(strings.TrimSpace(string(out)))
+	if len(parts) < 2 {
+		return Result{Tool: "rust", Err: fmt.Errorf("could not read a version out of %q", strings.TrimSpace(string(out)))}
+	}
+	version := parts[1]
 
 	st.SetToolVersion("rust", version)
 	return Result{Tool: "rust", Version: version}
 }
 
-func (l *LanguageRuntimeInstaller) latestPythonCycle() (string, error) {
+func latestPythonCycle() (string, error) {
 	resp, err := httpGet("https://endoflife.date/api/python.json")
 	if err != nil {
 		return "", err
@@ -341,7 +345,7 @@ func (l *LanguageRuntimeInstaller) findUVAsset(assets []github.Asset, p platform
 }
 
 func (l *LanguageRuntimeInstaller) downloadUV(p platform.Platform, gh *github.Client) (uvPath string, tagName string, err error) {
-	release, err := gh.LatestRelease("astral-sh/uv")
+	release, err := gh.LatestRelease(uvRepo)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to fetch uv release: %w", err)
 	}
@@ -358,7 +362,7 @@ func (l *LanguageRuntimeInstaller) downloadUV(p platform.Platform, gh *github.Cl
 	defer os.RemoveAll(tmpDir)
 
 	tarPath := filepath.Join(tmpDir, "uv.tar.gz")
-	if err := DownloadToFile(downloadURL, tarPath); err != nil {
+	if err := DownloadToFile(downloadURL, tarPath, nil); err != nil {
 		return "", "", fmt.Errorf("download uv failed: %w", err)
 	}
 
@@ -399,7 +403,7 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, gh *github
 	}
 	st.SetToolVersion("uv", uvTag)
 
-	version, err := l.latestPythonCycle()
+	version, err := latestPythonCycle()
 	if err != nil {
 		return Result{Tool: "python", Err: err}
 	}
@@ -423,10 +427,12 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, gh *github
 		return Result{Tool: "python", Err: fmt.Errorf("uv python install failed: %w", err)}
 	}
 
-	pipPath := filepath.Join(venvPath, "bin", "pip")
+	venvPython := filepath.Join(venvPath, "bin", "python")
 	var frozen []byte
-	if _, err := os.Stat(pipPath); err == nil {
-		frozen, _ = exec.Command(pipPath, "freeze").Output()
+	if _, err := os.Stat(venvPython); err == nil {
+		freezeCmd := exec.Command(uvPath, "pip", "freeze", "--python", venvPython)
+		freezeCmd.Env = uvEnv
+		frozen, _ = freezeCmd.Output()
 	}
 
 	venvCmd := exec.Command(uvPath, "venv", "--python", version, "--clear", venvPath)
@@ -449,11 +455,16 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, gh *github
 			keep = append(keep, trimmed)
 		}
 		if len(keep) > 0 {
-			pipNew := filepath.Join(venvPath, "bin", "pip")
-			installCmd := exec.Command(pipNew, "install", "--quiet", "-r", "/dev/stdin")
-			installCmd.Stdin = strings.NewReader(strings.Join(keep, "\n"))
-			if err := utils.RunCmd(installCmd); err != nil {
-				return Result{Tool: "python", Err: fmt.Errorf("pip package restore failed: %w", err)}
+			reqPath := filepath.Join(venvPath, "cps-restore-requirements.txt")
+			if err := os.WriteFile(reqPath, []byte(strings.Join(keep, "\n")+"\n"), 0644); err != nil {
+				return Result{Tool: "python", Err: fmt.Errorf("failed to stage the package list for restore: %w", err)}
+			}
+			installCmd := exec.Command(uvPath, "pip", "install", "--quiet", "--python", venvPython, "-r", reqPath)
+			installCmd.Env = uvEnv
+			restoreErr := utils.RunCmd(installCmd)
+			os.Remove(reqPath)
+			if restoreErr != nil {
+				return Result{Tool: "python", Err: fmt.Errorf("package restore failed: %w", restoreErr)}
 			}
 		}
 	}
@@ -488,7 +499,7 @@ func (l *LanguageRuntimeInstaller) fnmAssetName(p platform.Platform) string {
 }
 
 func (l *LanguageRuntimeInstaller) downloadFnm(p platform.Platform, gh *github.Client) (fnmPath string, tagName string, err error) {
-	release, err := gh.LatestRelease("Schniz/fnm")
+	release, err := gh.LatestRelease(fnmRepo)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to fetch fnm release: %w", err)
 	}
@@ -512,7 +523,7 @@ func (l *LanguageRuntimeInstaller) downloadFnm(p platform.Platform, gh *github.C
 	defer os.RemoveAll(tmpDir)
 
 	zipPath := filepath.Join(tmpDir, "fnm.zip")
-	if err := DownloadToFile(downloadURL, zipPath); err != nil {
+	if err := DownloadToFile(downloadURL, zipPath, nil); err != nil {
 		return "", "", fmt.Errorf("download fnm failed: %w", err)
 	}
 
@@ -608,9 +619,12 @@ func (l *LanguageRuntimeInstaller) installNode(p platform.Platform, gh *github.C
 	versionCmd := exec.Command(fnmPath, "exec", "--using=lts-latest", "--", "node", "--version")
 	versionCmd.Env = env
 	out, err := versionCmd.Output()
-	nodeVersion := "lts"
-	if err == nil {
-		nodeVersion = strings.TrimSpace(string(out))
+	if err != nil {
+		return Result{Tool: "node", Err: fmt.Errorf("node --version failed after install: %w", err)}
+	}
+	nodeVersion := strings.TrimSpace(string(out))
+	if nodeVersion == "" {
+		return Result{Tool: "node", Err: fmt.Errorf("node --version returned nothing after install")}
 	}
 
 	if oldNodeVersion != "" && oldNodeVersion != nodeVersion {

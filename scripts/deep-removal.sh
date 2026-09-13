@@ -4,7 +4,7 @@
 #
 # After running this, you can start fresh by:
 #   1. Reinstalling the cps binary (Homebrew stays)
-#   2. Running `cps init`
+#   2. Running `cps prereq` then `cps shell`
 
 echo "CPS deep removal"
 echo ""
@@ -16,17 +16,18 @@ echo "  - Neovim caches/state (~/.local/share/nvim, ~/.local/state/nvim, ~/.cach
 echo "  - Legacy pre-v1.3 paths (~/.nvm, ~/google-cloud-sdk, ~/nuclei-templates)"
 echo "  - Legacy runtime caches (~/.local/share/uv, ~/.bun, ~/.npm, go-build cache)"
 echo "  - CPS-deployed configs (.zshrc, .tmux.conf, .aerospace.toml, kitty configs, starship.toml)"
-echo "  - Brew packages installed by CPS (nmap, openssl, ffmpeg, aws-cli,"
-echo "    azure-cli, gcloud-cli cask, plus legacy brew neovim)"
+echo "  - Brew packages installed by CPS (nmap, openssl, ffmpeg, imagemagick,"
+echo "    aws-cli, azure-cli, gcloud-cli cask, plus legacy brew neovim)"
 echo ""
 echo "Will preserve:"
 echo "  - ~/.zsh_history"
 echo "  - Homebrew itself"
 echo "  - System tools (git, curl, zsh from apt or macOS built-in)"
-echo "  - Broadly-useful brew formulas (wget, zip, unzip, file, tmux, htop)"
-echo "  - Linux dev toolchain (cmake, gcc, make, ninja, gettext)"
-echo "  - Aerospace (macOS tiling WM cask)"
-echo "  - Extension-pack state outside ~/shell (~/.local/share/cursor-agent, ~/.config/antigravity)"
+echo "  - Prerequisites from \`cps prereq\` (wget, zip, unzip, file, tmux, htop,"
+echo "    and on Linux the apt build toolchain)"
+echo "  - macos-desktop casks (aerospace, sol, font-jetbrains-mono-nerd-font)"
+echo "    - remove them by hand if you want them gone"
+echo "  - Package state outside ~/shell (~/.local/share/cursor-agent, ~/.config/antigravity)"
 echo "  - Neo4j databases and config (~/.config/neo4j) - delete it by hand if you want them gone"
 echo ""
 read -rp "Continue? [y/N] " ans
@@ -75,17 +76,16 @@ rm -f "$HOME/.config/starship.toml"
 
 if command -v brew >/dev/null 2>&1; then
   echo "==> uninstalling CPS-installed brew formulas"
-  # Kept (broadly useful, not CPS-specific): wget zip unzip file tmux htop
-  # Kept (Linux dev-tools group): cmake gcc make ninja gettext
+  # Kept (installed by cps prereq, broadly useful): wget zip unzip file tmux htop
   # neovim is legacy here - CPS installed it via brew before it became an app bundle.
   brew uninstall \
     neovim \
-    nmap openssl ffmpeg \
+    nmap openssl ffmpeg imagemagick \
     awscli azure-cli \
     2>/dev/null || true
 
   echo "==> uninstalling CPS-installed brew casks"
-  # Kept (broadly useful, not CPS-specific): nikitabobko/tap/aerospace
+  # Kept (desktop apps a user keeps using): nikitabobko/tap/aerospace sol font-jetbrains-mono-nerd-font
   brew uninstall --cask --force gcloud-cli 2>/dev/null || true
 else
   echo "==> brew not found, skipping brew package uninstall"
@@ -101,4 +101,4 @@ echo ""
 echo "to start fresh:"
 echo "  1. reinstall cps:"
 echo "     see https://github.com/tanq16/cli-productivity-suite#install"
-echo "  2. cps init"
+echo "  2. cps prereq && cps shell"
