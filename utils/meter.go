@@ -27,6 +27,7 @@ const (
 	rateWindowSpan    = 800 * time.Millisecond
 	rateFloor         = 200 * time.Millisecond
 	etaCeiling        = 100 * time.Hour
+	indeterminateStep = 80 * time.Millisecond
 )
 
 var (
@@ -205,7 +206,11 @@ func (m *Meter) finish(err error) {
 }
 
 func (m *Meter) isSet() bool {
-	return m.unit != UnitBytes && m.total > 1
+	return m.unit != UnitBytes
+}
+
+func (m *Meter) opaque() bool {
+	return m.unit != UnitBytes && m.total <= 1
 }
 
 func (m *Meter) clear() {
@@ -259,7 +264,7 @@ func (m *Meter) render() {
 func (m *Meter) header() string {
 	label := strings.TrimSpace(m.verb + " " + clip(m.name, 60))
 	head := infoStyle.Render("↻ " + label)
-	if m.item == "" {
+	if m.item == "" || strings.HasSuffix(label, m.item) {
 		return head
 	}
 	return head + "  " + meterMutedStyle.Render(clip(m.item, 40))
@@ -298,6 +303,9 @@ type meterField struct {
 }
 
 func (m *Meter) allFields() []meterField {
+	if m.opaque() {
+		return []meterField{{formatElapsed(time.Since(m.start)), 7}}
+	}
 	fields := make([]meterField, 0, 5)
 	if m.total > 0 {
 		fields = append(fields, meterField{fmt.Sprintf("%3d%%", m.percent()), 4})
@@ -342,11 +350,19 @@ func (m *Meter) frame(width int) ([]string, string) {
 }
 
 func (m *Meter) bar(cells int) string {
-	if m.total <= 0 {
-		pos := int(time.Since(m.start)/(120*time.Millisecond)) % cells
+	if m.total <= 0 || m.opaque() {
+		w := max(3, cells/5)
+		span := cells - w
+		if span <= 0 {
+			return infoStyle.Render(strings.Repeat("─", cells))
+		}
+		pos := int(time.Since(m.start)/indeterminateStep) % (2 * span)
+		if pos > span {
+			pos = 2*span - pos
+		}
 		return meterChromeStyle.Render(strings.Repeat("─", pos)) +
-			infoStyle.Render("─") +
-			meterChromeStyle.Render(strings.Repeat("─", cells-pos-1))
+			infoStyle.Render(strings.Repeat("─", w)) +
+			meterChromeStyle.Render(strings.Repeat("─", cells-pos-w))
 	}
 	filled := m.percent() * cells / 100
 	if filled == 0 {
