@@ -69,7 +69,7 @@ cps package install runtime     # and whatever else you want
 
 Run them in that order. `cps shell` deploys a `.zshrc` that reaches for the binaries it installs in the same run, and everything past those two is optional. `scripts/bootstrap.sh` runs the whole sequence unattended for a fresh cloud box or container.
 
-`cps shell` installs 26 packages: 15 CLI binaries, Neovim, the two zsh plugins, and the eight config files. They are not addressable through `cps package`, and updating them means re-running `cps shell`.
+`cps shell` installs 26 packages on macOS and 25 on Linux: 15 CLI binaries, Neovim, the two zsh plugins, and the config files. The aerospace config is the macOS-only one. They are not addressable through `cps package`, and updating them means re-running `cps shell`.
 
 ### `cps package install <package|group|suite>`
 
