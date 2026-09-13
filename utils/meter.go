@@ -275,7 +275,7 @@ func (m *Meter) percent() int {
 }
 
 func (m *Meter) eta() string {
-	rate := m.window.current()
+	rate := m.averageRate(rateFloor)
 	if m.total <= 0 || rate <= 0 {
 		return "unknown"
 	}
@@ -286,12 +286,19 @@ func (m *Meter) eta() string {
 	return formatEstimate(left)
 }
 
-func (m *Meter) averageRate() float64 {
+func (m *Meter) averageRate(floor time.Duration) float64 {
 	elapsed := time.Since(m.start)
-	if m.current <= 0 || elapsed < rateFloor {
+	if m.current <= 0 || elapsed < floor {
 		return 0
 	}
 	return float64(m.current) / elapsed.Seconds()
+}
+
+func (m *Meter) pairReserve() int {
+	if !m.isSet() {
+		return 14
+	}
+	return len(strconv.FormatInt(max(m.total, m.current), 10))*2 + 3 + len(m.unit)
 }
 
 type meterField struct {
@@ -307,11 +314,14 @@ func (m *Meter) allFields() []meterField {
 	if m.total > 0 {
 		fields = append(fields, meterField{fmt.Sprintf("%3d%%", m.percent()), 4})
 	}
+	fields = append(fields, meterField{formatAmount(m.current, m.total, m.unit), m.pairReserve()})
+	if m.isSet() {
+		return append(fields, meterField{"eta " + m.eta(), 11})
+	}
 	return append(fields,
-		meterField{formatAmount(m.current, m.total, m.unit), 14},
 		meterField{formatRate(m.window.current(), m.unit), 11},
 		meterField{"eta " + m.eta(), 11},
-		meterField{"avg " + formatRate(m.averageRate(), m.unit), 15},
+		meterField{"avg " + formatRate(m.averageRate(rateFloor), m.unit), 15},
 	)
 }
 
@@ -373,14 +383,14 @@ func (m *Meter) bar(cells int) string {
 }
 
 func (m *Meter) settledLine() string {
-	parts := []string{m.name}
+	parts := []string{clip(m.name, 60)}
 	if m.failed > 0 {
 		parts = append(parts, fmt.Sprintf("%d ok, %d failed", m.ok, m.failed))
 	} else {
 		parts = append(parts, formatCount(m.current, m.unit))
 	}
 	parts = append(parts, formatElapsed(time.Since(m.start)))
-	if rate := m.averageRate(); rate > 0 {
+	if rate := m.averageRate(0); rate > 0 && !m.isSet() {
 		parts = append(parts, "avg "+formatRate(rate, m.unit))
 	}
 	return strings.Join(parts, "  ")
