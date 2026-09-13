@@ -13,6 +13,8 @@ var (
 	ColorGreen  = lipgloss.ANSIColor(10)
 	ColorRed    = lipgloss.ANSIColor(9)
 	ColorYellow = lipgloss.ANSIColor(11)
+	ColorMuted  = lipgloss.ANSIColor(7)
+	ColorChrome = lipgloss.ANSIColor(8)
 
 	infoStyle    = lipgloss.NewStyle().Foreground(ColorBlue)
 	successStyle = lipgloss.NewStyle().Foreground(ColorGreen)
@@ -67,6 +69,10 @@ func PrintWarn(msg string, err error) {
 
 func PrintGeneric(msg string) {
 	lipgloss.Println(msg)
+}
+
+func PrintIndentedGeneric(msg string) {
+	lipgloss.Println("    " + msg)
 }
 
 func PrintRunning(msg string) {

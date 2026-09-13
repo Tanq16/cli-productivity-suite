@@ -49,7 +49,7 @@ make build
 
 ### Requirements
 
-`cps prereq` installs everything CPS needs, which is why it is the first command you run. It uses `sudo`, and it is the only command besides `cps system` that does.
+`cps prereq` installs everything CPS needs, which is why it is the first command you run. It uses `sudo`, and it is the only command besides `cps system` that does. On Linux, `cps prereq --exclude-brew` installs the apt packages and skips Homebrew.
 
 [Kitty](https://sw.kovidgoyal.net/kitty/) is recommended rather than required, and `cps system kitty` installs it. `cps theme` only writes a kitty palette, and the kitty, tmux and Neovim configs draw glyphs a plain font renders as boxes. On macOS `cps package install nerd-font` provides one; on Linux, install a Nerd Font yourself.
 

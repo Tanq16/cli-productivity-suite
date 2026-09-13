@@ -30,9 +30,6 @@ var rcLoader []byte
 //go:embed rc-base.zsh
 var rcBase []byte
 
-//go:embed rc-runtimes.zsh
-var rcRuntimes []byte
-
 //go:embed rc-cloud.zsh
 var rcCloud []byte
 
@@ -60,7 +57,6 @@ func MacosKittyConf() []byte     { return macosKittyConf }
 func MacosAerospaceConf() []byte { return macosAerospaceConf }
 func RcLoader() []byte           { return rcLoader }
 func RcBase() []byte             { return rcBase }
-func RcRuntimes() []byte         { return rcRuntimes }
 func RcCloud() []byte            { return rcCloud }
 func StarshipToml() []byte       { return starshipToml }
 func CodeServerConfig() []byte   { return codeServerConfig }

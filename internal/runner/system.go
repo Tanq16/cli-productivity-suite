@@ -49,7 +49,8 @@ func systemUpdate(p platform.Platform) {
 		}
 	}
 
-	if !brewInstalled() {
+	brew := platform.BrewPath()
+	if brew == "" {
 		utils.PrintSuccess("system update complete!")
 		return
 	}
@@ -61,7 +62,7 @@ func systemUpdate(p platform.Platform) {
 	} {
 		label := "brew " + strings.Join(args, " ")
 		utils.PrintInfo(label)
-		if err := streamCmd(exec.Command("brew", args...)); err != nil {
+		if err := streamCmd(exec.Command(brew, args...)); err != nil {
 			utils.PrintFatal(label+" failed", err)
 		}
 	}

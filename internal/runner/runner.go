@@ -49,9 +49,11 @@ func SelfUpdate(appVersion string) {
 
 	assetName := fmt.Sprintf("cps-%s-%s", p.OS.String(), p.Arch.String())
 	var downloadURL string
+	var assetSize int64
 	for _, a := range release.Assets {
 		if a.Name == assetName {
 			downloadURL = a.BrowserDownloadURL
+			assetSize = a.Size
 			break
 		}
 	}
@@ -67,11 +69,14 @@ func SelfUpdate(appVersion string) {
 		destPath = resolved
 	}
 
-	utils.PrintRunning(fmt.Sprintf("downloading %s", release.TagName))
 	tmpBinary := destPath + ".new"
-	if err := installer.DownloadToFile(downloadURL, tmpBinary); err != nil {
-		utils.PrintFatal("download failed", err)
+	m := utils.NewMeter("downloading", release.TagName, assetSize, utils.UnitBytes)
+	if err := installer.DownloadToFile(downloadURL, tmpBinary, m); err != nil {
+		m.Fail(err)
+		os.Exit(1)
 	}
+	m.Done()
+
 	if err := os.Chmod(tmpBinary, 0755); err != nil {
 		os.Remove(tmpBinary)
 		utils.PrintFatal("chmod failed", err)
@@ -80,7 +85,6 @@ func SelfUpdate(appVersion string) {
 		os.Remove(tmpBinary)
 		utils.PrintFatal(fmt.Sprintf("failed to install binary at %s", destPath), err)
 	}
-	utils.ClearLines(1)
 
 	utils.PrintSuccess(fmt.Sprintf("updated cps: %s → %s", appVersion, release.TagName))
 }
@@ -89,45 +93,27 @@ func runPhase(phaseName string, tools []registry.Tool, p platform.Platform, gh *
 	if len(tools) == 0 {
 		return false
 	}
-	utils.PrintRunning("(Running) " + phaseName)
 
-	var lineCount int
-	var errors []jobResult
-
+	m := utils.NewMeter("", phaseName, int64(len(tools)), packagesUnit)
+	var failed int
 	for _, t := range tools {
+		m.Item(t.Name)
 		inst := installer.Dispatch(t.Kind)
 		if inst == nil {
-			kindErr := fmt.Errorf("no installer for kind: %s", t.Kind)
-			utils.PrintIndentedError(t.Name, kindErr)
-			errors = append(errors, jobResult{name: t.Name, err: kindErr})
-			lineCount++
+			m.ItemFailed(t.Name, fmt.Errorf("no installer for kind: %s", t.Kind))
+			failed++
 			continue
 		}
-		result := inst.Install(&t, p, gh, st)
-		if result.Err != nil {
-			utils.PrintIndentedError(t.Name, result.Err)
-			errors = append(errors, jobResult{name: t.Name, err: result.Err})
-		} else if result.Skipped {
-			utils.PrintIndentedSuccess(fmt.Sprintf("%s: already at %s", t.Name, result.Version))
-		} else if result.WasUpdated {
-			utils.PrintIndentedSuccess(fmt.Sprintf("%s: updated to %s", t.Name, result.Version))
-		} else {
-			utils.PrintIndentedSuccess(fmt.Sprintf("%s: installed %s", t.Name, result.Version))
+		if result := inst.Install(&t, p, gh, st); result.Err != nil {
+			m.ItemFailed(t.Name, result.Err)
+			failed++
+			continue
 		}
-		lineCount++
+		m.Add(1)
 	}
+	m.Done()
 
-	utils.ClearLines(lineCount + 1)
-	if len(errors) > 0 {
-		utils.PrintError(phaseName+": partially completed with errors", nil)
-		for _, e := range errors {
-			utils.PrintIndentedError(e.name, e.err)
-		}
-	} else {
-		utils.PrintInfo(phaseName)
-	}
-
-	return len(errors) > 0
+	return failed > 0
 }
 
 func generateShellEnv(p platform.Platform, errors *[]jobResult, lineCount *int) {
@@ -137,8 +123,8 @@ func generateShellEnv(p platform.Platform, errors *[]jobResult, lineCount *int) 
 		return
 	}
 
-	brewBin, err := exec.LookPath("brew")
-	if err != nil {
+	brewBin := platform.BrewPath()
+	if brewBin == "" {
 		return
 	}
 
@@ -222,8 +208,8 @@ func generateCompletions(p platform.Platform, errors *[]jobResult, lineCount *in
 	}
 }
 
-func runPostInstall(phaseName string, p platform.Platform, withShellEnv bool) {
-	utils.PrintRunning("(Running) " + phaseName)
+func runPostInstall(phaseName string, p platform.Platform, withShellEnv bool) bool {
+	utils.PrintRunning(phaseName)
 	var lineCount int
 	var errors []jobResult
 
@@ -238,9 +224,10 @@ func runPostInstall(phaseName string, p platform.Platform, withShellEnv bool) {
 		for _, e := range errors {
 			utils.PrintIndentedError(e.name, e.err)
 		}
-		return
+		return true
 	}
 	utils.PrintInfo(phaseName)
+	return false
 }
 
 func filterPlatformTools(tools []registry.Tool, p platform.Platform) []registry.Tool {

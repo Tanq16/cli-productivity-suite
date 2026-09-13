@@ -18,9 +18,14 @@ func (s *SystemPackageInstaller) Install(tool *registry.Tool, _ platform.Platfor
 		return Result{Tool: tool.Name, Skipped: true}
 	}
 
+	brew := platform.BrewPath()
+	if brew == "" {
+		return Result{Tool: tool.Name, Err: fmt.Errorf("brew not found; run `cps prereq` first")}
+	}
+
 	if len(tool.BrewPkgs) > 0 {
 		args := append([]string{"install"}, tool.BrewPkgs...)
-		cmd := exec.Command("brew", args...)
+		cmd := exec.Command(brew, args...)
 		if err := utils.RunCmd(cmd); err != nil {
 			return Result{Tool: tool.Name, Err: fmt.Errorf("brew install failed: %w", err)}
 		}
@@ -28,7 +33,7 @@ func (s *SystemPackageInstaller) Install(tool *registry.Tool, _ platform.Platfor
 
 	if len(tool.BrewCasks) > 0 {
 		for _, cask := range tool.BrewCasks {
-			cmd := exec.Command("brew", "install", "--cask", cask)
+			cmd := exec.Command(brew, "install", "--cask", cask)
 			if err := utils.RunCmd(cmd); err != nil {
 				return Result{Tool: tool.Name, Err: fmt.Errorf("brew cask install %s failed: %w", cask, err)}
 			}

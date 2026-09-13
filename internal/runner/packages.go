@@ -75,10 +75,11 @@ func PackageInstall(target, ghToken string) {
 
 	if err := st.Save(); err != nil {
 		utils.PrintError("failed to save state", err)
+		hadErrors = true
 	}
 
-	if hasBinaries(installable) {
-		runPostInstall("Regenerating completions", p, false)
+	if hasBinaries(installable) && runPostInstall("Regenerating completions", p, false) {
+		hadErrors = true
 	}
 	if deployRCFile("Regenerating the rc file", p, st) {
 		hadErrors = true
@@ -86,6 +87,7 @@ func PackageInstall(target, ghToken string) {
 
 	if err := st.Save(); err != nil {
 		utils.PrintError("failed to save state", err)
+		hadErrors = true
 	}
 
 	if hadErrors {

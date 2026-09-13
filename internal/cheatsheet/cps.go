@@ -49,7 +49,7 @@ func buildCPSSheet() string {
 	b.WriteString(divider + "\n")
 
 	b.WriteString(headingStyle.Render("Other") + "\n")
-	b.WriteString(cmdStyle.Render("  cps cheat <topic>") + "               Cheat sheets (go, java, uv, fnm, bun, rust, tmux, nvim, fzf, jq, regex)\n")
+	b.WriteString(cmdStyle.Render("  cps cheat <topic>") + "               Cheat sheets (cps, go, java, uv, fnm, bun, rust, tmux, nvim, fzf, jq, regex)\n")
 	b.WriteString(cmdStyle.Render("  cps self-update") + "                 Update cps itself to the latest release\n")
 	b.WriteString(cmdStyle.Render("  --gh-token <token>") + "              GitHub PAT, on package install and status\n")
 	b.WriteString(cmdStyle.Render("  --debug") + "                         Verbose debug logging\n")

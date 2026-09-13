@@ -99,7 +99,7 @@ func (l *LanguageRuntimeInstaller) installGo(p platform.Platform, st *state.Stat
 	defer os.RemoveAll(tmpDir)
 
 	tarPath := filepath.Join(tmpDir, "go.tar.gz")
-	if err := DownloadToFile(downloadURL, tarPath); err != nil {
+	if err := DownloadToFile(downloadURL, tarPath, nil); err != nil {
 		return Result{Tool: "go-sdk", Err: err}
 	}
 
@@ -186,7 +186,7 @@ func (l *LanguageRuntimeInstaller) installJava(p platform.Platform, st *state.St
 	defer os.RemoveAll(tmpDir)
 
 	tarPath := filepath.Join(tmpDir, "jdk.tar.gz")
-	if err := DownloadToFile(downloadURL, tarPath); err != nil {
+	if err := DownloadToFile(downloadURL, tarPath, nil); err != nil {
 		return Result{Tool: "java-sdk", Err: err}
 	}
 
@@ -255,7 +255,7 @@ func (l *LanguageRuntimeInstaller) installRust(p platform.Platform, st *state.St
 	defer os.RemoveAll(tmpDir)
 
 	initPath := filepath.Join(tmpDir, "rustup-init")
-	if err := DownloadToFile(url, initPath); err != nil {
+	if err := DownloadToFile(url, initPath, nil); err != nil {
 		return Result{Tool: "rust", Err: fmt.Errorf("download rustup-init failed: %w", err)}
 	}
 	if err := os.Chmod(initPath, 0755); err != nil {
@@ -278,13 +278,14 @@ func (l *LanguageRuntimeInstaller) installRust(p platform.Platform, st *state.St
 		"CARGO_HOME="+cargoHome,
 	)
 	out, err := verCmd.Output()
-	version := "stable"
-	if err == nil {
-		parts := strings.Fields(strings.TrimSpace(string(out)))
-		if len(parts) >= 2 {
-			version = parts[1]
-		}
+	if err != nil {
+		return Result{Tool: "rust", Err: fmt.Errorf("rustc --version failed after install: %w", err)}
 	}
+	parts := strings.Fields(strings.TrimSpace(string(out)))
+	if len(parts) < 2 {
+		return Result{Tool: "rust", Err: fmt.Errorf("could not read a version out of %q", strings.TrimSpace(string(out)))}
+	}
+	version := parts[1]
 
 	st.SetToolVersion("rust", version)
 	return Result{Tool: "rust", Version: version}
@@ -361,7 +362,7 @@ func (l *LanguageRuntimeInstaller) downloadUV(p platform.Platform, gh *github.Cl
 	defer os.RemoveAll(tmpDir)
 
 	tarPath := filepath.Join(tmpDir, "uv.tar.gz")
-	if err := DownloadToFile(downloadURL, tarPath); err != nil {
+	if err := DownloadToFile(downloadURL, tarPath, nil); err != nil {
 		return "", "", fmt.Errorf("download uv failed: %w", err)
 	}
 
@@ -426,10 +427,12 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, gh *github
 		return Result{Tool: "python", Err: fmt.Errorf("uv python install failed: %w", err)}
 	}
 
-	pipPath := filepath.Join(venvPath, "bin", "pip")
+	venvPython := filepath.Join(venvPath, "bin", "python")
 	var frozen []byte
-	if _, err := os.Stat(pipPath); err == nil {
-		frozen, _ = exec.Command(pipPath, "freeze").Output()
+	if _, err := os.Stat(venvPython); err == nil {
+		freezeCmd := exec.Command(uvPath, "pip", "freeze", "--python", venvPython)
+		freezeCmd.Env = uvEnv
+		frozen, _ = freezeCmd.Output()
 	}
 
 	venvCmd := exec.Command(uvPath, "venv", "--python", version, "--clear", venvPath)
@@ -452,11 +455,16 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, gh *github
 			keep = append(keep, trimmed)
 		}
 		if len(keep) > 0 {
-			pipNew := filepath.Join(venvPath, "bin", "pip")
-			installCmd := exec.Command(pipNew, "install", "--quiet", "-r", "/dev/stdin")
-			installCmd.Stdin = strings.NewReader(strings.Join(keep, "\n"))
-			if err := utils.RunCmd(installCmd); err != nil {
-				return Result{Tool: "python", Err: fmt.Errorf("pip package restore failed: %w", err)}
+			reqPath := filepath.Join(venvPath, "cps-restore-requirements.txt")
+			if err := os.WriteFile(reqPath, []byte(strings.Join(keep, "\n")+"\n"), 0644); err != nil {
+				return Result{Tool: "python", Err: fmt.Errorf("failed to stage the package list for restore: %w", err)}
+			}
+			installCmd := exec.Command(uvPath, "pip", "install", "--quiet", "--python", venvPython, "-r", reqPath)
+			installCmd.Env = uvEnv
+			restoreErr := utils.RunCmd(installCmd)
+			os.Remove(reqPath)
+			if restoreErr != nil {
+				return Result{Tool: "python", Err: fmt.Errorf("package restore failed: %w", restoreErr)}
 			}
 		}
 	}
@@ -515,7 +523,7 @@ func (l *LanguageRuntimeInstaller) downloadFnm(p platform.Platform, gh *github.C
 	defer os.RemoveAll(tmpDir)
 
 	zipPath := filepath.Join(tmpDir, "fnm.zip")
-	if err := DownloadToFile(downloadURL, zipPath); err != nil {
+	if err := DownloadToFile(downloadURL, zipPath, nil); err != nil {
 		return "", "", fmt.Errorf("download fnm failed: %w", err)
 	}
 
@@ -611,9 +619,12 @@ func (l *LanguageRuntimeInstaller) installNode(p platform.Platform, gh *github.C
 	versionCmd := exec.Command(fnmPath, "exec", "--using=lts-latest", "--", "node", "--version")
 	versionCmd.Env = env
 	out, err := versionCmd.Output()
-	nodeVersion := "lts"
-	if err == nil {
-		nodeVersion = strings.TrimSpace(string(out))
+	if err != nil {
+		return Result{Tool: "node", Err: fmt.Errorf("node --version failed after install: %w", err)}
+	}
+	nodeVersion := strings.TrimSpace(string(out))
+	if nodeVersion == "" {
+		return Result{Tool: "node", Err: fmt.Errorf("node --version returned nothing after install")}
 	}
 
 	if oldNodeVersion != "" && oldNodeVersion != nodeVersion {

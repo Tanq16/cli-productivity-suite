@@ -6,10 +6,11 @@
 # Exits 0 if all good, 1 otherwise.
 #
 # Usage:
-#   zsh -lc 'bash scripts/verify.sh'
+#   zsh -ic 'bash scripts/verify.sh'
 #
-# The zsh -l wrapper is required: it sources the login shell, which loads
-# ~/shell/rc/cps.zsh and exports the env vars this script checks.
+# The zsh -i wrapper is required: the rc loader is deployed into ~/.zshrc, which
+# only an interactive shell reads, and it is what exports the env vars and PATH
+# segments this script checks.
 #
 # It assumes every group is installed. Skip a group's section by hand when
 # checking a partial install.
@@ -158,8 +159,12 @@ done
 
 # --- cps agrees ---
 command -v cps >/dev/null 2>&1 && {
-    missing=$(cps status --json | jq -r '.[] | select(.installed == false) | .name')
-    [ -z "$missing" ] || fail "cps status reports not installed: $(echo "$missing" | tr '\n' ' ')"
+    if ! status_json=$(cps status --json); then
+        fail "cps status --json exited non-zero"
+    else
+        missing=$(printf '%s' "$status_json" | jq -r '.[] | select(.installed == false) | .name')
+        [ -z "$missing" ] || fail "cps status reports not installed: $(echo "$missing" | tr '\n' ' ')"
+    fi
 }
 
 # --- result ---

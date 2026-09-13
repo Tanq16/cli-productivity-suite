@@ -138,7 +138,7 @@ func (d *DirectDownloadInstaller) installArchive(tool *registry.Tool, url, versi
 	defer os.RemoveAll(tmpDir)
 
 	archivePath := filepath.Join(tmpDir, tool.Name+"."+archiveFormat)
-	if err := DownloadToFile(url, archivePath); err != nil {
+	if err := DownloadToFile(url, archivePath, nil); err != nil {
 		return Result{Tool: tool.Name, Err: fmt.Errorf("download failed: %w", err)}
 	}
 

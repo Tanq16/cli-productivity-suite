@@ -19,6 +19,7 @@ type Entry struct {
 	Version    string `json:"version,omitempty"`
 	Latest     string `json:"latest,omitempty"`
 	Outdated   bool   `json:"outdated"`
+	SkipReason string `json:"skip_reason,omitempty"`
 	CheckError string `json:"check_error,omitempty"`
 }
 
@@ -42,26 +43,30 @@ func Collect(p platform.Platform, st *state.State) []Entry {
 	return entries
 }
 
-func Check(entries []Entry, p platform.Platform, gh *github.Client) {
-	for i := range entries {
-		if !entries[i].Installed {
-			continue
-		}
-		tool, ok := registry.ByName(entries[i].Name)
-		if !ok || (tool.IsPrivate && !gh.HasToken()) {
-			continue
-		}
-		latest, err := installer.LatestVersion(&tool, p, gh)
-		if errors.Is(err, installer.ErrNotCheckable) {
-			continue
-		}
-		if err != nil {
-			entries[i].CheckError = err.Error()
-			continue
-		}
-		entries[i].Latest = latest
-		entries[i].Outdated = latest != entries[i].Version
+func CheckEntry(e *Entry, p platform.Platform, gh *github.Client) {
+	if !e.Installed {
+		return
 	}
+	tool, ok := registry.ByName(e.Name)
+	if !ok {
+		e.SkipReason = "not in the registry"
+		return
+	}
+	if tool.IsPrivate && !gh.HasToken() {
+		e.SkipReason = "needs --gh-token"
+		return
+	}
+	latest, err := installer.LatestVersion(&tool, p, gh)
+	if errors.Is(err, installer.ErrNotCheckable) {
+		e.SkipReason = "no upstream version to compare"
+		return
+	}
+	if err != nil {
+		e.CheckError = err.Error()
+		return
+	}
+	e.Latest = latest
+	e.Outdated = latest != e.Version
 }
 
 func GroupOrder() []string {

@@ -3,7 +3,6 @@ package runner
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -19,11 +18,11 @@ func Shell() {
 	p, st := platformAndState()
 	gh := github.NewClient("")
 
-	if _, err := exec.LookPath("brew"); err != nil {
-		utils.PrintWarn("Homebrew is not on PATH; run `cps prereq` first or the shell env will be incomplete", nil)
+	if platform.BrewPath() == "" {
+		utils.PrintWarn("Homebrew is not installed; run `cps prereq` first or the shell env will be incomplete", nil)
 	}
 
-	utils.PrintRunning("(Running) Phase 1: Shell directories")
+	utils.PrintRunning("Phase 1: Shell directories")
 	for _, dir := range []string{
 		p.ShellDir(),
 		filepath.Join(p.ShellDir(), "rc"),
@@ -58,10 +57,13 @@ func Shell() {
 		}
 		if err := st.Save(); err != nil {
 			utils.PrintError("failed to save state", err)
+			hadErrors = true
 		}
 	}
 
-	runPostInstall("Phase 6: Shell environment", p, true)
+	if runPostInstall("Phase 6: Shell environment", p, true) {
+		hadErrors = true
+	}
 
 	if deployRCFile("Phase 7: Shell rc file", p, st) {
 		hadErrors = true
@@ -70,6 +72,7 @@ func Shell() {
 	st.LastInit = time.Now()
 	if err := st.Save(); err != nil {
 		utils.PrintError("failed to save state", err)
+		hadErrors = true
 	}
 
 	if hadErrors {
@@ -79,7 +82,7 @@ func Shell() {
 }
 
 func deployRCFile(phaseName string, p platform.Platform, st *state.State) bool {
-	utils.PrintRunning("(Running) " + phaseName)
+	utils.PrintRunning(phaseName)
 	err := rcgen.Generate(p, st)
 	utils.ClearLines(1)
 	if err != nil {

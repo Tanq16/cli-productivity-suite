@@ -20,12 +20,6 @@ var brewPackages = []string{"wget", "zip", "unzip", "file", "tmux", "htop"}
 const brewInstallScript = `set -o pipefail
 curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | /bin/bash`
 
-var brewPaths = []string{
-	"/opt/homebrew/bin/brew",
-	"/usr/local/bin/brew",
-	"/home/linuxbrew/.linuxbrew/bin/brew",
-}
-
 func Prereq(excludeBrew bool) {
 	p, err := platform.Detect()
 	if err != nil {
@@ -47,9 +41,13 @@ func prereqDarwin() {
 
 	installBrew()
 
+	brew := platform.BrewPath()
+	if brew == "" {
+		utils.PrintFatal("Homebrew is not installed and the install script did not leave a brew binary behind", nil)
+	}
 	utils.PrintInfo("Homebrew packages")
 	args := append([]string{"install"}, brewPackages...)
-	if err := streamCmd(exec.Command("brew", args...)); err != nil {
+	if err := streamCmd(exec.Command(brew, args...)); err != nil {
 		utils.PrintFatal("brew install failed", err)
 	}
 	utils.PrintSuccess("prerequisites complete!")
@@ -80,7 +78,7 @@ func prereqLinux(excludeBrew bool) {
 }
 
 func installBrew() {
-	if brewInstalled() {
+	if platform.BrewPath() != "" {
 		utils.PrintInfo("Homebrew is already installed")
 		return
 	}
@@ -90,18 +88,6 @@ func installBrew() {
 	if err := streamCmd(cmd); err != nil {
 		utils.PrintFatal("Homebrew install failed", err)
 	}
-}
-
-func brewInstalled() bool {
-	if _, err := exec.LookPath("brew"); err == nil {
-		return true
-	}
-	for _, path := range brewPaths {
-		if info, err := os.Stat(path); err == nil && !info.IsDir() {
-			return true
-		}
-	}
-	return false
 }
 
 func isDebianFamily() bool {

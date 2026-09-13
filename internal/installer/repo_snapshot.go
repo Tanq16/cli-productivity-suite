@@ -30,7 +30,7 @@ func (r *RepoSnapshotInstaller) Install(tool *registry.Tool, p platform.Platform
 	// GitHub resolves HEAD to the repo's own default branch, so no branch name is pinned here.
 	url := fmt.Sprintf("https://github.com/%s/archive/HEAD.tar.gz", tool.Repo)
 	archivePath := filepath.Join(tmpDir, "snapshot.tar.gz")
-	if err := DownloadToFile(url, archivePath); err != nil {
+	if err := DownloadToFile(url, archivePath, nil); err != nil {
 		return Result{Tool: tool.Name, Err: fmt.Errorf("download failed: %w", err)}
 	}
 
