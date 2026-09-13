@@ -448,6 +448,15 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 		},
 	},
 	{
+		Name: "whiteboard", BinaryName: "whiteboard", Kind: GitHubRelease, Group: GroupHomelab,
+		Repo: "Tanq16/whiteboard", Description: "Local-first infinite canvas whiteboard",
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
+	{
 		Name: "goff", BinaryName: "goff", Kind: GitHubRelease, Group: GroupHomelab,
 		Repo: "Tanq16/goff", Description: "TUI and CLI harness for FFmpeg",
 		Asset: AssetPattern{
@@ -476,6 +485,16 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
 			ArchiveFormat: "none",
+		},
+	},
+	{
+		Name: "toon", BinaryName: "toon", Kind: GitHubRelease, Group: GroupHomelab,
+		Repo: "Tanq16/toon", Description: "Private Toon tool", IsPrivate: true,
+		Asset: AssetPattern{
+			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat:       "zip",
+			BinaryPathInArchive: "toon-*",
 		},
 	},
 	{
@@ -560,16 +579,6 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
 			ArchiveFormat: "none",
-		},
-	},
-	{
-		Name: "toon", BinaryName: "toon", Kind: GitHubRelease, Group: GroupPrivate,
-		Repo: "Tanq16/toon", Description: "Private Toon tool", IsPrivate: true,
-		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "zip",
-			BinaryPathInArchive: "toon-*",
 		},
 	},
 	{
