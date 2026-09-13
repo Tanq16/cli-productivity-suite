@@ -47,7 +47,7 @@ func prereqDarwin() {
 	}
 	utils.PrintInfo("Homebrew packages")
 	args := append([]string{"install"}, brewPackages...)
-	if err := streamCmd(exec.Command(brew, args...)); err != nil {
+	if err := streamCmd(brewCommand(brew, args...)); err != nil {
 		utils.PrintFatal("brew install failed", err)
 	}
 	utils.PrintSuccess("prerequisites complete!")
@@ -109,6 +109,12 @@ func isDebianFamily() bool {
 		}
 	}
 	return false
+}
+
+func brewCommand(brew string, args ...string) *exec.Cmd {
+	cmd := exec.Command(brew, args...)
+	cmd.Env = append(os.Environ(), "HOMEBREW_NO_ASK=1")
+	return cmd
 }
 
 func streamCmd(cmd *exec.Cmd) error {
