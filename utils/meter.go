@@ -298,7 +298,7 @@ func (m *Meter) pairReserve() int {
 	if !m.isSet() {
 		return 14
 	}
-	return len(strconv.FormatInt(max(m.total, m.current), 10))*2 + 3 + len(m.unit)
+	return len(strconv.FormatInt(max(m.total, m.current), 10))*2 + 4 + len(m.unit)
 }
 
 type meterField struct {
