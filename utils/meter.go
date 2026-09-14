@@ -158,9 +158,9 @@ func (m *Meter) ItemFailed(name string, err error) {
 	m.item = ""
 	m.window.add(time.Now(), m.current)
 	m.clear()
+	PrintIndentedError(fmt.Sprintf("%s: %s", name, oneLine(err)), err)
 	m.mu.Unlock()
 
-	PrintIndentedError(fmt.Sprintf("%s: %s", name, oneLine(err)), err)
 	m.render()
 }
 
