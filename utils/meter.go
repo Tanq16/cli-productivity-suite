@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"charm.land/lipgloss/v2"
-	"github.com/charmbracelet/x/term"
 	"github.com/rs/zerolog/log"
 )
 
@@ -20,13 +19,12 @@ type Unit string
 const UnitBytes Unit = ""
 
 const (
-	meterMinWidth     = 24
-	meterDefaultWidth = 80
 	barFloor          = 8
 	barCeiling        = 30
 	rateWindowSpan    = 800 * time.Millisecond
 	rateFloor         = 200 * time.Millisecond
 	etaCeiling        = 100 * time.Hour
+	indeterminateStep = 80 * time.Millisecond
 )
 
 var (
@@ -160,9 +158,9 @@ func (m *Meter) ItemFailed(name string, err error) {
 	m.item = ""
 	m.window.add(time.Now(), m.current)
 	m.clear()
+	PrintIndentedError(fmt.Sprintf("%s: %s", name, oneLine(err)), err)
 	m.mu.Unlock()
 
-	PrintIndentedError(fmt.Sprintf("%s: %s", name, oneLine(err)), err)
 	m.render()
 }
 
@@ -205,7 +203,11 @@ func (m *Meter) finish(err error) {
 }
 
 func (m *Meter) isSet() bool {
-	return m.unit != UnitBytes && m.total > 1
+	return m.unit != UnitBytes
+}
+
+func (m *Meter) opaque() bool {
+	return m.unit != UnitBytes && m.total <= 1
 }
 
 func (m *Meter) clear() {
@@ -244,7 +246,7 @@ func (m *Meter) render() {
 		return
 	}
 
-	fields, bar := m.frame(termWidth())
+	fields, bar := m.frame(TermWidth())
 	lines := []string{m.header(), "  " + strings.TrimLeft(bar+"  "+strings.Join(fields, "  "), " ")}
 
 	var b strings.Builder
@@ -259,7 +261,7 @@ func (m *Meter) render() {
 func (m *Meter) header() string {
 	label := strings.TrimSpace(m.verb + " " + clip(m.name, 60))
 	head := infoStyle.Render("↻ " + label)
-	if m.item == "" {
+	if m.item == "" || strings.HasSuffix(label, m.item) {
 		return head
 	}
 	return head + "  " + meterMutedStyle.Render(clip(m.item, 40))
@@ -273,7 +275,7 @@ func (m *Meter) percent() int {
 }
 
 func (m *Meter) eta() string {
-	rate := m.window.current()
+	rate := m.averageRate(rateFloor)
 	if m.total <= 0 || rate <= 0 {
 		return "unknown"
 	}
@@ -284,12 +286,19 @@ func (m *Meter) eta() string {
 	return formatEstimate(left)
 }
 
-func (m *Meter) averageRate() float64 {
+func (m *Meter) averageRate(floor time.Duration) float64 {
 	elapsed := time.Since(m.start)
-	if m.current <= 0 || elapsed < rateFloor {
+	if m.current <= 0 || elapsed < floor {
 		return 0
 	}
 	return float64(m.current) / elapsed.Seconds()
+}
+
+func (m *Meter) pairReserve() int {
+	if !m.isSet() {
+		return 14
+	}
+	return len(strconv.FormatInt(max(m.total, m.current), 10))*2 + 4 + len(m.unit)
 }
 
 type meterField struct {
@@ -298,15 +307,21 @@ type meterField struct {
 }
 
 func (m *Meter) allFields() []meterField {
+	if m.opaque() {
+		return []meterField{{formatElapsed(time.Since(m.start)), 7}}
+	}
 	fields := make([]meterField, 0, 5)
 	if m.total > 0 {
 		fields = append(fields, meterField{fmt.Sprintf("%3d%%", m.percent()), 4})
 	}
+	fields = append(fields, meterField{formatAmount(m.current, m.total, m.unit), m.pairReserve()})
+	if m.isSet() {
+		return append(fields, meterField{"eta " + m.eta(), 11})
+	}
 	return append(fields,
-		meterField{formatAmount(m.current, m.total, m.unit), 14},
 		meterField{formatRate(m.window.current(), m.unit), 11},
 		meterField{"eta " + m.eta(), 11},
-		meterField{"avg " + formatRate(m.averageRate(), m.unit), 15},
+		meterField{"avg " + formatRate(m.averageRate(rateFloor), m.unit), 15},
 	)
 }
 
@@ -342,11 +357,19 @@ func (m *Meter) frame(width int) ([]string, string) {
 }
 
 func (m *Meter) bar(cells int) string {
-	if m.total <= 0 {
-		pos := int(time.Since(m.start)/(120*time.Millisecond)) % cells
+	if m.total <= 0 || m.opaque() {
+		w := max(3, cells/5)
+		span := cells - w
+		if span <= 0 {
+			return infoStyle.Render(strings.Repeat("─", cells))
+		}
+		pos := int(time.Since(m.start)/indeterminateStep) % (2 * span)
+		if pos > span {
+			pos = 2*span - pos
+		}
 		return meterChromeStyle.Render(strings.Repeat("─", pos)) +
-			infoStyle.Render("─") +
-			meterChromeStyle.Render(strings.Repeat("─", cells-pos-1))
+			infoStyle.Render(strings.Repeat("─", w)) +
+			meterChromeStyle.Render(strings.Repeat("─", cells-pos-w))
 	}
 	filled := m.percent() * cells / 100
 	if filled == 0 {
@@ -360,27 +383,17 @@ func (m *Meter) bar(cells int) string {
 }
 
 func (m *Meter) settledLine() string {
-	parts := []string{m.name}
+	parts := []string{clip(m.name, 60)}
 	if m.failed > 0 {
 		parts = append(parts, fmt.Sprintf("%d ok, %d failed", m.ok, m.failed))
 	} else {
 		parts = append(parts, formatCount(m.current, m.unit))
 	}
 	parts = append(parts, formatElapsed(time.Since(m.start)))
-	if rate := m.averageRate(); rate > 0 {
+	if rate := m.averageRate(0); rate > 0 && !m.isSet() {
 		parts = append(parts, "avg "+formatRate(rate, m.unit))
 	}
 	return strings.Join(parts, "  ")
-}
-
-func termWidth() int {
-	if w, _, err := term.GetSize(os.Stdout.Fd()); err == nil && w > 0 {
-		return w
-	}
-	if n, err := strconv.Atoi(os.Getenv("COLUMNS")); err == nil && n >= meterMinWidth {
-		return n
-	}
-	return meterDefaultWidth
 }
 
 func oneLine(err error) string {

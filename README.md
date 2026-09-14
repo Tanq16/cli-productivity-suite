@@ -69,7 +69,7 @@ cps package install runtime     # and whatever else you want
 
 Run them in that order. `cps shell` deploys a `.zshrc` that reaches for the binaries it installs in the same run, and everything past those two is optional. `scripts/bootstrap.sh` runs the whole sequence unattended for a fresh cloud box or container.
 
-`cps shell` installs 26 packages: 15 CLI binaries, Neovim, the two zsh plugins, and the eight config files. They are not addressable through `cps package`, and updating them means re-running `cps shell`.
+`cps shell` installs 26 packages on macOS and 25 on Linux: 15 CLI binaries, Neovim, the two zsh plugins, and the config files. The aerospace config is the macOS-only one. They are not addressable through `cps package`, and updating them means re-running `cps shell`.
 
 ### `cps package install <package|group|suite>`
 
@@ -87,8 +87,8 @@ cps package install nuclei            # one package
 | `runtime` | Go, Node, Python, Java and Rust, each as a suite, with bun and the gopls, pyright, typescript-language-server and ruff language servers |
 | `ai` | claude-code, codex, antigravity, cursor-agent |
 | `binaries` | nuclei, nuclei-templates, naabu, subfinder, proxify, httpx, dnsx, katana, trufflehog, ffuf, gobuster, gau, gowitness, kubelogin, grpcurl, terraform, kubectl, trivy |
-| `homelab` | caddy, senkaimon, linksnapper, kairo, raikiri, expenseowl, backhub, local-content-share, goff, yt-dlp, telly, and the rinnegan, code-server and neo4j app bundles |
-| `private` | anbu, box, gcli, nits, sharingan, claudex, toon, cybernest |
+| `homelab` | caddy, senkaimon, linksnapper, kairo, raikiri, expenseowl, backhub, local-content-share, whiteboard, goff, yt-dlp, telly, toon, and the rinnegan, code-server and neo4j app bundles |
+| `private` | anbu, box, gcli, nits, sharingan, claudex, cybernest |
 
 A package that needs another is installed after it, and a missing dependency is pulled in rather than failing at the package manager: `cps package install claude-code` installs Node first. The five runtime suites are `go-suite`, `js-suite`, `python-suite`, `java-suite` and `rust-suite`, and each is installable on its own.
 
