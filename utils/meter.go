@@ -248,7 +248,11 @@ func (m *Meter) render() {
 
 	width := TermWidth()
 	fields, bar := m.frame(width)
-	lines := []string{m.header(width), "  " + strings.TrimLeft(bar+"  "+strings.Join(fields, "  "), " ")}
+	meter := strings.Join(fields, "  ")
+	if bar != "" {
+		meter = bar + "  " + meter
+	}
+	lines := []string{m.header(width), "  " + meter}
 
 	var b strings.Builder
 	b.WriteString(strings.Repeat("\033[1A\033[2K", m.drawn))

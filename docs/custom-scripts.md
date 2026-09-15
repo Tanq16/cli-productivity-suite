@@ -1,6 +1,14 @@
 # Custom scripts
 
-`cps custom` runs `~/.config/cps/custom.sh` and gets out of the way. CPS resolves the path, execs the script with the CPS `PATH` in front, passes every argument through verbatim, and exits with whatever the script exited with. Unknown names, help text, argument parsing and error messages all belong to the script.
+`cps custom` runs `~/.config/cps/custom.sh` and gets out of the way. CPS resolves the path, execs the script with the CPS `PATH` in front, passes its arguments through verbatim, and exits with whatever the script exited with. Unknown names, argument parsing and error messages all belong to the script.
+
+Flag-shaped arguments go after a `--` separator, so that `cps custom --debug` stays the CPS debug flag and `cps custom -- --debug` reaches the script. Bare names need no separator:
+
+```bash
+cps custom list
+cps custom mytool
+cps custom -- --help
+```
 
 The script must be executable:
 
