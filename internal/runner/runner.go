@@ -37,10 +37,10 @@ func SelfUpdate(appVersion string) {
 
 	utils.PrintRunning("checking latest version")
 	release, err := gh.LatestRelease("Tanq16/cli-productivity-suite")
+	utils.ClearLines(1)
 	if err != nil {
 		utils.PrintFatal("failed to check latest version", err)
 	}
-	utils.ClearLines(1)
 
 	if appVersion == release.TagName {
 		utils.PrintSuccess(fmt.Sprintf("already at latest version %s", appVersion))

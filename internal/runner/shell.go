@@ -34,6 +34,7 @@ func Shell() {
 		p.ShellAppsDir(),
 	} {
 		if err := os.MkdirAll(dir, 0755); err != nil {
+			utils.ClearLines(1)
 			utils.PrintFatal(fmt.Sprintf("failed to create %s", dir), err)
 		}
 	}
