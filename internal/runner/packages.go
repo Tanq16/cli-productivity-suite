@@ -29,7 +29,7 @@ func PackageList() {
 			if len(suiteTools) == 0 {
 				continue
 			}
-			utils.PrintGeneric(fmt.Sprintf("    %s: %s", s.Name, strings.Join(toolNames(suiteTools), ", ")))
+			utils.PrintIndentedGeneric(fmt.Sprintf("%s: %s", s.Name, strings.Join(toolNames(suiteTools), ", ")))
 		}
 	}
 }
