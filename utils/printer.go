@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"charm.land/lipgloss/v2"
 	"github.com/rs/zerolog/log"
@@ -72,10 +73,18 @@ func PrintGeneric(msg string) {
 }
 
 func PrintIndentedGeneric(msg string) {
+	if GlobalDebugFlag {
+		log.Info().Msg(msg)
+		return
+	}
 	lipgloss.Println("    " + msg)
 }
 
 func PrintIndentedList(items []string) {
+	if GlobalDebugFlag {
+		log.Info().Msg(strings.Join(items, ", "))
+		return
+	}
 	width := max(TermWidth()-4, 1)
 	var line string
 	for i, item := range items {

@@ -42,7 +42,6 @@ func unwrapSingleDir(dir string) string {
 	if err != nil || len(entries) != 1 || !entries[0].IsDir() {
 		return dir
 	}
-	// Bundle archive roots are named per tool and version, so the install path is only stable one level down.
 	return filepath.Join(dir, entries[0].Name())
 }
 

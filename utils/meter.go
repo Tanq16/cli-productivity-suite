@@ -242,12 +242,13 @@ func (m *Meter) render() {
 	}
 
 	if !StdoutIsTerminal {
-		lipgloss.Println(m.header() + "  " + strings.Join(m.fields(), "  "))
+		lipgloss.Println(m.header(0) + "  " + strings.Join(m.fields(), "  "))
 		return
 	}
 
-	fields, bar := m.frame(TermWidth())
-	lines := []string{m.header(), "  " + strings.TrimLeft(bar+"  "+strings.Join(fields, "  "), " ")}
+	width := TermWidth()
+	fields, bar := m.frame(width)
+	lines := []string{m.header(width), "  " + strings.TrimLeft(bar+"  "+strings.Join(fields, "  "), " ")}
 
 	var b strings.Builder
 	b.WriteString(strings.Repeat("\033[1A\033[2K", m.drawn))
@@ -258,13 +259,24 @@ func (m *Meter) render() {
 	m.drawn = len(lines)
 }
 
-func (m *Meter) header() string {
+func (m *Meter) header(width int) string {
 	label := strings.TrimSpace(m.verb + " " + clip(m.name, 60))
+	item := ""
+	if m.item != "" && !strings.HasSuffix(label, m.item) {
+		item = clip(m.item, 40)
+	}
+	if width > 0 {
+		room := max(width-2, 1)
+		if item != "" && lipgloss.Width(label)+2+lipgloss.Width(item) > room {
+			item = ""
+		}
+		label = clip(label, room)
+	}
 	head := infoStyle.Render("↻ " + label)
-	if m.item == "" || strings.HasSuffix(label, m.item) {
+	if item == "" {
 		return head
 	}
-	return head + "  " + meterMutedStyle.Render(clip(m.item, 40))
+	return head + "  " + meterMutedStyle.Render(item)
 }
 
 func (m *Meter) percent() int {

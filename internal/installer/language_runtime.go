@@ -442,7 +442,6 @@ func (l *LanguageRuntimeInstaller) installPython(p platform.Platform, gh *github
 	}
 
 	if len(frozen) > 0 {
-		// Drop "pkg @ file://..." entries; the source path may not exist post-recreate.
 		var keep []string
 		for _, line := range strings.Split(string(frozen), "\n") {
 			trimmed := strings.TrimSpace(line)
@@ -598,7 +597,6 @@ func (l *LanguageRuntimeInstaller) installNode(p platform.Platform, gh *github.C
 				if name == "npm" || name == "corepack" {
 					continue
 				}
-				// Preserve pinned versions so upgrade-via-cps doesn't silently bump pinned tooling.
 				if info.Version != "" {
 					pkgs = append(pkgs, name+"@"+info.Version)
 				} else {
