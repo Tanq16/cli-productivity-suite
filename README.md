@@ -87,12 +87,12 @@ cps package install nuclei            # one package
 | `runtime` | Go, Node, Python, Java and Rust, each as a suite, with bun and the gopls, pyright, typescript-language-server and ruff language servers |
 | `ai` | claude-code, codex, antigravity, cursor-agent |
 | `binaries` | nuclei, nuclei-templates, naabu, subfinder, proxify, httpx, dnsx, katana, trufflehog, ffuf, gobuster, gau, gowitness, kubelogin, grpcurl, terraform, kubectl, trivy |
-| `homelab` | caddy, senkaimon, linksnapper, kairo, raikiri, expenseowl, backhub, local-content-share, whiteboard, goff, yt-dlp, telly, toon, and the rinnegan, code-server and neo4j app bundles |
+| `homelab` | caddy, senkaimon, linksnapper, kairo, raikiri, expenseowl, backhub, local-content-share, whiteboard, inoichi, goff, yt-dlp, telly, toon, and the rinnegan, code-server and neo4j app bundles |
 | `private` | anbu, box, gcli, nits, sharingan, claudex, cybernest |
 
 A package that needs another is installed after it, and a missing dependency is pulled in rather than failing at the package manager: `cps package install claude-code` installs Node first. The five runtime suites are `go-suite`, `js-suite`, `python-suite`, `java-suite` and `rust-suite`, and each is installable on its own.
 
-`telly`, `toon` and `cybernest` live in private repos and need `--gh-token`. Without one they are skipped with a warning and the rest of the group still installs.
+`inoichi`, `telly`, `toon` and `cybernest` live in private repos and need `--gh-token`. Without one they are skipped with a warning and the rest of the group still installs.
 
 ### `cps status`
 
