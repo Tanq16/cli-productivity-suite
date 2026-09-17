@@ -128,7 +128,7 @@ done
 
 # --- homelab ---
 for t in caddy senkaimon linksnapper kairo raikiri expenseowl backhub \
-         local-content-share whiteboard goff yt-dlp telly toon; do
+         local-content-share whiteboard inoichi goff yt-dlp telly toon; do
     check_bin "$t" "homelab"
 done
 # app bundles are not on PATH, so check the launcher inside the bundle
