@@ -92,7 +92,7 @@ cps package install nuclei            # one package
 
 A package that needs another is installed after it, and a missing dependency is pulled in rather than failing at the package manager: `cps package install claude-code` installs Node first. The five runtime suites are `go-suite`, `js-suite`, `python-suite`, `java-suite` and `rust-suite`, and each is installable on its own.
 
-`inoichi`, `telly`, `toon` and `cybernest` live in private repos and need `--gh-token`. Without one they are skipped with a warning and the rest of the group still installs.
+`telly`, `toon` and `cybernest` live in private repos and need `--gh-token`. Without one they are skipped with a warning and the rest of the group still installs.
 
 ### `cps status`
 
