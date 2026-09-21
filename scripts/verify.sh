@@ -153,7 +153,7 @@ grep -q '^auth: none$' "$HOME/.config/code-server/config.yaml" 2>/dev/null || \
     fail "homelab: code-server settings.json missing"
 
 # --- private ---
-for t in anbu box gcli nits sharingan claudex cybernest; do
+for t in anbu box gcli nits sharingan claudex cybernest aizen; do
     check_bin "$t" "private"
 done
 
