@@ -10,9 +10,9 @@
 # of ~/shell/uv-tool-executables/ on the PATH that cps builds for its subprocesses,
 # so a leftover copy keeps winning.
 #
-# uv tools also recorded the literal string "uv-managed" as their version through
-# v1.14.x, so `cps status --check` had nothing to compare against PyPI. Reinstalling
-# them writes the real version.
+# uv tools and npm packages also recorded the literal strings "uv-managed" and
+# "npm-managed" as their version through v1.14.x, so `cps status --check` had nothing
+# to compare against PyPI or the npm registry. Reinstalling them writes the real version.
 #
 # Run this once, after updating cps. Safe to re-run and safe on a machine that
 # never had yt-dlp.
@@ -28,7 +28,7 @@ command -v cps >/dev/null 2>&1 || { echo "cps is not on PATH; update it first" >
 command -v jq >/dev/null 2>&1 || { echo "jq is not on PATH; run \`cps shell\` first" >&2; exit 1; }
 
 status=$(cps status --json)
-untracked=$(printf '%s' "$status" | jq -r '.[] | select(.kind == "python-tool" and .version == "uv-managed") | .name')
+untracked=$(printf '%s' "$status" | jq -r '.[] | select(.version == "uv-managed" or .version == "npm-managed") | .name')
 
 if [ -z "$untracked" ] && [ ! -e "$OLD_BINARY" ]; then
     echo "nothing to migrate"
@@ -40,12 +40,12 @@ if [ -e "$OLD_BINARY" ]; then
     rm -f "$OLD_BINARY"
 fi
 
-installed=$(printf '%s' "$status" | jq -r '.[] | select(.kind == "python-tool" and .installed) | .name')
-for tool in $installed; do
-    echo "==> reinstalling $tool as a uv tool"
+managed=$(printf '%s' "$status" | jq -r '.[] | select((.kind == "python-tool" or .kind == "node-package") and .installed) | .name')
+for tool in $managed; do
+    echo "==> reinstalling $tool"
     cps package install "$tool"
 done
 
 echo ""
-echo "uv tools now record:"
-cps status --json | jq -r '.[] | select(.kind == "python-tool" and .installed) | "  \(.name) \(.version)"'
+echo "uv tools and npm packages now record:"
+cps status --json | jq -r '.[] | select((.kind == "python-tool" or .kind == "node-package") and .installed) | "  \(.name) \(.version)"'

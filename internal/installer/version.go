@@ -27,6 +27,8 @@ func LatestVersion(tool *registry.Tool, p platform.Platform, gh *github.Client) 
 		return runtimeLatest(tool.Name, p, gh)
 	case registry.PythonTool:
 		return pypiLatest(tool.PyTool)
+	case registry.NodePackage:
+		return npmLatest(primaryNodePkg(tool.NodePkg))
 	default:
 		return "", ErrNotCheckable
 	}
@@ -53,6 +55,27 @@ func pypiLatest(pkg string) (string, error) {
 		return "", fmt.Errorf("no version in the PyPI response for %s", pkg)
 	}
 	return project.Info.Version, nil
+}
+
+func npmLatest(pkg string) (string, error) {
+	resp, err := httpGet("https://registry.npmjs.org/" + pkg + "/latest")
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("npm registry returned HTTP %d for %s", resp.StatusCode, pkg)
+	}
+	var release struct {
+		Version string `json:"version"`
+	}
+	if err := json.UnmarshalRead(resp.Body, &release); err != nil {
+		return "", err
+	}
+	if release.Version == "" {
+		return "", fmt.Errorf("no version in the npm registry response for %s", pkg)
+	}
+	return release.Version, nil
 }
 
 func ghTag(gh *github.Client, repo string) (string, error) {
