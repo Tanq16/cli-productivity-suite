@@ -592,4 +592,13 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 			ArchiveFormat: "none",
 		},
 	},
+	{
+		Name: "aizen", BinaryName: "aizen", Kind: GitHubRelease, Group: GroupPrivate,
+		Repo: "Tanq16/aizen", Description: "Recording HTTPS proxy with JSONL output", IsPrivate: true,
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
 }
