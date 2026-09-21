@@ -475,17 +475,10 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 		},
 	},
 	{
-		Name: "yt-dlp", BinaryName: "yt-dlp", Kind: GitHubRelease, Group: GroupHomelab,
-		Repo: "yt-dlp/yt-dlp", Description: "Media downloader",
-		Asset: AssetPattern{
-			AssetNames: map[string]string{
-				"linux/amd64":  "yt-dlp_linux",
-				"linux/arm64":  "yt-dlp_linux_aarch64",
-				"darwin/amd64": "yt-dlp_macos",
-				"darwin/arm64": "yt-dlp_macos",
-			},
-			ArchiveFormat: "none",
-		},
+		Name: "yt-dlp", Kind: PythonTool, Group: GroupHomelab,
+		Description: "Media downloader",
+		Requires:    []string{"uv"},
+		PyTool:      "yt-dlp",
 	},
 	{
 		Name: "telly", BinaryName: "telly", Kind: GitHubRelease, Group: GroupHomelab,
