@@ -1,6 +1,7 @@
 package installer
 
 import (
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"strings"
@@ -25,6 +26,34 @@ func (n *NodePackageInstaller) Install(tool *registry.Tool, p platform.Platform,
 		return Result{Tool: tool.Name, Err: fmt.Errorf("npm install %s failed: %w", tool.NodePkg, err)}
 	}
 
-	st.SetToolVersion(tool.Name, "npm-managed")
-	return Result{Tool: tool.Name, Version: "npm-managed"}
+	version := installedNodeVersion(p.CustomScriptEnv(), primaryNodePkg(tool.NodePkg))
+	st.SetToolVersion(tool.Name, version)
+	return Result{Tool: tool.Name, Version: version}
+}
+
+func primaryNodePkg(spec string) string {
+	name, _, _ := strings.Cut(spec, " ")
+	if base, _, found := strings.CutLast(name, "@"); found && base != "" {
+		return base
+	}
+	return name
+}
+
+func installedNodeVersion(env []string, pkg string) string {
+	out, err := envCommand(env, "npm", "ls", "-g", pkg, "--json", "--depth=0").Output()
+	if err != nil {
+		return "npm-managed"
+	}
+	var listed struct {
+		Dependencies map[string]struct {
+			Version string `json:"version"`
+		} `json:"dependencies"`
+	}
+	if err := json.Unmarshal(out, &listed); err != nil {
+		return "npm-managed"
+	}
+	if dep, ok := listed.Dependencies[pkg]; ok && dep.Version != "" {
+		return dep.Version
+	}
+	return "npm-managed"
 }
