@@ -105,7 +105,7 @@ cps status --json         # the same data, for a script
 > [!WARNING]
 > `cps status --check` makes one GitHub API call per binary package. Without a token this exhausts the 60-per-hour unauthenticated limit in a single run.
 
-Packages whose version is owned by a package manager report it as such: `brew-managed`, `npm-managed`, `uv-managed`, `custom-managed` or `deployed`. Re-running their install is the update path.
+Packages whose version is owned by a package manager report it as such: `brew-managed`, `npm-managed`, `custom-managed` or `deployed`. Re-running their install is the update path. uv tools are the exception and carry their real version, checked against PyPI.
 
 ### `cps system <verb>`
 
@@ -147,4 +147,4 @@ Downloads the latest release and replaces the running binary in place, at whatev
 - **Snapshot directories are replaced wholesale.** The zsh plugins and `nuclei-templates` are downloaded as tarballs of the default branch with no `.git` at all, and an update swaps the whole directory. Keep nothing of your own in `~/shell/plugins/` or `~/shell/nuclei-templates`; custom nuclei templates belong in a directory of your own that you pass with `-t`.
 - **Sudo is confined to two commands.** `cps prereq` and `cps system` use it because installing system packages needs it. Nothing in `cps shell` or `cps package` escalates.
 - **Removal is a script, not a command.** `./scripts/deep-removal.sh` wipes the `cps` binary, the whole `~/shell/` tree, the CPS-deployed configs, and the brew packages CPS installed. Homebrew itself, `~/.zsh_history`, the macOS desktop casks and `~/.config/neo4j/` are left alone.
-- **Coming from v1.14 needs one script run.** `./scripts/migrate-from-v1.14.sh` moves `yt-dlp` off its GitHub release binary and onto a uv tool install, deleting the copy in `~/shell/extensions/` that would otherwise keep shadowing the new one. It is a no-op on a machine that never had `yt-dlp`.
+- **Coming from v1.14 needs one script run.** `./scripts/migrate-from-v1.14.sh` moves `yt-dlp` off its GitHub release binary and onto a uv tool install, deleting the copy in `~/shell/extensions/` that would otherwise keep shadowing the new one. It also reinstalls every uv tool, because v1.14 recorded them as `uv-managed` with no version for `--check` to compare.

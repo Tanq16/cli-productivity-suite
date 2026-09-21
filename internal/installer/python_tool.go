@@ -3,6 +3,7 @@ package installer
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/tanq16/cli-productivity-suite/internal/github"
 	"github.com/tanq16/cli-productivity-suite/internal/platform"
@@ -18,11 +19,27 @@ func (t *PythonToolInstaller) Install(tool *registry.Tool, p platform.Platform, 
 		return Result{Tool: tool.Name, Err: errors.New("no uv tool defined")}
 	}
 
-	cmd := envCommand(p.CustomScriptEnv(), "uv", "tool", "install", "--force", tool.PyTool)
+	env := p.CustomScriptEnv()
+	cmd := envCommand(env, "uv", "tool", "install", "--force", tool.PyTool)
 	if err := utils.RunCmd(cmd); err != nil {
 		return Result{Tool: tool.Name, Err: fmt.Errorf("uv tool install %s failed: %w", tool.PyTool, err)}
 	}
 
-	st.SetToolVersion(tool.Name, "uv-managed")
-	return Result{Tool: tool.Name, Version: "uv-managed"}
+	version := installedPyToolVersion(env, tool.PyTool)
+	st.SetToolVersion(tool.Name, version)
+	return Result{Tool: tool.Name, Version: version}
+}
+
+func installedPyToolVersion(env []string, pkg string) string {
+	out, err := envCommand(env, "uv", "tool", "list").Output()
+	if err != nil {
+		return "uv-managed"
+	}
+	for line := range strings.SplitSeq(string(out), "\n") {
+		name, version, found := strings.Cut(strings.TrimSpace(line), " v")
+		if found && name == pkg {
+			return version
+		}
+	}
+	return "uv-managed"
 }
