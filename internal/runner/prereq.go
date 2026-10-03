@@ -83,10 +83,22 @@ func installBrew() {
 		return
 	}
 	utils.PrintInfo("Homebrew")
+	primeSudo()
 	cmd := exec.Command("/bin/bash", "-c", brewInstallScript)
 	cmd.Env = append(os.Environ(), "NONINTERACTIVE=1")
 	if err := streamCmd(cmd); err != nil {
 		utils.PrintFatal("Homebrew install failed", err)
+	}
+}
+
+// The Homebrew installer passes -n to sudo under NONINTERACTIVE, so it can only use a sudo timestamp that is already live.
+func primeSudo() {
+	if exec.Command("sudo", "-n", "-v").Run() == nil {
+		return
+	}
+	utils.PrintInfo("caching sudo credentials for the Homebrew installer")
+	if err := streamCmd(exec.Command("sudo", "-v")); err != nil {
+		utils.PrintWarn("could not cache sudo credentials; the Homebrew installer will fail if it needs root for its prefix", err)
 	}
 }
 
