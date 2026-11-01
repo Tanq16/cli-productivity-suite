@@ -18,6 +18,7 @@ echo "    ~/.local/kitty.app on Linux, ~/.cache/uv)"
 echo "  - Legacy pre-v1.3 paths (~/.nvm, ~/google-cloud-sdk, ~/nuclei-templates)"
 echo "  - Legacy runtime caches (~/.local/share/uv, ~/.bun, ~/.npm, go-build cache)"
 echo "  - CPS-deployed configs (.zshrc, .tmux.conf, .aerospace.toml, kitty configs, starship.toml)"
+echo "  - The CPS loader lines in ~/.zprofile (the rest of the file is kept)"
 echo "  - Brew packages installed by CPS (nmap, openssl, ffmpeg, imagemagick,"
 echo "    aws-cli, azure-cli, gcloud-cli cask, plus legacy brew neovim)"
 echo ""
@@ -78,7 +79,24 @@ rm -rf "$HOME/Library/Caches/go-build"  # macOS: go build cache, before GOCACHE
 echo "==> removing CPS-deployed configs"
 rm -f "$HOME/.tmux.conf"
 rm -f "$HOME/.zshrc"
-rm -f "$HOME/.zprofile"
+# .zprofile is shared with other installers, so strip only the CPS loader lines.
+# grep exits 1 when nothing is left and 2 on a real error; only the first two are safe.
+# Writing back with cat keeps a symlinked .zprofile a symlink and keeps its mode.
+if [ -f "$HOME/.zprofile" ]; then
+    tmp=$(mktemp)
+    grep -vF -e "# CPS managed - gives login shells" -e "shell/rc/cps-env.zsh" "$HOME/.zprofile" > "$tmp"
+    rc=$?
+    if [ "$rc" -le 1 ]; then
+        if grep -q '[^[:space:]]' "$tmp"; then
+            cat "$tmp" > "$HOME/.zprofile"
+        else
+            rm -f "$HOME/.zprofile"
+        fi
+    else
+        echo "warning: could not read ~/.zprofile, left it untouched"
+    fi
+    rm -f "$tmp"
+fi
 rm -f "$HOME/.aerospace.toml"
 rm -f "$HOME/.config/kitty/kitty.conf"
 rm -f "$HOME/.config/kitty/current-theme.conf"

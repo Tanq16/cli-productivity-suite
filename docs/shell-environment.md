@@ -11,7 +11,7 @@ Everything CPS owns lives here, so removing it removes CPS.
 | `extensions/` | Every single-binary tool, on PATH |
 | `custom-bin/` | Your own binaries, on PATH ahead of `extensions/` so yours wins a name collision |
 | `apps/` | Multi-file app bundles, not on PATH |
-| `rc/` | The generated `cps.zsh`, which is the whole CPS zsh config |
+| `rc/` | The generated `cps.zsh`, which is the whole CPS zsh config, and `cps-env.zsh`, its PATH and environment half |
 | `rc/custom/` | Your own zsh files, sourced after `cps.zsh` so they can override it |
 | `env/` | Generated environment, currently `brew shellenv` output |
 | `completions/` | Generated zsh completions for fzf, uv, fnm, zoxide and starship |
@@ -23,11 +23,12 @@ Language runtimes install here too, rather than into system locations: `go-sdk/`
 
 ## The config files
 
-`cps shell` deploys these outside `~/shell/`, overwriting whatever is at each path:
+`cps shell` deploys these outside `~/shell/`, overwriting whatever is at each path except `~/.zprofile`, which installers such as Homebrew's also write to:
 
 | File | Purpose |
 |---|---|
 | `~/.zshrc` | Thin loader, nothing else |
+| `~/.zprofile` | Gets a two-line loader appended that sources `cps-env.zsh`; the rest of the file is left alone |
 | `~/.tmux.conf` | The whole tmux configuration |
 | `~/.config/nvim/init.lua` | The whole Neovim configuration |
 | `~/.config/kitty/kitty.conf` | Kitty settings |
@@ -36,20 +37,21 @@ Language runtimes install here too, rather than into system locations: `go-sdk/`
 | `~/.config/starship.toml` | The starship prompt |
 | `~/.aerospace.toml` | Aerospace window manager, macOS only |
 
-## One generated file, not a monolithic `.zshrc`
+## Generated files, not a monolithic `.zshrc`
 
 `~/.zshrc` is a loader and nothing more. It sources `~/shell/rc/cps.zsh`, then every `.zsh` file in `~/shell/rc/custom/`.
 
-`cps.zsh` is generated whole on every `cps shell` and every `cps package install`. CPS owns it, so an edit to it is lost on the next run and your own zsh belongs in `~/shell/rc/custom/`. Generation reads the installed set out of `state.json` and appends each snippet whose condition holds, in a fixed order:
+zsh reads `~/.zshrc` only in interactive shells, so PATH and the environment live in a second generated file, `~/shell/rc/cps-env.zsh`, which `~/.zprofile` sources. Login shells that are not interactive, the kind editors, agent harnesses and `zsh -l -c` one-shots start, then find the same binaries a terminal does. `cps.zsh` sources `cps-env.zsh` first as well, because interactive non-login shells such as Linux terminals and tmux panes never read `~/.zprofile`. `typeset -U path` makes sourcing it twice harmless, and the second pass puts the CPS paths back in front after macOS `path_helper` has reordered them. Completions, `fnm env`, the prompt and everything else interactive stay in `cps.zsh`.
+
+`cps.zsh` is generated whole on every `cps shell` and every `cps package install`. CPS owns it, so an edit to it is lost on the next run and your own zsh belongs in `~/shell/rc/custom/`. Generation reads the installed set out of `state.json` and appends each snippet whose condition holds, in a fixed order. `NUCLEI_TEMPLATES_DIR` and `NEO4J_CONF` go to `cps-env.zsh` when `nuclei-templates` or `neo4j` is installed:
 
 | Snippet | Present when | Sets |
 |---|---|---|
-| base | always | Homebrew, plugins, history, completion, keybindings, PATH, aliases, fzf, zoxide |
+| env | always, written to `cps-env.zsh` | Homebrew, PATH, and each installed runtime's exports and PATH entries |
+| base | always | plugins, history, completion, keybindings, aliases, fzf, zoxide |
 | `alias a=anbu` | `anbu` is installed | the `a` alias |
-| runtimes | any runtime is installed | `GOROOT`, `GOPATH`, `JAVA_HOME`, `CARGO_HOME`, `FNM_DIR`, `BUN_INSTALL`, `VIRTUAL_ENV`, the `UV_*` paths, and `fnm env` |
+| runtimes | any runtime is installed | uv and fnm completions, and `fnm env`; their `GOROOT`, `GOPATH`, `JAVA_HOME`, `CARGO_HOME`, `FNM_DIR`, `BUN_INSTALL`, `VIRTUAL_ENV` and `UV_*` exports go to `cps-env.zsh` |
 | cloud | `aws-cli` or `gcloud-cli` is installed | gcloud path, lazily loaded aws and gcloud completions |
-| security | `nuclei-templates` is installed | `NUCLEI_TEMPLATES_DIR` |
-| homelab | `neo4j` is installed | `NEO4J_CONF` |
 | syntax highlighting | always | sources the zsh-syntax-highlighting plugin |
 
 Syntax highlighting is last because upstream requires it, and generating the file is what makes that ordering reliable.

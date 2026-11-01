@@ -27,6 +27,12 @@ var macosAerospaceConf []byte
 //go:embed rc-loader
 var rcLoader []byte
 
+//go:embed rc-profile-loader
+var rcProfileLoader []byte
+
+//go:embed rc-env.zsh
+var rcEnv []byte
+
 //go:embed rc-base.zsh
 var rcBase []byte
 
@@ -56,6 +62,8 @@ func LinuxKittyConf() []byte     { return linuxKittyConf }
 func MacosKittyConf() []byte     { return macosKittyConf }
 func MacosAerospaceConf() []byte { return macosAerospaceConf }
 func RcLoader() []byte           { return rcLoader }
+func RcProfileLoader() []byte    { return rcProfileLoader }
+func RcEnv() []byte              { return rcEnv }
 func RcBase() []byte             { return rcBase }
 func RcCloud() []byte            { return rcCloud }
 func StarshipToml() []byte       { return starshipToml }

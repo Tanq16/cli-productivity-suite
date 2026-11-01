@@ -8,9 +8,9 @@
 # Usage:
 #   zsh -ic 'bash scripts/verify.sh'
 #
-# The zsh -i wrapper is required: the rc loader is deployed into ~/.zshrc, which
-# only an interactive shell reads, and it is what exports the env vars and PATH
-# segments this script checks.
+# The zsh -i wrapper is required: the aliases and completions this script relies
+# on load from ~/.zshrc, which only an interactive shell reads. PATH and the env
+# vars also load from ~/.zprofile, checked separately below with zsh -l -c.
 #
 # It assumes every group is installed. Skip a group's section by hand when
 # checking a partial install.
@@ -43,7 +43,7 @@ for f in \
     .config/lsd/colors.yaml .config/lsd/config.yaml \
     .config/nvim/init.lua \
     shell/apps/neovim/bin/nvim \
-    shell/rc/cps.zsh \
+    shell/rc/cps.zsh shell/rc/cps-env.zsh \
     shell/env/brew.zsh \
     shell/completions/fzf.zsh shell/completions/uv.zsh \
     shell/completions/fnm.zsh shell/completions/zoxide.zsh \
@@ -54,6 +54,11 @@ done
 for stale in 00-base.zsh 10-runtimes.zsh 20-cloud.zsh 30-security.zsh 40-misc.zsh 50-homelab.zsh; do
     [ -f "$HOME/shell/rc/$stale" ] && fail "stale rc fragment: ~/shell/rc/$stale"
 done
+
+# Non-interactive login shells (editors, agent harnesses) must see the CPS PATH via ~/.zprofile
+grep -qF 'shell/rc/cps-env.zsh' "$HOME/.zprofile" 2>/dev/null || fail "~/.zprofile does not source cps-env.zsh"
+env -i HOME="$HOME" USER="${USER:-$(id -un)}" PATH=/usr/bin:/bin:/usr/sbin:/sbin \
+    zsh -l -c 'command -v nvim' >/dev/null 2>&1 || fail "zsh -l -c cannot find nvim (cps-env.zsh not loading)"
 
 # brew.zsh must be non-empty - guards against the cold-shellenv early-return bug.
 [ -s "$HOME/shell/env/brew.zsh" ] || fail "~/shell/env/brew.zsh is empty (cold brew shellenv)"

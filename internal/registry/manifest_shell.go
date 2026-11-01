@@ -207,7 +207,7 @@ var shellTools = []Tool{
 	},
 	{
 		Name: "rcfile", Kind: ConfigFile, Group: GroupShell,
-		Description: "Zsh RC file (complete .zshrc)",
+		Description: "Zsh loaders (.zshrc, plus .zprofile for login shells)",
 	},
 	{
 		Name: "nvim-config", Kind: ConfigFile, Group: GroupShell,

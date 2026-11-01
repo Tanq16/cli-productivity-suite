@@ -1,7 +1,3 @@
-# --- Homebrew ---
-export HOMEBREW_NO_AUTO_UPDATE=1
-[ -f "$HOME/shell/env/brew.zsh" ] && source "$HOME/shell/env/brew.zsh"
-
 # --- Zsh plugins (sourced directly, no framework) ---
 ZSH_PLUGINS="$HOME/shell/plugins"
 [ -f "$ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh" ] && source "$ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh"
@@ -47,10 +43,6 @@ bindkey '^X^E' edit-command-line
 # Frees Ctrl+S - terminal driver swallows it as XOFF without both of these
 setopt NO_FLOW_CONTROL
 stty -ixon
-
-# --- PATH ---
-# custom-bin first so user-dropped binaries win over CPS-managed ones on name collision
-export PATH="$HOME/shell/custom-bin:$HOME/shell/extensions:$HOME/.local/bin:$PATH"
 
 # --- Starship prompt ---
 [ -f "$HOME/shell/completions/starship.zsh" ] && source "$HOME/shell/completions/starship.zsh"

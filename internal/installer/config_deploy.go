@@ -1,6 +1,7 @@
 package installer
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -94,6 +95,12 @@ func (c *ConfigDeployInstaller) Install(tool *registry.Tool, p platform.Platform
 		return Result{Tool: tool.Name, Err: err}
 	}
 
+	if tool.Name == "rcfile" {
+		if err := ensureProfileLoader(filepath.Join(p.HomeDir, ".zprofile")); err != nil {
+			return Result{Tool: tool.Name, Err: fmt.Errorf("update .zprofile: %w", err)}
+		}
+	}
+
 	if tool.Name == "lsd-colors" {
 		cfgPath := filepath.Join(filepath.Dir(destPath), "config.yaml")
 		if err := os.WriteFile(cfgPath, configs.LsdConfig(), 0644); err != nil {
@@ -103,4 +110,28 @@ func (c *ConfigDeployInstaller) Install(tool *registry.Tool, p platform.Platform
 
 	st.SetToolVersion(tool.Name, "deployed")
 	return Result{Tool: tool.Name, Version: "deployed"}
+}
+
+// profileMarker is the part of the loader that stays recognisable through line-ending
+// changes and comment edits
+const profileMarker = "shell/rc/cps-env.zsh"
+
+// ensureProfileLoader appends the CPS loader to ~/.zprofile instead of owning the file,
+// because installers such as Homebrew's write their own lines there
+func ensureProfileLoader(path string) error {
+	loader := configs.RcProfileLoader()
+	existing, err := os.ReadFile(path)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	if bytes.Contains(existing, []byte(profileMarker)) {
+		return nil
+	}
+	if len(existing) > 0 && !bytes.HasSuffix(existing, []byte("\n")) {
+		existing = append(existing, '\n')
+	}
+	if len(existing) > 0 && !bytes.HasSuffix(existing, []byte("\n\n")) {
+		existing = append(existing, '\n')
+	}
+	return os.WriteFile(path, append(existing, loader...), 0644)
 }

@@ -1,0 +1,2 @@
+# CPS managed - gives login shells, including non-interactive ones, the CPS PATH and env
+[ -f "$HOME/shell/rc/cps-env.zsh" ] && source "$HOME/shell/rc/cps-env.zsh"

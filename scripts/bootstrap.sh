@@ -16,14 +16,8 @@ set -euo pipefail
 cps prereq
 cps shell
 
-cat > ~/.zprofile <<'EOF'
-[[ -o interactive ]] && return
-source "$HOME/shell/rc/cps.zsh"
-for f in "$HOME/shell/rc/custom/"*.zsh(N); do source "$f"; done
-EOF
-
-# Each install runs in a login shell so it inherits the runtime env vars the
-# generated rc file exports.
+# Each install runs in a login shell, whose ~/.zprofile (set up by cps shell)
+# sources the runtime env vars and PATH from cps-env.zsh.
 run() { zsh -l -c "$1"; }
 
 run 'cps package install brew'
