@@ -493,10 +493,18 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 		Name: "toon", BinaryName: "toon", Kind: GitHubRelease, Group: GroupHomelab,
 		Repo: "Tanq16/toon", Description: "Private Toon tool", IsPrivate: true,
 		Asset: AssetPattern{
-			OSPatterns:          map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:        map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat:       "zip",
-			BinaryPathInArchive: "toon-*",
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
+		},
+	},
+	{
+		Name: "anbu", BinaryName: "anbu", Kind: GitHubRelease, Group: GroupHomelab,
+		Repo: "Tanq16/anbu", Description: "Anbu tool",
+		Asset: AssetPattern{
+			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
+			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
+			ArchiveFormat: "none",
 		},
 	},
 	{
@@ -530,15 +538,6 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 	},
 
 	{
-		Name: "anbu", BinaryName: "anbu", Kind: GitHubRelease, Group: GroupPrivate,
-		Repo: "Tanq16/anbu", Description: "Anbu tool",
-		Asset: AssetPattern{
-			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat: "none",
-		},
-	},
-	{
 		Name: "box", BinaryName: "box", Kind: GitHubRelease, Group: GroupPrivate,
 		Repo: "Tanq16/box-cli", Description: "Box CLI tool",
 		Asset: AssetPattern{
@@ -559,15 +558,6 @@ ln -sf "$APP_DIR/cursor-agent" "$DEST_DIR/cursor-agent"
 	{
 		Name: "nits", BinaryName: "nits", Kind: GitHubRelease, Group: GroupPrivate,
 		Repo: "Tanq16/nits", Description: "Nits tool",
-		Asset: AssetPattern{
-			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
-			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},
-			ArchiveFormat: "none",
-		},
-	},
-	{
-		Name: "sharingan", BinaryName: "sharingan", Kind: GitHubRelease, Group: GroupPrivate,
-		Repo: "Tanq16/sharingan", Description: "EC2 workstation manager",
 		Asset: AssetPattern{
 			OSPatterns:    map[string]string{"linux": "linux", "darwin": "darwin"},
 			ArchPatterns:  map[string]string{"amd64": "amd64", "arm64": "arm64"},

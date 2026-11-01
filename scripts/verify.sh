@@ -128,7 +128,7 @@ done
 
 # --- homelab ---
 for t in caddy senkaimon linksnapper kairo raikiri expenseowl backhub \
-         local-content-share whiteboard inoichi goff yt-dlp telly toon; do
+         local-content-share whiteboard inoichi goff yt-dlp telly toon anbu; do
     check_bin "$t" "homelab"
 done
 # app bundles are not on PATH, so check the launcher inside the bundle
@@ -153,7 +153,7 @@ grep -q '^auth: none$' "$HOME/.config/code-server/config.yaml" 2>/dev/null || \
     fail "homelab: code-server settings.json missing"
 
 # --- private ---
-for t in anbu box gcli nits sharingan claudex cybernest aizen; do
+for t in box gcli nits claudex cybernest aizen; do
     check_bin "$t" "private"
 done
 
